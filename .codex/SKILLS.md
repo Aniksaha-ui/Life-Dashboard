@@ -1,5 +1,4 @@
 ---
-
 name: kampanel-module-structure
 description: Use when creating or refactoring any feature module in this repository. Follow the merchant-tickets module as the canonical structure, preserve existing UI design, and separate orchestration, table columns, filters, hooks, API queries, types, mappers, and print utilities into the correct files.
 ---

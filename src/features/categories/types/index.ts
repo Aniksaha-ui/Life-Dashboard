@@ -4,6 +4,7 @@ export interface CategoryApiItem {
   slug?: string;
   type?: string;
   is_default?: boolean | number | string;
+  is_active?: boolean | number | string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -16,6 +17,7 @@ export interface CategoryRow {
   type: "EXPENSE" | "INCOME";
   typeLabel: string;
   isDefault: boolean;
+  statusLabel: "Active" | "Inactive" | "N/A";
   updatedAtLabel: string;
 }
 
