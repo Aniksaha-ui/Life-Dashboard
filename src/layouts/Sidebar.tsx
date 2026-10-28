@@ -21,6 +21,7 @@ import {
   Building,
   Brain,
   Handshake,
+  Tags,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -31,6 +32,7 @@ import { filterHiddenNavItems, isRouteHidden } from "../config/routeVisibility";
 const navItems = [
   { to: "/dashboard", icon: Home, label: "Home" },
   { to: "/account", icon: CreditCard, label: "Accounts" },
+  { to: "/categories", icon: Tags, label: "Categories" },
   {
     to: "/kam-intelligence",
     icon: Brain,

@@ -114,6 +114,7 @@ import AddLocalIssuerBankPage from "../features/manage-bank/AddLocalIssuerBankPa
 import { LocalIssuerBankDrawer } from "../features/manage-bank/LocalIssuerBankDrawer";
 import NotificationsPage from "../features/notifications/NotificationsPage";
 import { AccountsPage } from "../features/accounts";
+import { CategoriesPage } from "../features/categories";
 
 function SettlementDrawerWrapper() {
   const { batchId } = useParams();
@@ -172,6 +173,7 @@ const routes: RouteObject[] = [
             children: [{ path: "m/:merchantId", element: <MerchantDrawer /> }],
           },
           { path: "account", element: <AccountsPage /> },
+          { path: "categories", element: <CategoriesPage /> },
           {
             path: "kam-intelligence",
             element: <KamIntelligencePage />,
