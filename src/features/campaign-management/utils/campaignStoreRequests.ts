@@ -1,0 +1,36 @@
+import type { CampaignStoreRequestRow } from "../types";
+
+export const CAMPAIGN_STORE_REQUESTS_MOCK: CampaignStoreRequestRow[] = [
+  {
+    merchant: "Sandbox Live Test",
+    brand: "NEWDEMOTEST",
+    storeId: "newdemotestlive",
+    kam: "susanta.kam",
+    category: "Corporate | Furniture",
+    url: "demo.sslwireless.com",
+    disc: 10,
+    consumed: "yes",
+    shared: 0,
+    min: 10,
+    max: 10,
+    maxAmt: 10,
+    sectors: "Corporate, Furniture, Retail Outlet Services, Business Service",
+    remarks: "Approved by KAM",
+  },
+  {
+    merchant: "GPE Care Demo",
+    brand: "GPECARE",
+    storeId: "gpecarelive01",
+    kam: "kam.demo",
+    category: "Healthcare | Services",
+    url: "care.gpe.com.bd",
+    disc: 15,
+    consumed: "no",
+    shared: 1,
+    min: 50,
+    max: 500,
+    maxAmt: 1000,
+    sectors: "Healthcare, Diagnostics & Treatment, Tele-Medicine, Subscription",
+    remarks: "Pending review",
+  },
+];
