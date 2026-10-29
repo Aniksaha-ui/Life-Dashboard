@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { AlertCircle, CheckCircle2, Eye, EyeOff, Shield } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import logoSslCommerz from "../../assets/logo_ssl_commerz.svg";
+import infinityLogo from "../../assets/infinitycodehubltd.jpeg";
 import { useLoginMutation } from "./api/auth";
 import { CaptchaField } from "./components/CaptchaField";
 import { StripeGradient } from "./components/StripeGradient";
@@ -59,11 +59,13 @@ export default function LoginPage() {
       <StripeGradient />
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <img
-            src={logoSslCommerz}
-            alt="SSLCOMMERZ"
-            className="h-10 mx-auto mb-6"
-          />
+          <div className="mx-auto mb-6 h-12 w-44 overflow-hidden rounded-md bg-slate-950">
+            <img
+              src={infinityLogo}
+              alt="Infinity Code Hub"
+              className="h-full w-full object-contain"
+            />
+          </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">
             Login to continue
           </h1>

@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import logoSslCommerz from "../assets/logo_ssl_commerz.svg";
+import infinityLogo from "../assets/infinitycodehubltd.jpeg";
 import { Tooltip } from "../components/Tooltip";
 import { filterHiddenNavItems, isRouteHidden } from "../config/routeVisibility";
 
@@ -364,7 +364,13 @@ export function Sidebar({
         >
           {!isCollapsed ? (
             <>
-              <img src={logoSslCommerz} alt="SSLCOMMERZ" className="h-8" />
+              <div className="h-8 w-32 overflow-hidden rounded bg-slate-950">
+                <img
+                  src={infinityLogo}
+                  alt="Infinity Code Hub"
+                  className="h-full w-full object-contain"
+                />
+              </div>
               <button
                 onClick={onToggle}
                 className="hidden md:block p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"

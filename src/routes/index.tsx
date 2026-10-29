@@ -54,7 +54,7 @@ import {
   MerchantTicketsPage,
   TransactionTicketsPage,
 } from "../features/support";
-import { TransactionsPage } from "../features/transactions";
+import { ExpenseTransactionsPage } from "../features/expense-transactions";
 import RetailNewsPage from "../features/retail-news/RetailNewsPage";
 import AddRetailNewsPage from "../features/retail-news/AddRetailNewsPage";
 
@@ -334,7 +334,7 @@ const routes: RouteObject[] = [
           },
           {
             path: "transactions",
-            element: <TransactionsPage />,
+            element: <ExpenseTransactionsPage />,
           },
           {
             path: "transaction-tickets",
