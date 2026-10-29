@@ -58,6 +58,7 @@ const navItems = [
     ],
   },
   { to: "/transactions", icon: CreditCard, label: "Transactions" },
+  { to: "/transfers", icon: Shuffle, label: "Transfers" },
   {
     to: "/support",
     icon: MessageSquare,
