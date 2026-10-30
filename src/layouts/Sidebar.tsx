@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import {
   ChevronDown,
+  BarChart3,
   CreditCard,
   PanelLeftClose,
   PanelLeftOpen,
@@ -20,6 +21,7 @@ const navItems = [
   { to: "/transactions", icon: CreditCard, label: "Transactions" },
   { to: "/transfers", icon: Shuffle, label: "Transfers" },
   { to: "/recurring-expenses", icon: Repeat, label: "Recurring Expenses" },
+  { to: "/reports", icon: BarChart3, label: "Reports" },
 ];
 
 interface SidebarProps {
