@@ -24,7 +24,7 @@ const getToken = () => {
 
 export async function getReport(
   endpoint: string,
-  filters: { fromDate?: string; toDate?: string },
+  filters: { fromDate?: string; toDate?: string; granularity?: string },
 ) {
   const token = getToken();
   if (!baseUrl() || !token)
@@ -33,6 +33,7 @@ export async function getReport(
   const params = new URLSearchParams();
   if (filters.fromDate) params.set("from_date", filters.fromDate);
   if (filters.toDate) params.set("to_date", filters.toDate);
+  if (filters.granularity) params.set("granularity", filters.granularity);
   const path = params.size ? `${endpoint}?${params}` : endpoint;
   const response = await fetch(`${baseUrl()}${path}`, {
     headers: { Accept: "application/json", Authorization: `Bearer ${token}` },

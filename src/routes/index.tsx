@@ -10,7 +10,11 @@ import { CategoriesPage } from "../features/categories";
 import { ExpenseTransactionsPage } from "../features/expense-transactions";
 import { TransfersPage } from "../features/transfers";
 import { RecurringExpensesPage } from "../features/recurring-expenses";
-import { ReportDetailPage, ReportsPage } from "../features/reports";
+import {
+  FinancialOverviewPage,
+  ReportDetailPage,
+  ReportsPage,
+} from "../features/reports";
 import { AppLayout } from "../layouts/AppLayout";
 
 const routes: RouteObject[] = [
@@ -36,6 +40,10 @@ const routes: RouteObject[] = [
           { path: "transfers", element: <TransfersPage /> },
           { path: "recurring-expenses", element: <RecurringExpensesPage /> },
           { path: "reports", element: <ReportsPage /> },
+          {
+            path: "reports/financial-overview",
+            element: <FinancialOverviewPage />,
+          },
           { path: "reports/:reportId", element: <ReportDetailPage /> },
         ],
       },
