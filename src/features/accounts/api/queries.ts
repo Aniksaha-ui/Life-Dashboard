@@ -1,5 +1,9 @@
 import { getCookie } from "../../../utils/cookie";
 import { useAuthStore } from "../../../stores/authStore";
+import {
+  endUnauthenticatedSession,
+  isUnauthenticatedResponse,
+} from "../../../utils/session";
 import type { AccountApiItem, AccountFormValues } from "../types";
 
 const baseUrl = () =>
@@ -41,6 +45,10 @@ const accountRequest = async <T>(
     },
   });
   const payload = await response.json().catch(() => null);
+  if (isUnauthenticatedResponse(response, payload)) {
+    endUnauthenticatedSession();
+    throw new Error("Your session has expired. Please sign in again.");
+  }
   if (!response.ok)
     throw new Error(
       payload?.message || "Unable to complete the account request.",

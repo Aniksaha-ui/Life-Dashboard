@@ -1,7 +1,6 @@
 import { LogOut, Menu, Search } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { User } from "../features/auth/types";
 import { useAuthStore } from "../stores/authStore";
 
 interface HeaderProps {
@@ -30,18 +29,47 @@ export function Header({ onOpenMobileNav }: HeaderProps) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
   const { user, clearAuth } = useAuthStore();
-  const profileUser = user as
-    | (User & {
-        email?: string;
-        last_login?: string;
-        last_login_at?: string;
-      })
-    | null;
-  const displayName = profileUser?.profile_name || profileUser?.uname || "User";
-  const username = profileUser?.uname || "--";
+  const profileUser = user as {
+    name?: string;
+    full_name?: string;
+    first_name?: string;
+    last_name?: string;
+    username?: string;
+    uname?: string;
+    profile_name?: string;
+    email?: string;
+    role?: string | { name?: string; title?: string };
+    role_name?: string;
+    user_type?: string;
+    utype?: string;
+    last_login?: string;
+    last_login_at?: string;
+    created_on?: string;
+  } | null;
+  const fullName = [profileUser?.first_name, profileUser?.last_name]
+    .filter(Boolean)
+    .join(" ");
+  const displayName =
+    profileUser?.name ||
+    profileUser?.full_name ||
+    fullName ||
+    profileUser?.profile_name ||
+    profileUser?.username ||
+    profileUser?.uname ||
+    profileUser?.email?.split("@")[0] ||
+    "User";
+  const username =
+    profileUser?.username || profileUser?.uname || profileUser?.email || "--";
   const avatarLetter =
     profileUser?.uname?.trim().charAt(0).toUpperCase() || "U";
-  const roleName = profileUser?.role_name || "--";
+  const roleName =
+    (typeof profileUser?.role === "string"
+      ? profileUser.role
+      : profileUser?.role?.name || profileUser?.role?.title) ||
+    profileUser?.role_name ||
+    profileUser?.user_type ||
+    profileUser?.utype ||
+    "User";
   const email = profileUser?.email || "--";
   const previousLoginRaw =
     profileUser?.last_login_at ||
@@ -82,6 +110,14 @@ export function Header({ onOpenMobileNav }: HeaderProps) {
             <div className="w-8 h-8 rounded-full ring-2 ring-white shadow-sm bg-slate-700 text-white flex items-center justify-center text-xs font-semibold uppercase">
               {avatarLetter}
             </div>
+            <span className="hidden max-w-36 text-left sm:block">
+              <span className="block truncate text-sm font-semibold text-slate-800">
+                {displayName}
+              </span>
+              <span className="block truncate text-xs text-slate-500">
+                {roleName}
+              </span>
+            </span>
           </button>
 
           {/* Dropdown Menu */}

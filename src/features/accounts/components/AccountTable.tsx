@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { DataTable } from "../../../components/DataTable";
 import { EmptyState } from "../../../components/EmptyState";
-import { Skeleton } from "../../../components/Skeleton";
 import type { AccountRow } from "../types";
 import { getAccountColumns } from "./columns";
 import { MobileRecordDrawer } from "../../../components/MobileRecordDrawer";
@@ -19,15 +18,7 @@ export function AccountTable({
     null,
   );
   const columns = useMemo(() => getAccountColumns(onEdit), [onEdit]);
-  if (isLoading)
-    return (
-      <div className="space-y-3">
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-12 w-full" />
-      </div>
-    );
-  if (!rows.length)
+  if (!rows.length && !isLoading)
     return (
       <div className="rounded-xl border border-slate-200 bg-white">
         <EmptyState
@@ -41,6 +32,8 @@ export function AccountTable({
       <DataTable
         data={rows}
         columns={columns}
+        isLoading={isLoading}
+        loadingText="Loading accounts..."
         hideToolbarDateFilter
         hideViewColumn
         mobileCard

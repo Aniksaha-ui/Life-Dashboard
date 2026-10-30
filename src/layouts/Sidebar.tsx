@@ -215,7 +215,7 @@ export function Sidebar({
         >
           {!isCollapsed ? (
             <>
-              <div className="h-8 w-32 overflow-hidden rounded bg-slate-950">
+              <div className="h-8 w-32">
                 <img
                   src={infinityLogo}
                   alt="Infinity Code Hub"

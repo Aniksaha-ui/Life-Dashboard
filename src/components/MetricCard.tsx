@@ -4,6 +4,7 @@ import type { MetricCardProps } from "../types/common";
 export function MetricCard({
   title,
   value,
+  isLoading = false,
   onClick,
   className,
   valueClassName,
@@ -26,14 +27,18 @@ export function MetricCard({
       >
         {title}
       </p>
-      <p
-        className={clsx(
-          "text-2xl font-bold mt-2 text-slate-900",
-          valueClassName,
-        )}
-      >
-        {value}
-      </p>
+      {isLoading ? (
+        <div className="mt-2 h-7 w-24 animate-pulse rounded-md bg-slate-200" />
+      ) : (
+        <p
+          className={clsx(
+            "text-2xl font-bold mt-2 text-slate-900",
+            valueClassName,
+          )}
+        >
+          {value}
+        </p>
+      )}
     </div>
   );
 }

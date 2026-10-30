@@ -1,5 +1,9 @@
 import { getCookie } from "../../../utils/cookie";
 import { useAuthStore } from "../../../stores/authStore";
+import {
+  endUnauthenticatedSession,
+  isUnauthenticatedResponse,
+} from "../../../utils/session";
 
 const baseUrl = () =>
   (import.meta.env.VITE_BASE_URL as string | undefined)?.replace(/\/+$/, "") ??
@@ -31,6 +35,10 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
     },
   });
   const payload = await response.json().catch(() => null);
+  if (isUnauthenticatedResponse(response, payload)) {
+    endUnauthenticatedSession();
+    throw new Error("Your session has expired. Please sign in again.");
+  }
   const status = payload?.isExecute ?? payload?.isExecture;
   const successful =
     status === undefined ||

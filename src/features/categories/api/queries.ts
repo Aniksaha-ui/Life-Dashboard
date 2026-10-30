@@ -1,5 +1,9 @@
 import { getCookie } from "../../../utils/cookie";
 import { useAuthStore } from "../../../stores/authStore";
+import {
+  endUnauthenticatedSession,
+  isUnauthenticatedResponse,
+} from "../../../utils/session";
 import type { CategoryApiItem, CategoryFormValues } from "../types";
 
 const STORAGE_KEY = "travel-agency-admin-auth-session";
@@ -33,6 +37,10 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
     },
   });
   const payload = await response.json().catch(() => null);
+  if (isUnauthenticatedResponse(response, payload)) {
+    endUnauthenticatedSession();
+    throw new Error("Your session has expired. Please sign in again.");
+  }
   if (
     !response.ok ||
     payload?.isExecute === false ||

@@ -58,22 +58,26 @@ export default function CategoriesPage() {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           title="Total Categories"
-          value={isLoading ? "..." : metrics.total}
+          value={metrics.total}
+          isLoading={isLoading}
           className="border-blue-100"
         />
         <MetricCard
           title="Expense Categories"
-          value={isLoading ? "..." : metrics.expense}
+          value={metrics.expense}
+          isLoading={isLoading}
           className="border-amber-100"
         />
         <MetricCard
           title="Income Categories"
-          value={isLoading ? "..." : metrics.income}
+          value={metrics.income}
+          isLoading={isLoading}
           className="border-emerald-100"
         />
         <MetricCard
           title="Custom Categories"
-          value={isLoading ? "..." : metrics.custom}
+          value={metrics.custom}
+          isLoading={isLoading}
           className="border-cyan-100"
         />
       </div>

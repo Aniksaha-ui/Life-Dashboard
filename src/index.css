@@ -259,6 +259,24 @@
     justify-content: flex-start;
   }
 
+  .mobile-card-table .data-table-loading-row {
+    display: block;
+    padding: 0;
+  }
+
+  .mobile-card-table .data-table-loading-cell {
+    display: flex !important;
+    min-height: 10rem;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem !important;
+    border: 0 !important;
+  }
+
+  .mobile-card-table .data-table-loading-cell::before {
+    display: none;
+  }
+
   /* Compact app-style summary cards for management lists. Tapping a card
      opens its page-specific drawer with the full record details. */
   .compact-mobile-table.mobile-card-table tr {

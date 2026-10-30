@@ -71,22 +71,26 @@ export default function AccountsPage() {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           title="Total Accounts"
-          value={isLoading ? "..." : metrics.total}
+          value={metrics.total}
+          isLoading={isLoading}
           className="border-blue-100"
         />
         <MetricCard
           title="Active Accounts"
-          value={isLoading ? "..." : metrics.active}
+          value={metrics.active}
+          isLoading={isLoading}
           className="border-cyan-100"
         />
         <MetricCard
           title="Cash Accounts"
-          value={isLoading ? "..." : metrics.cash}
+          value={metrics.cash}
+          isLoading={isLoading}
           className="border-emerald-100"
         />
         <MetricCard
           title="Tracked Balance"
-          value={isLoading ? "..." : `BDT ${balance.format(metrics.balance)}`}
+          value={`BDT ${balance.format(metrics.balance)}`}
+          isLoading={isLoading}
           className="border-amber-100"
         />
       </div>

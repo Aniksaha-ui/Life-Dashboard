@@ -135,6 +135,8 @@ export default function TransfersPage() {
       <DataTable
         data={state.rows}
         columns={columns}
+        isLoading={state.loading}
+        loadingText="Loading transfers..."
         hideToolbarDateFilter
         hideViewColumn
         className="compact-mobile-table border-slate-200"

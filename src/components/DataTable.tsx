@@ -23,6 +23,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { clsx } from "clsx";
+import { Loader } from "./Loader";
 
 // ----------------------------------------------------------------------
 // DataTable Component
@@ -40,6 +41,8 @@ interface DataTableProps<TData, TValue> {
   filterExtension?: React.ReactNode;
   hideViewColumn?: boolean;
   hidePagination?: boolean;
+  isLoading?: boolean;
+  loadingText?: string;
   noScrollX?: boolean;
   allowHeaderWrap?: boolean;
   /** Renders each row as a labelled card below the phone breakpoint. */
@@ -72,6 +75,8 @@ export function DataTable<TData, TValue>({
   filterExtension,
   hideViewColumn = false,
   hidePagination = false,
+  isLoading = false,
+  loadingText = "Loading records...",
   noScrollX = false,
   allowHeaderWrap = false,
   mobileCard = true,
@@ -415,7 +420,19 @@ export function DataTable<TData, TValue>({
             ))}
           </thead>
           <tbody className={clsx("divide-y", rowBorderColor)}>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              <tr className="data-table-loading-row">
+                <td
+                  colSpan={columns.length}
+                  className="data-table-loading-cell h-36 text-center text-slate-500"
+                >
+                  <div className="flex flex-col items-center justify-center gap-3">
+                    <Loader size="sm" />
+                    <span className="text-sm font-medium">{loadingText}</span>
+                  </div>
+                </td>
+              </tr>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}

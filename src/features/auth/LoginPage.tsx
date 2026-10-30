@@ -59,7 +59,7 @@ export default function LoginPage() {
       <StripeGradient />
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="mx-auto mb-6 h-12 w-44 overflow-hidden rounded-md bg-slate-950">
+          <div className="mx-auto mb-6 h-12 w-48">
             <img
               src={infinityLogo}
               alt="Infinity Code Hub"

@@ -9,6 +9,7 @@ export interface ApiResponse<T = any> {
 export interface MetricCardProps {
   title: string;
   value: string | number;
+  isLoading?: boolean;
   onClick?: () => void;
   className?: string;
   valueClassName?: string;

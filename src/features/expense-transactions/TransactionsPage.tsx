@@ -230,6 +230,8 @@ export default function ExpenseTransactionsPage() {
       <DataTable
         data={state.rows}
         columns={columns}
+        isLoading={state.loading}
+        loadingText="Loading transactions..."
         onRowClick={setSelectedTransaction}
         hideToolbarDateFilter
         hideViewColumn
