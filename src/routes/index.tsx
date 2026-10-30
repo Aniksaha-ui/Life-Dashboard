@@ -9,6 +9,7 @@ import { AuthGuard, GuestGuard, LoginPage } from "../features/auth";
 import { CategoriesPage } from "../features/categories";
 import { ExpenseTransactionsPage } from "../features/expense-transactions";
 import { TransfersPage } from "../features/transfers";
+import { RecurringExpensesPage } from "../features/recurring-expenses";
 import { AppLayout } from "../layouts/AppLayout";
 
 const routes: RouteObject[] = [
@@ -32,6 +33,7 @@ const routes: RouteObject[] = [
           { path: "categories", element: <CategoriesPage /> },
           { path: "transactions", element: <ExpenseTransactionsPage /> },
           { path: "transfers", element: <TransfersPage /> },
+          { path: "recurring-expenses", element: <RecurringExpensesPage /> },
         ],
       },
     ],

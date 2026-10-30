@@ -87,6 +87,10 @@
   display: none;
 }
 
+.transfer-mobile-amount {
+  display: none;
+}
+
 /* Small-screen application shell: preserve readable controls and avoid horizontal page drift. */
 @media (max-width: 767px) {
   body {
@@ -310,6 +314,14 @@
 
   .compact-mobile-table .account-mobile-id {
     display: none;
+  }
+
+  .compact-mobile-table .transfer-mobile-amount {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--color-slate-900);
+    font-size: 0.875rem;
+    font-weight: 700;
   }
 
   /* Transaction cards have a fixed field layout on phones. The desktop table

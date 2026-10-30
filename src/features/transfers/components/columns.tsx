@@ -10,13 +10,14 @@ export const getTransferColumns = (
     cell: ({ row }) => (
       <div>
         <span
-          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${row.original.withdrawal ? "bg-amber-50 text-amber-700" : "bg-primary-50 text-primary-700"}`}
+          className={`rounded-full  py-1 text-xs font-semibold ${row.original.withdrawal ? "bg-amber-50 text-amber-700" : "bg-primary-50 text-primary-700"}`}
         >
           {row.original.withdrawal ? "Withdraw To Cash" : "Transfer"}
         </span>
         <p className="mt-1 text-sm text-slate-700">
           {row.original.note || "No note added"}
         </p>
+        <p className="transfer-mobile-amount">{row.original.amountLabel}</p>
       </div>
     ),
   },

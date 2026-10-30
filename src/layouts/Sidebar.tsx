@@ -6,6 +6,7 @@ import {
   PanelLeftOpen,
   X,
   Shuffle,
+  Repeat,
   Tags,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
@@ -18,6 +19,7 @@ const navItems = [
   { to: "/categories", icon: Tags, label: "Categories" },
   { to: "/transactions", icon: CreditCard, label: "Transactions" },
   { to: "/transfers", icon: Shuffle, label: "Transfers" },
+  { to: "/recurring-expenses", icon: Repeat, label: "Recurring Expenses" },
 ];
 
 interface SidebarProps {
