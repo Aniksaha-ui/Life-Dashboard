@@ -1,6 +1,7 @@
 import { ArrowLeftRight, RefreshCcw, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 import { DataTable } from "../../components/DataTable";
+import { MobileRecordDrawer } from "../../components/MobileRecordDrawer";
 import { MetricCard } from "../../components/MetricCard";
 import { TransferForm } from "./components/TransferForm";
 import { getTransferColumns } from "./components/columns";
@@ -14,6 +15,7 @@ export default function TransfersPage() {
   const state = useTransfers();
   const [mode, setMode] = useState<"TRANSFER" | "WITHDRAWAL" | null>(null);
   const [editing, setEditing] = useState<any>(null);
+  const [selectedTransfer, setSelectedTransfer] = useState<any>(null);
   const columns = useMemo(
     () =>
       getTransferColumns((item) => {
@@ -135,6 +137,28 @@ export default function TransfersPage() {
         columns={columns}
         hideToolbarDateFilter
         hideViewColumn
+        className="compact-mobile-table border-slate-200"
+        onRowClick={setSelectedTransfer}
+      />
+      <MobileRecordDrawer
+        open={Boolean(selectedTransfer)}
+        onClose={() => setSelectedTransfer(null)}
+        title="Transfer Details"
+        subtitle={
+          selectedTransfer?.withdrawal ? "Withdraw To Cash" : "Transfer"
+        }
+        details={
+          selectedTransfer
+            ? [
+                { label: "Transfer ID", value: selectedTransfer.id },
+                { label: "Source", value: selectedTransfer.fromName },
+                { label: "Destination", value: selectedTransfer.toName },
+                { label: "Amount", value: selectedTransfer.amountLabel },
+                { label: "Date", value: selectedTransfer.dateLabel },
+                { label: "Note", value: selectedTransfer.note },
+              ]
+            : []
+        }
       />
       <TransferForm
         open={!!mode}

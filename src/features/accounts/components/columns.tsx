@@ -16,7 +16,12 @@ export const getAccountColumns = (
     cell: ({ row }) => (
       <div>
         <p className="font-semibold text-slate-900">{row.original.name}</p>
-        <p className="text-xs text-slate-500">Account ID: {row.original.id}</p>
+        <p className="account-mobile-id text-xs text-slate-500">
+          Account ID: {row.original.id}
+        </p>
+        <p className="account-mobile-balance">
+          {row.original.currentBalanceLabel}
+        </p>
       </div>
     ),
   },

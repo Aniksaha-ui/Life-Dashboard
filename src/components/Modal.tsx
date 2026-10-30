@@ -66,7 +66,7 @@ export function Modal({
       {/* Modal Panel */}
       <div
         className={clsx(
-          "relative bg-white rounded-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-200 overflow-hidden",
+          "relative flex max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-xl bg-white shadow-2xl animate-in zoom-in-95 duration-200",
           sizeClasses[size],
         )}
       >
@@ -86,7 +86,9 @@ export function Modal({
         </div>
 
         {/* Content */}
-        <div className="px-6 py-2 pb-6">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-2 pb-6">
+          {children}
+        </div>
 
         {/* Footer */}
         {footer && (

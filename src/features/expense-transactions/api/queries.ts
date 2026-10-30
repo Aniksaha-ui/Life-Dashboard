@@ -74,6 +74,48 @@ export const createLedgerEntry = (type: string, payload: object) =>
     method: "POST",
     body: JSON.stringify(payload),
   });
+
+const canTryNextUpdateEndpoint = (error: unknown) => {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+  return (
+    message.includes("could not be found") ||
+    message.includes("not supported for route") ||
+    message.includes("supported methods") ||
+    message.includes("not found")
+  );
+};
+
+export const updateLedgerEntry = async (
+  id: string | number,
+  payload: object,
+) => {
+  const candidates: Array<{ path: string; method: "PUT" | "PATCH" | "POST" }> =
+    [
+      { path: `/transactions/${id}`, method: "PUT" },
+      { path: `/transactions/${id}`, method: "PATCH" },
+      { path: `/transactions/update/${id}`, method: "PUT" },
+      { path: `/transactions/update/${id}`, method: "PATCH" },
+      { path: `/transactions/update/${id}`, method: "POST" },
+    ];
+  let lastError: unknown;
+
+  for (const candidate of candidates) {
+    try {
+      return await request(candidate.path, {
+        method: candidate.method,
+        body: JSON.stringify(payload),
+      });
+    } catch (error) {
+      lastError = error;
+      if (!canTryNextUpdateEndpoint(error)) throw error;
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Unable to update transaction.");
+};
 export const createBulkLedgerEntries = (transactions: object[]) =>
   request("/transactions/bulk", {
     method: "POST",

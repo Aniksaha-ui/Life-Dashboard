@@ -81,6 +81,14 @@
   }
 }
 
+.transaction-table__mobile-summary {
+  display: none;
+}
+
+.account-mobile-balance {
+  display: none;
+}
+
 /* Small-screen application shell: preserve readable controls and avoid horizontal page drift. */
 @media (max-width: 767px) {
   body {
@@ -132,6 +140,24 @@
 
   .data-table-toolbar > div:last-child {
     justify-content: flex-start;
+  }
+
+  .data-table-pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .data-table-pagination > div:first-child {
+    text-align: center;
+  }
+
+  .data-table-pagination > div:last-child {
+    justify-content: space-between;
+  }
+
+  .data-table-pagination button,
+  .data-table-pagination span {
+    justify-content: center;
   }
 
   .data-table-toolbar select,
@@ -233,6 +259,126 @@
 
   .mobile-card-table td:last-child > div {
     justify-content: flex-start;
+  }
+
+  /* Compact app-style summary cards for management lists. Tapping a card
+     opens its page-specific drawer with the full record details. */
+  .compact-mobile-table.mobile-card-table tr {
+    display: block;
+    cursor: pointer;
+    overflow: hidden;
+    padding: 0;
+    border-radius: 0.875rem;
+  }
+
+  .compact-mobile-table.mobile-card-table td {
+    display: none;
+  }
+
+  .compact-mobile-table.mobile-card-table td:nth-child(2) {
+    display: block;
+    padding: 1rem !important;
+  }
+
+  .compact-mobile-table.mobile-card-table td:nth-child(2)::before {
+    display: none;
+  }
+
+  .compact-mobile-table .account-mobile-balance {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--color-slate-900);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .compact-mobile-table .account-mobile-id {
+    display: none;
+  }
+
+  /* Transaction cards have a fixed field layout on phones. The desktop table
+     has more columns than a generic card, so explicit grid areas prevent
+     values from shifting when a description or reference is long. */
+  .transaction-table.mobile-card-table tr {
+    display: block;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 0.875rem;
+  }
+
+  .transaction-table.mobile-card-table td {
+    display: none;
+  }
+
+  .transaction-table.mobile-card-table td:first-child {
+    display: block;
+    padding: 0 !important;
+  }
+
+  .transaction-table.mobile-card-table td:first-child::before {
+    display: none;
+  }
+
+  .transaction-table__desktop-date {
+    display: none;
+  }
+
+  .transaction-table__mobile-summary {
+    display: block;
+    position: relative;
+    min-height: 7rem;
+    padding: 1rem 4rem 1rem 1rem;
+    background: #fff;
+  }
+
+  .transaction-table__mobile-label {
+    margin: 0;
+    color: var(--color-primary-700);
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .transaction-table__mobile-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-top: 0.5rem;
+    color: var(--color-slate-500);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .transaction-table__mobile-type {
+    border: 1px solid #fecaca;
+    border-radius: 9999px;
+    background: #fff1f2;
+    padding: 0.3rem 0.65rem;
+    color: #be123c;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: capitalize;
+  }
+
+  .transaction-table__mobile-note {
+    margin: 0.65rem 0 0;
+    color: var(--color-slate-900);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .transaction-table__mobile-open {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: grid;
+    height: 2rem;
+    width: 2rem;
+    place-items: center;
+    border-radius: 9999px;
+    background: var(--color-slate-100);
+    color: var(--color-slate-500);
   }
 }
 

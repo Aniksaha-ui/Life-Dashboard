@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { DataTable } from "../../../components/DataTable";
 import { EmptyState } from "../../../components/EmptyState";
 import { Skeleton } from "../../../components/Skeleton";
 import type { CategoryRow } from "../types";
 import { getCategoryColumns } from "./columns";
+import { MobileRecordDrawer } from "../../../components/MobileRecordDrawer";
 
 export function CategoryTable({
   rows,
@@ -14,6 +15,9 @@ export function CategoryTable({
   isLoading: boolean;
   onEdit: (category: CategoryRow) => void;
 }) {
+  const [selectedCategory, setSelectedCategory] = useState<CategoryRow | null>(
+    null,
+  );
   const columns = useMemo(() => getCategoryColumns(onEdit), [onEdit]);
   if (isLoading)
     return (
@@ -33,14 +37,42 @@ export function CategoryTable({
       </div>
     );
   return (
-    <DataTable
-      data={rows}
-      columns={columns}
-      hideToolbarDateFilter
-      hideViewColumn
-      mobileCard
-      mobileCardTitleColumn={2}
-      mobileCardHideFirstColumn
-    />
+    <>
+      <DataTable
+        data={rows}
+        columns={columns}
+        hideToolbarDateFilter
+        hideViewColumn
+        mobileCard
+        mobileCardTitleColumn={2}
+        mobileCardHideFirstColumn
+        className="compact-mobile-table border-slate-200"
+        onRowClick={setSelectedCategory}
+      />
+      <MobileRecordDrawer
+        open={Boolean(selectedCategory)}
+        onClose={() => setSelectedCategory(null)}
+        title="Category Details"
+        subtitle={selectedCategory?.name}
+        details={
+          selectedCategory
+            ? [
+                { label: "Category ID", value: selectedCategory.id },
+                { label: "Slug", value: selectedCategory.slug },
+                { label: "Type", value: selectedCategory.typeLabel },
+                {
+                  label: "Source",
+                  value: selectedCategory.isDefault ? "Default" : "Custom",
+                },
+                { label: "Status", value: selectedCategory.statusLabel },
+                {
+                  label: "Last Updated",
+                  value: selectedCategory.updatedAtLabel,
+                },
+              ]
+            : []
+        }
+      />
+    </>
   );
 }

@@ -15,7 +15,13 @@ import type {
   SortingState,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Settings, Calendar, ChevronDown } from "lucide-react";
+import {
+  Settings,
+  Calendar,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { clsx } from "clsx";
 
 // ----------------------------------------------------------------------
@@ -455,8 +461,8 @@ export function DataTable<TData, TValue>({
       </div>
 
       {!hidePagination && (
-        <div className="flex items-center justify-between px-2">
-          <div className="flex-1 text-sm text-slate-500">
+        <div className="data-table-pagination flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
+          <div className="min-w-0 text-sm text-slate-500">
             {(() => {
               if (hasExternalPagination) {
                 const from = externalPagination?.from ?? 0;
@@ -478,9 +484,9 @@ export function DataTable<TData, TValue>({
               return `Showing ${from} to ${to} of ${total} entries`;
             })()}
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex shrink-0 items-center gap-2">
             <button
-              className="px-3 py-1 text-sm border border-slate-200 rounded hover:bg-white disabled:opacity-50"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               onClick={() => {
                 if (hasExternalPagination && onPageChange) {
                   onPageChange(currentPage - 1);
@@ -490,13 +496,14 @@ export function DataTable<TData, TValue>({
               }}
               disabled={!canGoPrevious}
             >
+              <ChevronLeft className="h-4 w-4" />
               Previous
             </button>
-            <span className="text-sm text-slate-600">
+            <span className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700">
               Page {currentPage} of {totalPages}
             </span>
             <button
-              className="px-3 py-1 text-sm border border-slate-200 rounded hover:bg-white disabled:opacity-50"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               onClick={() => {
                 if (hasExternalPagination && onPageChange) {
                   onPageChange(currentPage + 1);
@@ -507,6 +514,7 @@ export function DataTable<TData, TValue>({
               disabled={!canGoNext}
             >
               Next
+              <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>

@@ -6,12 +6,13 @@ import {
   RefreshCcw,
 } from "lucide-react";
 import { useMemo, useState, type FormEvent } from "react";
-import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "../../components/DataTable";
-import { MetricCard } from "../../components/MetricCard";
 import { Modal } from "../../components/Modal";
 import { useExpenseTransactions } from "./hooks/useExpenseTransactions";
 import { BulkTransactionModal } from "./components/BulkTransactionModal";
+import { TransactionDetailsDrawer } from "./components/TransactionDetailsDrawer";
+import { getTransactionColumns } from "./components/columns";
+import { TransactionsOverview } from "./components/TransactionsOverview";
 
 const tabs = [
   "all",
@@ -23,48 +24,57 @@ const tabs = [
   "OPENING_BALANCE",
   "WITHDRAW",
 ];
-export default function ExpenseTransactionsPage() {
-  const state = useExpenseTransactions();
-  const [entryType, setEntryType] = useState<string | null>(null);
-  const [isBulkOpen, setIsBulkOpen] = useState(false);
-  const [values, setValues] = useState({
+
+const createEmptyValues = () => {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return {
     account_id: "",
     category_id: "",
     amount: "",
     note: "",
-    transaction_date: new Date().toISOString().slice(0, 10),
-  });
+    transaction_date: `${today.getFullYear()}-${month}-${day}`,
+  };
+};
+
+export default function ExpenseTransactionsPage() {
+  const state = useExpenseTransactions();
+  const [entryType, setEntryType] = useState<string | null>(null);
+  const [editingTransaction, setEditingTransaction] = useState<any>(null);
+  const [isBulkOpen, setIsBulkOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [values, setValues] = useState(createEmptyValues);
   const [saving, setSaving] = useState(false);
-  const columns = useMemo<ColumnDef<any>[]>(
-    () => [
-      { accessorKey: "serial", header: "SL" },
-      { accessorKey: "dateLabel", header: "Date" },
-      {
-        accessorKey: "type",
-        header: "Type",
-        cell: ({ row }) => (
-          <span className="rounded-full bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700">
-            {row.original.type}
-          </span>
-        ),
-      },
-      { accessorKey: "accountName", header: "Account" },
-      { accessorKey: "categoryName", header: "Category" },
-      {
-        accessorKey: "amountLabel",
-        header: "Amount",
-        cell: ({ row }) => (
-          <span className="font-semibold text-slate-900">
-            {row.original.amountLabel}
-          </span>
-        ),
-      },
-      {
-        accessorKey: "note",
-        header: "Note",
-        cell: ({ row }) => row.original.note || "No note added",
-      },
-    ],
+  const openCreate = (type: string) => {
+    setEditingTransaction(null);
+    setValues(createEmptyValues());
+    setEntryType(type);
+  };
+  const openEdit = (transaction: any) => {
+    setSelectedTransaction(null);
+    setEditingTransaction(transaction);
+    setValues({
+      account_id: String(
+        transaction.account_id ?? transaction.account?.id ?? "",
+      ),
+      category_id: String(
+        transaction.category_id ?? transaction.category?.id ?? "",
+      ),
+      amount: String(transaction.amount ?? ""),
+      note: String(transaction.note ?? ""),
+      transaction_date: String(transaction.transaction_date ?? "").slice(0, 10),
+    });
+    setEntryType(String(transaction.type).toUpperCase());
+  };
+  const closeEntryModal = () => {
+    setEntryType(null);
+    setEditingTransaction(null);
+    setValues(createEmptyValues());
+  };
+  const columns = useMemo(
+    () => getTransactionColumns(setSelectedTransaction, openEdit),
     [],
   );
   const save = async (event: FormEvent) => {
@@ -72,8 +82,12 @@ export default function ExpenseTransactionsPage() {
     if (!entryType) return;
     setSaving(true);
     try {
-      await state.create(entryType, values);
-      setEntryType(null);
+      if (editingTransaction) {
+        await state.update(editingTransaction.id, entryType, values);
+      } else {
+        await state.create(entryType, values);
+      }
+      closeEntryModal();
     } finally {
       setSaving(false);
     }
@@ -92,21 +106,21 @@ export default function ExpenseTransactionsPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           <button
-            onClick={() => setEntryType("EXPENSE")}
+            onClick={() => openCreate("EXPENSE")}
             className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-3 py-2 text-sm font-semibold text-white"
           >
             <ArrowDownToLine className="h-4 w-4" />
             New Expense
           </button>
           <button
-            onClick={() => setEntryType("INCOME")}
+            onClick={() => openCreate("INCOME")}
             className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
           >
             <ArrowUpToLine className="h-4 w-4" />
             New Income
           </button>
           <button
-            onClick={() => setEntryType("DEPOSIT")}
+            onClick={() => openCreate("DEPOSIT")}
             className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
           >
             <PiggyBank className="h-4 w-4" />
@@ -121,26 +135,9 @@ export default function ExpenseTransactionsPage() {
           </button>
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard
-          title="Total Transactions"
-          value={state.loading ? "..." : state.metrics.total}
-        />
-        <MetricCard
-          title="Expenses"
-          value={`BDT ${state.metrics.expense.toLocaleString()}`}
-        />
-        <MetricCard
-          title="Income"
-          value={`BDT ${state.metrics.income.toLocaleString()}`}
-        />
-        <MetricCard
-          title="Deposits"
-          value={`BDT ${state.metrics.deposit.toLocaleString()}`}
-        />
-      </div>
+      <TransactionsOverview loading={state.loading} metrics={state.metrics} />
       <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:justify-between">
+        <div className="flex flex-col gap-3">
           <div className="flex flex-wrap gap-2">
             {tabs.map((tab) => (
               <button
@@ -152,7 +149,33 @@ export default function ExpenseTransactionsPage() {
               </button>
             ))}
           </div>
-          <div className="flex gap-2">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+            <select
+              value={state.accountFilter}
+              onChange={(event) => state.setAccountFilter(event.target.value)}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              aria-label="Filter by account"
+            >
+              <option value="all">All accounts</option>
+              {state.accounts.map((account) => (
+                <option key={account.id} value={account.id}>
+                  {account.name}
+                </option>
+              ))}
+            </select>
+            <select
+              value={state.categoryFilter}
+              onChange={(event) => state.setCategoryFilter(event.target.value)}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              aria-label="Filter by category"
+            >
+              <option value="all">All categories</option>
+              {state.categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
             <label className="sr-only" htmlFor="transactions-from-date">
               From date
             </label>
@@ -189,30 +212,41 @@ export default function ExpenseTransactionsPage() {
             >
               <RefreshCcw className="h-4 w-4" />
             </button>
-            {(state.fromDate || state.toDate) && (
-              <button
-                onClick={() => {
-                  state.setFromDate("");
-                  state.setToDate("");
-                }}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
-              >
-                Clear dates
-              </button>
-            )}
+            <button
+              onClick={() => {
+                state.setAccountFilter("all");
+                state.setCategoryFilter("all");
+                state.setFromDate(state.defaultDateRange.fromDate);
+                state.setToDate(state.defaultDateRange.toDate);
+                state.setSearch("");
+              }}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+            >
+              Clear filters
+            </button>
           </div>
         </div>
       </section>
       <DataTable
         data={state.rows}
         columns={columns}
+        onRowClick={setSelectedTransaction}
         hideToolbarDateFilter
         hideViewColumn
+        className="transaction-table border-slate-200"
+      />
+      <TransactionDetailsDrawer
+        transaction={selectedTransaction}
+        onClose={() => setSelectedTransaction(null)}
       />
       <Modal
         isOpen={!!entryType}
-        onClose={() => setEntryType(null)}
-        title={entryType ? `New ${entryType.toLowerCase()}` : ""}
+        onClose={closeEntryModal}
+        title={
+          entryType
+            ? `${editingTransaction ? "Edit" : "New"} ${entryType.toLowerCase()}`
+            : ""
+        }
         footer={
           <button
             form="entry-form"
@@ -220,7 +254,11 @@ export default function ExpenseTransactionsPage() {
             disabled={saving}
             className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white"
           >
-            {saving ? "Saving..." : "Save Transaction"}
+            {saving
+              ? "Saving..."
+              : editingTransaction
+                ? "Update Transaction"
+                : "Save Transaction"}
           </button>
         }
       >

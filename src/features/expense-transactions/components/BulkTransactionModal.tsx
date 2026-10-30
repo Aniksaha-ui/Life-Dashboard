@@ -53,6 +53,12 @@ const parseText = (text: string) => {
   return { entries, invalidLines };
 };
 
+const formatPreviewDate = (value: string) => {
+  const [year, month, day] = value.split("-");
+
+  return year && month && day ? `${day}-${month}-${year}` : value;
+};
+
 export function BulkTransactionModal({
   open,
   onClose,
@@ -209,6 +215,39 @@ export function BulkTransactionModal({
             className="mt-3 w-full rounded-lg border border-slate-300 p-3 text-sm"
             rows={4}
           />
+          {parsed.entries.length > 0 && (
+            <div className="mt-3 rounded-lg border border-primary-200 bg-white p-3 text-sm">
+              <div className="flex items-center justify-between gap-3">
+                <strong className="text-slate-900">Entry preview</strong>
+                <span className="text-primary-700">
+                  {parsed.entries.length}{" "}
+                  {parsed.entries.length === 1 ? "entry" : "entries"} found
+                </span>
+              </div>
+              <div className="mt-2 divide-y divide-slate-100">
+                {parsed.entries.slice(0, 10).map((entry, index) => (
+                  <div
+                    key={`${entry.transaction_date}-${entry.note}-${index}`}
+                    className="grid grid-cols-[auto_1fr_auto] gap-3 py-2 text-slate-600"
+                  >
+                    <span>{formatPreviewDate(entry.transaction_date)}</span>
+                    <span className="truncate">{entry.note}</span>
+                    <strong className="text-slate-900">{entry.amount}</strong>
+                  </div>
+                ))}
+              </div>
+              {parsed.entries.length > 10 && (
+                <p className="mt-2 text-slate-500">
+                  Showing the first 10 entries.
+                </p>
+              )}
+              {parsed.invalidLines.length > 0 && (
+                <p className="mt-2 text-amber-700">
+                  Lines {parsed.invalidLines.join(", ")} will be skipped.
+                </p>
+              )}
+            </div>
+          )}
           <button
             onClick={importText}
             className="mt-2 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-primary-700 ring-1 ring-primary-200"
