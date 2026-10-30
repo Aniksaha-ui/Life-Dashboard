@@ -11,6 +11,7 @@ import { ExpenseTransactionsPage } from "../features/expense-transactions";
 import { TransfersPage } from "../features/transfers";
 import { RecurringExpensesPage } from "../features/recurring-expenses";
 import {
+  BurnRateAnalysisPage,
   FinancialOverviewPage,
   AccountBalancesReportPage,
   ReportDetailPage,
@@ -47,6 +48,10 @@ const routes: RouteObject[] = [
             element: <FinancialOverviewPage />,
           },
           { path: "reports/summary", element: <SummaryReportPage /> },
+          {
+            path: "reports/burn-rate-analysis",
+            element: <BurnRateAnalysisPage />,
+          },
           {
             path: "reports/account-balances",
             element: <AccountBalancesReportPage />,

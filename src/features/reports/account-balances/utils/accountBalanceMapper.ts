@@ -1,4 +1,8 @@
-import type { AccountBalanceMetrics, AccountBalanceRow } from "../types";
+import type {
+  AccountBalanceChartItem,
+  AccountBalanceMetrics,
+  AccountBalanceRow,
+} from "../types";
 
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -89,3 +93,25 @@ export const buildAccountBalanceMetrics = (
   ),
   totalBalanceLabel: `BDT ${moneyFormatter.format(rows.reduce((total, row) => total + row.currentBalance, 0))}`,
 });
+
+const chartColors = [
+  "#295cab",
+  "#059669",
+  "#d97706",
+  "#7c3aed",
+  "#0e7490",
+  "#e11d48",
+];
+
+export const buildAccountBalanceChart = (
+  rows: AccountBalanceRow[],
+): AccountBalanceChartItem[] =>
+  rows
+    .filter((row) => row.currentBalance > 0)
+    .sort((first, second) => second.currentBalance - first.currentBalance)
+    .map((row, index) => ({
+      name: row.name,
+      value: row.currentBalance,
+      label: row.currentBalanceLabel,
+      color: chartColors[index % chartColors.length],
+    }));

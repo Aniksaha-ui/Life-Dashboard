@@ -2,9 +2,11 @@ import { ArrowLeft, Wallet } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ReportLoadingOverlay } from "../components/ReportLoadingOverlay";
 import { AccountBalanceFilters } from "./components/AccountBalanceFilters";
+import { AccountBalanceChart } from "./components/AccountBalanceChart";
 import { AccountBalanceMetrics } from "./components/AccountBalanceMetrics";
 import { AccountBalanceTable } from "./components/AccountBalanceTable";
 import { useAccountBalancesReport } from "./hooks/useAccountBalancesReport";
+import { buildAccountBalanceChart } from "./utils/accountBalanceMapper";
 
 function AccountBalancesContent({
   state,
@@ -14,6 +16,7 @@ function AccountBalancesContent({
   return (
     <div className="space-y-6">
       <AccountBalanceMetrics metrics={state.metrics} />
+      <AccountBalanceChart items={buildAccountBalanceChart(state.rows)} />
       <AccountBalanceTable
         rows={state.rows}
         search={state.search}

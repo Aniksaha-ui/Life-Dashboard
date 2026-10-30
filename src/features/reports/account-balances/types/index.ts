@@ -20,3 +20,10 @@ export interface AccountBalanceMetrics {
   cashCountLabel: string;
   totalBalanceLabel: string;
 }
+
+export interface AccountBalanceChartItem {
+  name: string;
+  value: number;
+  label: string;
+  color: string;
+}
