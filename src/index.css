@@ -83,6 +83,10 @@
   display: none;
 }
 
+.data-table-mobile-summary {
+  display: none;
+}
+
 .account-mobile-balance {
   display: none;
 }
@@ -849,5 +853,152 @@
   body .sidebar-container:not(.w-20) nav {
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
+  }
+
+  /* Every ordinary data table uses the same compact, transaction-inspired
+     record card on phones. The transaction module keeps its own exact card. */
+  .mobile-summary-table:not(.transaction-table) {
+    overflow: visible !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  .mobile-summary-table:not(.transaction-table) table,
+  .mobile-summary-table:not(.transaction-table) tbody {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .mobile-summary-table:not(.transaction-table) thead {
+    display: none;
+  }
+
+  .mobile-summary-table:not(.transaction-table) tbody {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .mobile-summary-table:not(.transaction-table)
+    tr:not(.data-table-loading-row) {
+    display: block;
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid var(--color-slate-200);
+    border-radius: 0.875rem;
+    background: #fff;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
+  }
+
+  .mobile-summary-table:not(.transaction-table) td {
+    display: none !important;
+  }
+
+  .mobile-summary-table:not(.transaction-table) td:first-child {
+    display: block !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  .mobile-summary-table:not(.transaction-table) td:first-child::before {
+    display: none;
+  }
+
+  .mobile-summary-table:not(.transaction-table)
+    td:first-child
+    > .data-table-cell-content {
+    display: none;
+  }
+
+  .data-table-mobile-summary {
+    display: block;
+    min-height: 6.25rem;
+    padding: 1rem;
+  }
+
+  .data-table-mobile-summary__top,
+  .data-table-mobile-summary__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .data-table-mobile-summary__label {
+    color: var(--color-primary-700);
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .data-table-mobile-summary__meta {
+    max-width: 48%;
+    overflow: hidden;
+    color: var(--color-slate-500);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .data-table-mobile-summary__content {
+    align-items: flex-end;
+    margin-top: 0.7rem;
+  }
+
+  .data-table-mobile-summary__title {
+    min-width: 0;
+    color: var(--color-slate-900);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .data-table-mobile-summary__title p,
+  .data-table-mobile-summary__title span {
+    font-size: inherit !important;
+  }
+
+  .data-table-mobile-summary__title > div > p:not(:first-child),
+  .data-table-mobile-summary .account-mobile-id,
+  .data-table-mobile-summary .account-mobile-balance,
+  .data-table-mobile-summary .transfer-mobile-amount {
+    display: none !important;
+  }
+
+  .data-table-mobile-summary__amount {
+    flex: 0 0 auto;
+    color: var(--color-primary-700);
+    font-size: 0.875rem;
+    font-weight: 800;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .data-table-mobile-summary__amount > * {
+    font-size: inherit !important;
+  }
+
+  .data-table-mobile-summary__detail {
+    overflow: hidden;
+    margin-top: 0.75rem;
+    color: var(--color-slate-500);
+    font-size: 0.75rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-summary-table:not(.transaction-table) .data-table-loading-row,
+  .mobile-summary-table:not(.transaction-table) .data-table-loading-cell {
+    display: flex !important;
+  }
+
+  .mobile-summary-table:not(.transaction-table) .data-table-loading-cell {
+    min-height: 10rem;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
   }
 }

@@ -12,6 +12,7 @@ import { TransfersPage } from "../features/transfers";
 import { RecurringExpensesPage } from "../features/recurring-expenses";
 import {
   BurnRateAnalysisPage,
+  CategoryBreakdownPage,
   FinancialOverviewPage,
   AccountBalancesReportPage,
   ReportDetailPage,
@@ -51,6 +52,10 @@ const routes: RouteObject[] = [
           {
             path: "reports/burn-rate-analysis",
             element: <BurnRateAnalysisPage />,
+          },
+          {
+            path: "reports/category-breakdown",
+            element: <CategoryBreakdownPage />,
           },
           {
             path: "reports/account-balances",

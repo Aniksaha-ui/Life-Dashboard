@@ -12,6 +12,7 @@ import {
 import type {
   ColumnDef,
   ColumnFiltersState,
+  Row,
   SortingState,
   VisibilityState,
 } from "@tanstack/react-table";
@@ -176,6 +177,78 @@ export function DataTable<TData, TValue>({
       .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
       .replace(/[_-]+/g, " ")
       .trim();
+  };
+
+  const renderMobileSummary = (row: Row<TData>) => {
+    const cells = row
+      .getVisibleCells()
+      .filter(
+        (cell) =>
+          !/^(sl|serial|action|actions)$/i.test(getColumnLabel(cell.column)),
+      );
+    const primaryCell = cells[0];
+    if (!primaryCell) return null;
+    const secondaryCells = cells.filter((cell) => cell.id !== primaryCell.id);
+    const amountCell =
+      secondaryCells.find((cell) =>
+        /(amount|balance|spend|total|net)/i.test(getColumnLabel(cell.column)),
+      ) ?? null;
+    const metaCell =
+      secondaryCells.find((cell) =>
+        /(date|month|period|updated)/i.test(getColumnLabel(cell.column)),
+      ) ??
+      secondaryCells.find((cell) =>
+        /(type|status|category)/i.test(getColumnLabel(cell.column)),
+      ) ??
+      null;
+    const detailCell = secondaryCells.find(
+      (cell) =>
+        cell.id !== primaryCell.id &&
+        cell.id !== amountCell?.id &&
+        cell.id !== metaCell?.id,
+    );
+
+    return (
+      <div className="data-table-mobile-summary">
+        <div className="data-table-mobile-summary__top">
+          <span className="data-table-mobile-summary__label">
+            {getColumnLabel(primaryCell.column)}
+          </span>
+          {metaCell && (
+            <span className="data-table-mobile-summary__meta">
+              {flexRender(
+                metaCell.column.columnDef.cell,
+                metaCell.getContext(),
+              )}
+            </span>
+          )}
+        </div>
+        <div className="data-table-mobile-summary__content">
+          <div className="data-table-mobile-summary__title">
+            {flexRender(
+              primaryCell.column.columnDef.cell,
+              primaryCell.getContext(),
+            )}
+          </div>
+          {amountCell && (
+            <div className="data-table-mobile-summary__amount">
+              {flexRender(
+                amountCell.column.columnDef.cell,
+                amountCell.getContext(),
+              )}
+            </div>
+          )}
+        </div>
+        {detailCell && (
+          <div className="data-table-mobile-summary__detail">
+            {flexRender(
+              detailCell.column.columnDef.cell,
+              detailCell.getContext(),
+            )}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -380,6 +453,7 @@ export function DataTable<TData, TValue>({
           "rounded-md border bg-white shadow-sm overflow-hidden",
           !noScrollX && "overflow-x-auto",
           mobileCard && "mobile-card-table",
+          mobileCard && "mobile-summary-table",
           mobileCardTitleColumn && "mobile-card-has-title",
           mobileCardHideFirstColumn && "mobile-card-hide-first-column",
           className || "border-slate-200",
@@ -455,10 +529,14 @@ export function DataTable<TData, TValue>({
                           "px-3 py-2 align-middle",
                       )}
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                      {cell === row.getVisibleCells()[0] &&
+                        renderMobileSummary(row)}
+                      <div className="data-table-cell-content">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </div>
                     </td>
                   ))}
                 </tr>
