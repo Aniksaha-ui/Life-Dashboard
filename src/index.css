@@ -91,6 +91,10 @@
   display: none;
 }
 
+.transaction-table__mobile-amount {
+  display: none;
+}
+
 /* Small-screen application shell: preserve readable controls and avoid horizontal page drift. */
 @media (max-width: 767px) {
   body {
@@ -354,28 +358,26 @@
   .transaction-table__mobile-summary {
     display: block;
     position: relative;
-    min-height: 7rem;
-    padding: 1rem 4rem 1rem 1rem;
+    min-height: 0;
+    padding: 1rem;
     background: #fff;
   }
 
-  .transaction-table__mobile-label {
-    margin: 0;
-    color: var(--color-primary-700);
-    font-size: 0.625rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
   .transaction-table__mobile-meta {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
-    gap: 0.625rem;
-    margin-top: 0.5rem;
+    gap: 0.5rem;
     color: var(--color-slate-500);
     font-size: 0.75rem;
     font-weight: 700;
+  }
+
+  .transaction-table__mobile-id {
+    overflow: hidden;
+    color: var(--color-slate-600);
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .transaction-table__mobile-type {
@@ -389,24 +391,35 @@
     text-transform: capitalize;
   }
 
+  .transaction-table__mobile-date {
+    color: var(--color-slate-500);
+    font-size: 0.6875rem;
+    white-space: nowrap;
+  }
+
+  .transaction-table__mobile-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 0.75rem;
+    margin-top: 0.8rem;
+  }
+
   .transaction-table__mobile-note {
-    margin: 0.65rem 0 0;
+    margin: 0;
     color: var(--color-slate-900);
     font-size: 0.875rem;
     font-weight: 700;
   }
 
-  .transaction-table__mobile-open {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    display: grid;
-    height: 2rem;
-    width: 2rem;
-    place-items: center;
-    border-radius: 9999px;
-    background: var(--color-slate-100);
-    color: var(--color-slate-500);
+  .transaction-table__mobile-amount {
+    display: block;
+    margin: 0;
+    color: var(--color-primary-700);
+    font-size: 0.875rem;
+    font-weight: 800;
+    text-align: right;
+    white-space: nowrap;
   }
 }
 

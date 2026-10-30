@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, Eye, Pencil } from "lucide-react";
+import { Eye, Pencil } from "lucide-react";
 
 export const getTransactionColumns = (
   onView: (transaction: any) => void,
@@ -17,19 +17,25 @@ export const getTransactionColumns = (
           </p>
         </div>
         <div className="transaction-table__mobile-summary">
-          <p className="transaction-table__mobile-label">Transaction</p>
           <div className="transaction-table__mobile-meta">
+            <span className="transaction-table__mobile-id">
+              TXN #{row.original.id}
+            </span>
             <span className="transaction-table__mobile-type">
               {String(row.original.type || "Transaction").toLowerCase()}
             </span>
-            <span>TXN #{row.original.id}</span>
+            <span className="transaction-table__mobile-date">
+              {row.original.dateLabel}
+            </span>
           </div>
-          <p className="transaction-table__mobile-note">
-            {row.original.note || "No remarks added"}
-          </p>
-          <span className="transaction-table__mobile-open" aria-hidden="true">
-            <ChevronDown className="h-4 w-4" />
-          </span>
+          <div className="transaction-table__mobile-content">
+            <p className="transaction-table__mobile-note">
+              {row.original.note || "No remarks added"}
+            </p>
+            <p className="transaction-table__mobile-amount">
+              {row.original.amountLabel}
+            </p>
+          </div>
         </div>
       </>
     ),
