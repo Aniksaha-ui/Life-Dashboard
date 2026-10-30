@@ -36,8 +36,8 @@ export default function CategoriesPage() {
     setIsFormOpen(true);
   };
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="app-management-page categories-page space-y-6">
+      <div className="app-page-header flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
             Category Management
@@ -49,13 +49,13 @@ export default function CategoriesPage() {
         </div>
         <button
           onClick={openCreate}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
+          className="app-page-primary-action inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
         >
           <Plus className="h-4 w-4" />
           New Category
         </button>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="app-metrics-grid grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           title="Total Categories"
           value={metrics.total}
@@ -81,7 +81,7 @@ export default function CategoriesPage() {
           className="border-cyan-100"
         />
       </div>
-      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <section className="app-filter-panel rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-2">
             {filters.map(([value, label]) => (

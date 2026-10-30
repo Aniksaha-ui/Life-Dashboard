@@ -12,6 +12,7 @@ import { TransfersPage } from "../features/transfers";
 import { RecurringExpensesPage } from "../features/recurring-expenses";
 import {
   FinancialOverviewPage,
+  AccountBalancesReportPage,
   ReportDetailPage,
   ReportsPage,
   SummaryReportPage,
@@ -46,6 +47,10 @@ const routes: RouteObject[] = [
             element: <FinancialOverviewPage />,
           },
           { path: "reports/summary", element: <SummaryReportPage /> },
+          {
+            path: "reports/account-balances",
+            element: <AccountBalancesReportPage />,
+          },
           { path: "reports/:reportId", element: <ReportDetailPage /> },
         ],
       },

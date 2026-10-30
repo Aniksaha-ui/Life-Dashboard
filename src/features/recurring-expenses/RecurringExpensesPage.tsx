@@ -22,8 +22,8 @@ export default function RecurringExpensesPage() {
     [state.run],
   );
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+    <div className="app-management-page recurring-expenses-page space-y-6">
+      <div className="app-page-header flex flex-col gap-4 sm:flex-row sm:justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
             <CalendarCheck className="h-6 w-6 text-primary-600" />
@@ -33,7 +33,7 @@ export default function RecurringExpensesPage() {
             Schedule repeated expense transactions and execute due items.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="app-page-actions flex flex-wrap gap-2">
           <button
             onClick={() => void state.runDue()}
             className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
@@ -53,7 +53,7 @@ export default function RecurringExpensesPage() {
           </button>
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="app-metrics-grid grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           title="Total Plans"
           value={state.metrics.total}
@@ -75,7 +75,7 @@ export default function RecurringExpensesPage() {
           isLoading={state.loading}
         />
       </div>
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
+      <section className="app-filter-panel rounded-xl border border-slate-200 bg-white p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:justify-between">
           <div className="flex gap-2">
             {[

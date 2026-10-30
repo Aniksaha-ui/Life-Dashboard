@@ -4,8 +4,8 @@ import { reports } from "./constants/reports";
 
 export default function ReportsPage() {
   return (
-    <div className="space-y-5 sm:space-y-6">
-      <header className="overflow-hidden rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 via-white to-white p-5 shadow-sm sm:p-6">
+    <div className="reports-hub-page space-y-5 sm:space-y-6">
+      <header className="reports-hub-hero overflow-hidden rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 via-white to-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex gap-3.5">
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary-600 text-white shadow-lg shadow-primary-600/20">
@@ -30,14 +30,14 @@ export default function ReportsPage() {
           </div>
         </div>
       </header>
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <section className="reports-directory-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {reports.map((report) => {
           const Icon = report.icon;
           return (
             <Link
               key={report.id}
               to={`/reports/${report.id}`}
-              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-md"
+              className="reports-directory-card group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-md"
             >
               <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary-500 to-primary-300 opacity-0 transition group-hover:opacity-100" />
               <div className="flex items-start justify-between gap-4">

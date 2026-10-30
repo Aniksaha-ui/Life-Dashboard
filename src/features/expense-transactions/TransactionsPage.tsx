@@ -93,8 +93,8 @@ export default function ExpenseTransactionsPage() {
     }
   };
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+    <div className="app-management-page transactions-page space-y-6">
+      <div className="app-page-header flex flex-col gap-4 sm:flex-row sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
             Transaction Management
@@ -104,7 +104,7 @@ export default function ExpenseTransactionsPage() {
             in sync.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="app-page-actions flex flex-wrap gap-2">
           <button
             onClick={() => openCreate("EXPENSE")}
             className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-3 py-2 text-sm font-semibold text-white"
@@ -136,7 +136,7 @@ export default function ExpenseTransactionsPage() {
         </div>
       </div>
       <TransactionsOverview loading={state.loading} metrics={state.metrics} />
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
+      <section className="app-filter-panel rounded-xl border border-slate-200 bg-white p-4">
         <div className="flex flex-col gap-3">
           <div className="flex flex-wrap gap-2">
             {tabs.map((tab) => (

@@ -16,8 +16,8 @@ function ReportContent({ definition }: { definition: ReportDefinition }) {
   const Icon = definition.icon;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="report-detail-page space-y-6">
+      <div className="report-detail-header flex flex-col gap-4 rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 via-white to-white p-5 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-6">
         <div>
           <Link
             to="/reports"

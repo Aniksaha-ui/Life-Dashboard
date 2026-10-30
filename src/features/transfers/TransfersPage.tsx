@@ -29,8 +29,8 @@ export default function TransfersPage() {
     setMode(nextMode);
   };
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+    <div className="app-management-page transfers-page space-y-6">
+      <div className="app-page-header flex flex-col gap-4 sm:flex-row sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
             Transfer Management
@@ -40,7 +40,7 @@ export default function TransfersPage() {
             keeping balances synchronized.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="app-page-actions flex gap-2">
           <button
             onClick={() => open("TRANSFER")}
             disabled={state.accounts.length < 2}
@@ -59,7 +59,7 @@ export default function TransfersPage() {
           </button>
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="app-metrics-grid grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           title="Total Transfers"
           value={state.loading ? "..." : state.metrics.total}
@@ -77,7 +77,7 @@ export default function TransfersPage() {
           value={`BDT ${state.metrics.amount.toLocaleString()}`}
         />
       </div>
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
+      <section className="app-filter-panel rounded-xl border border-slate-200 bg-white p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:justify-between">
           <div className="flex flex-wrap gap-2">
             {filters.map(([value, label]) => (
