@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-@import "./components/command-palette.css";
-
 @theme {
   --color-primary-50: #f0f4fa;
   --color-primary-100: #dde6f4;

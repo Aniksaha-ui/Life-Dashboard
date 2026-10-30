@@ -1,173 +1,23 @@
 import clsx from "clsx";
 import {
-  Banknote,
-  BarChart2,
   ChevronDown,
-  Code,
   CreditCard,
-  Home,
-  MessageSquare,
   PanelLeftClose,
   PanelLeftOpen,
   X,
-  ShieldAlert,
   Shuffle,
-  Landmark,
-  Newspaper,
-  Mail,
-  Users,
-  Megaphone,
-  Repeat,
-  Building,
-  Brain,
-  Handshake,
   Tags,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import infinityLogo from "../assets/infinitycodehubltd.jpeg";
 import { Tooltip } from "../components/Tooltip";
-import { filterHiddenNavItems, isRouteHidden } from "../config/routeVisibility";
 
 const navItems = [
-  { to: "/dashboard", icon: Home, label: "Home" },
   { to: "/account", icon: CreditCard, label: "Accounts" },
   { to: "/categories", icon: Tags, label: "Categories" },
-  {
-    to: "/kam-intelligence",
-    icon: Brain,
-    label: "KAM Intelligence",
-    children: [
-      { to: "/kam-intelligence", label: "KAM Actions" },
-      { to: "/qr-analytics", label: "QR Merchants Analytics" },
-    ],
-  },
-  {
-    to: "/merchants",
-    icon: Users,
-    label: "Manage Merchant",
-    children: [
-      { to: "/merchants", label: "Merchants Lists" },
-      { to: "/merchants/store-commission-approval", label: "Store Commission" },
-      { to: "/merchants/store-discount", label: "Store Discount" },
-      {
-        to: "/merchants/reverse-adjustment-amount",
-        label: "Reverse Adjustment Amount",
-      },
-      { to: "/merchants/manage-account", label: "Store AC Change Request" },
-    ],
-  },
   { to: "/transactions", icon: CreditCard, label: "Transactions" },
   { to: "/transfers", icon: Shuffle, label: "Transfers" },
-  {
-    to: "/support",
-    icon: MessageSquare,
-    label: "Support",
-    children: [
-      { to: "/transaction-tickets", label: "Transaction Tickets" },
-      { to: "/merchant-tickets", label: "Merchant Tickets" },
-    ],
-  },
-  {
-    to: "/disputes",
-    icon: ShieldAlert,
-    label: "Disputes",
-    children: [
-      { to: "/chargebacks", label: "Chargeback" },
-      { to: "/refunds", label: "Refund" },
-    ],
-  },
-  {
-    to: "/settlements",
-    icon: Banknote,
-    label: "Manage Settlement",
-    children: [
-      { to: "/settlements", label: "Settlement" },
-      { to: "/emi-operations", label: "EMI Operation" },
-    ],
-  },
-  {
-    to: "/manage-bank",
-    icon: Landmark,
-    label: "Manage Bank",
-    children: [
-      { to: "/manage-bank/banks", label: "Banks" },
-      { to: "/manage-bank/card-types", label: "Card Types" },
-      { to: "/manage-bank/bank-validation", label: "Bank Validation" },
-    ],
-  },
-  {
-    to: "/campaign-management",
-    icon: Megaphone,
-    label: "Manage Campaign",
-    children: [
-      {
-        to: "/campaign-management/merchant-campaign-list",
-        label: "Campaign list",
-      },
-      {
-        to: "/campaign-management/store-management",
-        label: "Campaign Store Management",
-      },
-      {
-        to: "/campaign-management/kam-merchant-campaign-list",
-        label: "Kam Merchant Campaign List",
-      },
-      {
-        to: "/campaign-management/bank-campaign-store",
-        label: "Bank Campaign Store Management",
-      },
-      {
-        to: "/campaign-management/bank-campaign-approved",
-        label: "Bank Campaign Approved List",
-      },
-      {
-        to: "/campaign-management/bank-campaign-poc",
-        label: "Manage Bank Campaign POC",
-      },
-      {
-        to: "/campaign-management/sector-mapping",
-        label: "Kam Sector Mapping",
-      },
-      {
-        to: "/campaign-management/email-message-analytics",
-        label: "Email And Message Analytics",
-      },
-      {
-        to: "/campaign-management/campaign-calendar",
-        label: "KAM Campaign Calendar",
-      },
-      { to: "/campaign-management/custom-campaign", label: "Custom Campaign" },
-    ],
-  },
-  { to: "/analytics", icon: BarChart2, label: "Reports", hasDivider: true },
-  {
-    to: "/manage-bank/local-issuer-bank",
-    icon: Building,
-    label: "Local Issuer Bank",
-  },
-  { to: "/recurring-info", icon: Repeat, label: "Recurring Info" },
-  {
-    to: "/resellers",
-    icon: Handshake,
-    label: "Manage Reseller",
-    children: [
-      // { to: '/resellers', label: 'Resellers List' },
-      { to: "/resellers/invite", label: "Invite Reseller" },
-      { to: "/resellers/kam-list", label: "KAM Resellers List" },
-      { to: "/resellers/op-list", label: "OP Resellers List" },
-      { to: "/resellers/ap-list", label: "AP Resellers List" },
-      { to: "/resellers/ra-list", label: "RA Resellers List" },
-      { to: "/resellers/history-log", label: "Reseller History Log" },
-    ],
-  },
-  { to: "/retail-news", icon: Newspaper, label: "Retail News" },
-  {
-    to: "/analysis-categories",
-    icon: Landmark,
-    label: "Global Analysis Category",
-  },
-  { to: "/email-logs", icon: Mail, label: "Email Log" },
 ];
 
 interface SidebarProps {
@@ -423,31 +273,7 @@ export function Sidebar({
               )}
             </div>
           ))}
-
-          <div className="my-4 border-t border-slate-200 mx-1"></div>
         </nav>
-
-        <div
-          className={clsx(
-            "border-t border-slate-200 space-y-1 transition-all duration-300",
-            isCollapsed ? "p-2" : "p-3",
-          )}
-        >
-          <div onClick={handleNavigation}>
-            <NavItem
-              item={{
-                to: "/gateway-routing",
-                icon: Shuffle,
-                label: "Gateway Routing",
-              }}
-            />
-          </div>
-          <div onClick={handleNavigation}>
-            <NavItem
-              item={{ to: "/developers", icon: Code, label: "Developers" }}
-            />
-          </div>
-        </div>
       </div>
     </>
   );

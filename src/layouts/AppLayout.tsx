@@ -1,21 +1,16 @@
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { CommandPalette } from "../components/CommandPalette"; // Updated path
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 
 export function AppLayout() {
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setIsCommandPaletteOpen((open) => !open);
-      }
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) e.preventDefault();
     };
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
@@ -35,18 +30,11 @@ export function AppLayout() {
           !isCollapsed && "md:pl-64",
         )}
       >
-        <Header
-          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-          onOpenMobileNav={() => setIsMobileNavOpen(true)}
-        />
+        <Header onOpenMobileNav={() => setIsMobileNavOpen(true)} />
         <main className="flex-1 min-w-0 p-4 pb-24 bg-slate-50 overflow-auto sm:p-5 md:p-6 md:pb-6">
           <Outlet />
         </main>
       </div>
-      <CommandPalette
-        open={isCommandPaletteOpen}
-        onOpenChange={setIsCommandPaletteOpen}
-      />
     </div>
   );
 }

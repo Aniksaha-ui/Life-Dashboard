@@ -27,7 +27,7 @@ export default function LoginPage() {
   }, []);
 
   const loginMutation = useLoginMutation({
-    onSuccess: () => navigate("/dashboard", { replace: true }),
+    onSuccess: () => navigate("/account", { replace: true }),
     onError: (requestError) =>
       setError(requestError.message || "An error occurred. Please try again."),
   });
@@ -161,15 +161,6 @@ export default function LoginPage() {
             >
               {isLoading ? "Logging in..." : "Log in"}
             </button>
-            <div className="text-center">
-              <button
-                type="button"
-                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
-                onClick={() => navigate("/forgot-password")}
-              >
-                Forgot password?
-              </button>
-            </div>
           </form>
         </div>
         <div className="mt-6 text-center">

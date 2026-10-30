@@ -1,12 +1,10 @@
-import { Bell, LogOut, Menu, Search } from "lucide-react";
+import { LogOut, Menu, Search } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { User } from "../features/auth/types";
-import { api } from "../lib/api/client";
 import { useAuthStore } from "../stores/authStore";
 
 interface HeaderProps {
-  onOpenCommandPalette: () => void;
   onOpenMobileNav: () => void;
 }
 
@@ -28,7 +26,7 @@ function formatPreviousLogin(value?: string) {
   return `${day} ${month}, ${year} | ${time}`;
 }
 
-export function Header({ onOpenCommandPalette, onOpenMobileNav }: HeaderProps) {
+export function Header({ onOpenMobileNav }: HeaderProps) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
   const { user, clearAuth } = useAuthStore();
@@ -53,7 +51,6 @@ export function Header({ onOpenCommandPalette, onOpenMobileNav }: HeaderProps) {
   const previousLogin = formatPreviousLogin(previousLoginRaw);
 
   const handleLogout = async () => {
-    await api.auth.logout();
     clearAuth();
     navigate("/login");
   };
@@ -69,28 +66,13 @@ export function Header({ onOpenCommandPalette, onOpenMobileNav }: HeaderProps) {
         >
           <Menu className="w-5 h-5" />
         </button>
-        <button
-          onClick={onOpenCommandPalette}
-          className="flex items-center w-full max-w-sm min-w-0 gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100 hover:border-slate-300 transition-colors group text-left cursor-text"
-        >
+        <div className="flex w-full max-w-sm min-w-0 gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-left">
           <Search className="w-4 h-4 text-slate-400 group-hover:text-slate-500" />
           <span className="text-sm text-slate-500 flex-1">Search...</span>
-          <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-xs font-medium text-slate-500 bg-white border border-slate-200 rounded shadow-sm">
-            ⌘K
-          </kbd>
-        </button>
+        </div>
       </div>
 
       <div className="flex items-center gap-1 sm:gap-4">
-        {/* Notifications */}
-        <button
-          onClick={() => navigate("/notifications")}
-          className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-full transition-colors relative"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-        </button>
-
         {/* User Menu */}
         <div className="relative">
           <button
@@ -152,15 +134,6 @@ export function Header({ onOpenCommandPalette, onOpenMobileNav }: HeaderProps) {
                   >
                     <LogOut className="w-4 h-4" />
                     Logout
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowUserMenu(false);
-                      navigate("/change-password");
-                    }}
-                    className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 font-medium hover:text-primary-600 transition-colors w-full mt-4"
-                  >
-                    Change Password
                   </button>
                 </div>
               </div>
