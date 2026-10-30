@@ -14,6 +14,7 @@ import {
   FinancialOverviewPage,
   ReportDetailPage,
   ReportsPage,
+  SummaryReportPage,
 } from "../features/reports";
 import { AppLayout } from "../layouts/AppLayout";
 
@@ -44,6 +45,7 @@ const routes: RouteObject[] = [
             path: "reports/financial-overview",
             element: <FinancialOverviewPage />,
           },
+          { path: "reports/summary", element: <SummaryReportPage /> },
           { path: "reports/:reportId", element: <ReportDetailPage /> },
         ],
       },
