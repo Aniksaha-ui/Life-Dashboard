@@ -7,13 +7,18 @@ import { ReportChart } from "./components/ReportChart";
 import { ReportFilters } from "./components/ReportFilters";
 import { ReportsOverview } from "./components/ReportsOverview";
 import { getReportDefinition } from "./constants/reports";
+import { ManagementSummary } from "./current-vs-previous-month-analysis/components/ManagementSummary";
 import { useReport } from "./hooks/useReport";
 import type { ReportDefinition } from "./types";
+import { WeeklySpendProfile } from "./weekly-current-month-analysis/components/WeeklySpendProfile";
 
 function ReportContent({ definition }: { definition: ReportDefinition }) {
   const state = useReport(definition);
   const columns = useMemo(() => getReportColumns(state.rows), [state.rows]);
   const Icon = definition.icon;
+  const isCategoryUsage = definition.id === "category-usage-analysis";
+  const isCurrentVsPrevious = definition.id === "current-vs-previous-month-analysis";
+  const isWeeklyCurrentMonth = definition.id === "weekly-current-month-analysis";
 
   return (
     <div className="report-detail-page space-y-6">
@@ -61,10 +66,12 @@ function ReportContent({ definition }: { definition: ReportDefinition }) {
         isLoading={state.loading}
       />
 
-      <ReportsOverview metrics={state.metrics} loading={state.loading} />
-      <ReportChart chart={state.chart} />
+      {!isWeeklyCurrentMonth && <ReportsOverview metrics={state.metrics} loading={state.loading} />}
+      {isCurrentVsPrevious && !state.loading && <ManagementSummary report={state} />}
+      {isWeeklyCurrentMonth && !state.loading && <WeeklySpendProfile rows={state.rows} />}
+      {!isWeeklyCurrentMonth && <ReportChart chart={state.chart} />}
 
-      {(state.loading || state.rows.length > 0) && (
+      {!isWeeklyCurrentMonth && (state.loading || state.rows.length > 0) && (
         <DataTable
           data={state.rows}
           columns={columns}
@@ -73,17 +80,22 @@ function ReportContent({ definition }: { definition: ReportDefinition }) {
           hideToolbarDateFilter
           hideViewColumn
           filterActions={
-            <input
-              value={state.search}
-              onChange={(event) => state.setSearch(event.target.value)}
-              placeholder="Search report data"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm md:w-64"
-            />
+            <label className="relative block w-full md:w-80">
+              <span className="sr-only">Search report data</span>
+              <input
+                type="search"
+                value={state.search}
+                onChange={(event) => state.setSearch(event.target.value)}
+                placeholder={isCategoryUsage ? "Search category, usage count, amount, or share" : "Search report data"}
+                className="h-10 w-full rounded-xl border border-slate-300 bg-white py-2 pl-3 pr-9 text-sm text-slate-700 shadow-sm transition placeholder:text-slate-400 hover:border-slate-400 focus:border-primary-500 focus:outline-none focus:ring-4 focus:ring-primary-100"
+              />
+              {state.search && <button type="button" onClick={() => state.setSearch("")} aria-label="Clear search" className="absolute inset-y-0 right-2 my-auto grid h-7 w-7 place-items-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700">×</button>}
+            </label>
           }
         />
       )}
 
-      {!state.loading && !state.rows.length && (
+      {!isWeeklyCurrentMonth && !state.loading && !state.rows.length && (
         <section className="rounded-xl border border-slate-200 bg-white px-5 py-10 text-center shadow-sm">
           <BarChart3 className="mx-auto h-8 w-8 text-slate-300" />
           <p className="mt-3 text-sm font-medium text-slate-600">

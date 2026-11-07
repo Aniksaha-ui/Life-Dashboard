@@ -10,6 +10,7 @@ import { CategoriesPage } from "../features/categories";
 import { ExpenseTransactionsPage } from "../features/expense-transactions";
 import { TransfersPage } from "../features/transfers";
 import { RecurringExpensesPage } from "../features/recurring-expenses";
+import { FileManagerPage } from "../features/file-manager";
 import {
   BurnRateAnalysisPage,
   CategoryBreakdownPage,
@@ -20,6 +21,15 @@ import {
   SummaryReportPage,
 } from "../features/reports";
 import { AppLayout } from "../layouts/AppLayout";
+
+function LastVisitedRouteRedirect() {
+  const lastRoute = window.localStorage.getItem("life-dashboard:last-route");
+  const destination = lastRoute?.startsWith("/") && lastRoute !== "/"
+    ? lastRoute
+    : "/account";
+
+  return <Navigate to={destination} replace />;
+}
 
 const routes: RouteObject[] = [
   {
@@ -37,12 +47,13 @@ const routes: RouteObject[] = [
         path: "/",
         element: <AppLayout />,
         children: [
-          { index: true, element: <Navigate to="/account" replace /> },
+          { index: true, element: <LastVisitedRouteRedirect /> },
           { path: "account", element: <AccountsPage /> },
           { path: "categories", element: <CategoriesPage /> },
           { path: "transactions", element: <ExpenseTransactionsPage /> },
           { path: "transfers", element: <TransfersPage /> },
           { path: "recurring-expenses", element: <RecurringExpensesPage /> },
+          { path: "file-manager", element: <FileManagerPage /> },
           { path: "reports", element: <ReportsPage /> },
           {
             path: "reports/financial-overview",

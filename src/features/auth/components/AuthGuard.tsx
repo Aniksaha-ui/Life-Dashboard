@@ -22,7 +22,8 @@ export function GuestGuard({ children }: AuthGuardProps) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   if (isAuthenticated) {
-    return <Navigate to="/account" replace />;
+    const lastRoute = window.localStorage.getItem("life-dashboard:last-route");
+    return <Navigate to={lastRoute?.startsWith("/") ? lastRoute : "/account"} replace />;
   }
 
   return <>{children}</>;

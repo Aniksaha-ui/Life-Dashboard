@@ -1,10 +1,13 @@
 import clsx from "clsx";
-import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 
 export function AppLayout() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isInitialLocation = useRef(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
@@ -15,6 +18,35 @@ export function AppLayout() {
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
+
+  useEffect(() => {
+    const path = `${location.pathname}${location.search}${location.hash}`;
+    const savedPath = window.localStorage.getItem("life-dashboard:last-route");
+    const shouldRestoreSavedPath =
+      isInitialLocation.current &&
+      savedPath?.startsWith("/") &&
+      savedPath !== path;
+
+    if (shouldRestoreSavedPath) {
+      isInitialLocation.current = false;
+      navigate(savedPath, { replace: true });
+      return;
+    }
+
+    if (!isInitialLocation.current && location.pathname !== "/") {
+      window.localStorage.setItem("life-dashboard:last-route", path);
+    }
+
+    isInitialLocation.current = false;
+  }, [location.hash, location.pathname, location.search, navigate]);
+
+  useEffect(() => {
+    const persistCurrentLocation = () => {
+      window.localStorage.setItem("life-dashboard:last-route", `${location.pathname}${location.search}${location.hash}`);
+    };
+    window.addEventListener("beforeunload", persistCurrentLocation);
+    return () => window.removeEventListener("beforeunload", persistCurrentLocation);
+  }, [location.hash, location.pathname, location.search]);
 
   return (
     <div className="min-h-[100dvh] bg-white">
