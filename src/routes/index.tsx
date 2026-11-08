@@ -11,6 +11,7 @@ import { ExpenseTransactionsPage } from "../features/expense-transactions";
 import { TransfersPage } from "../features/transfers";
 import { RecurringExpensesPage } from "../features/recurring-expenses";
 import { FileManagerPage } from "../features/file-manager";
+import { FinancialIntelligencePage } from "../features/financial-intelligence";
 import {
   BurnRateAnalysisPage,
   CategoryBreakdownPage,
@@ -54,6 +55,7 @@ const routes: RouteObject[] = [
           { path: "transfers", element: <TransfersPage /> },
           { path: "recurring-expenses", element: <RecurringExpensesPage /> },
           { path: "file-manager", element: <FileManagerPage /> },
+          { path: "financial-intelligence", element: <FinancialIntelligencePage /> },
           { path: "reports", element: <ReportsPage /> },
           {
             path: "reports/financial-overview",

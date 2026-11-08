@@ -517,6 +517,24 @@
     display: block !important;
     -webkit-print-color-adjust: exact;
   }
+
+  /* File previews should remain readable; the general compact table rules
+     are intended for dashboard tables, not document content. */
+  .file-preview-table,
+  .file-preview-table td,
+  .file-preview-table td * {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+  }
+
+  .file-preview-table td {
+    min-height: 2.75rem;
+    padding: 0.65rem 0.75rem !important;
+  }
+
+  .file-preview-image {
+    min-height: 16rem;
+  }
 }
 
 /* Make table font size smaller overall across the project under 1200px width */

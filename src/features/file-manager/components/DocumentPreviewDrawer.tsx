@@ -193,7 +193,7 @@ export function DocumentPreviewDrawer({
               </select>
             </div>
             <div className="flex-1 overflow-auto">
-              <table className="min-w-full border-collapse text-left text-xs sm:text-sm">
+              <table className="file-preview-table min-w-full border-collapse text-left text-sm">
                 <tbody>
                   {rows.map((row, rowIndex) => (
                     <tr
@@ -209,7 +209,7 @@ export function DocumentPreviewDrawer({
                           key={cellIndex}
                           className="whitespace-nowrap border-b border-r border-slate-100 px-3 py-2"
                         >
-                          {editing ? <input value={String(cell ?? "")} onChange={(event) => updateCell(rowIndex, cellIndex, event.target.value)} className="min-w-28 rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 outline-none focus:border-primary-500 sm:text-sm" /> : String(cell ?? "")}
+                          {editing ? <input value={String(cell ?? "")} onChange={(event) => updateCell(rowIndex, cellIndex, event.target.value)} className="min-w-32 rounded border border-slate-200 bg-white px-2 py-2 text-sm text-slate-700 outline-none focus:border-primary-500" /> : String(cell ?? "")}
                         </td>
                       ))}
                     </tr>
@@ -227,7 +227,7 @@ export function DocumentPreviewDrawer({
           <img
             src={url}
             alt={filename(file)}
-            className="h-full w-full object-contain"
+            className="file-preview-image h-full w-full rounded-xl bg-slate-50 object-contain"
           />
         ) : mime.includes("pdf") ? (
           <iframe

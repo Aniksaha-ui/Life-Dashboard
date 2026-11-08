@@ -10,6 +10,7 @@ import {
   Repeat,
   Tags,
   Folder,
+  BrainCircuit,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -23,6 +24,7 @@ const navItems = [
   { to: "/transfers", icon: Shuffle, label: "Transfers" },
   { to: "/recurring-expenses", icon: Repeat, label: "Recurring Expenses" },
   { to: "/file-manager", icon: Folder, label: "File Manager" },
+  { to: "/financial-intelligence", icon: BrainCircuit, label: "Financial Intelligence" },
   { to: "/reports", icon: BarChart3, label: "Reports" },
 ];
 
@@ -40,6 +42,9 @@ export function Sidebar({
   onMobileClose,
 }: SidebarProps) {
   const location = useLocation();
+  // A phone drawer must always show its labels. Desktop collapse preference
+  // should only affect the persistent desktop rail.
+  const isCompact = isCollapsed && !isMobileOpen;
 
   const getActiveParentLabel = (pathname: string): string | null => {
     const activeParent = navItems.find((item) =>
@@ -60,7 +65,7 @@ export function Sidebar({
   }, [location.pathname]);
 
   const toggleExpand = (label: string) => {
-    if (isCollapsed) {
+    if (isCompact) {
       onToggle(); // Open sidebar if a parent with children is clicked while collapsed
       setExpandedItem(label);
       return;
@@ -73,18 +78,18 @@ export function Sidebar({
       <div
         className={clsx(
           "flex items-center gap-3 w-full",
-          isCollapsed && "justify-center",
+          isCompact && "justify-center",
         )}
       >
         <item.icon className="w-5 h-5 min-w-[20px]" />
-        {!isCollapsed && <span className="truncate">{item.label}</span>}
+        {!isCompact && <span className="truncate">{item.label}</span>}
       </div>
     );
 
     if (item.children) {
       return (
         <div className="relative w-full">
-          {isCollapsed ? (
+          {isCompact ? (
             <Tooltip content={item.label} position="right" className="w-full">
               <button
                 onClick={() => toggleExpand(item.label)}
@@ -115,7 +120,7 @@ export function Sidebar({
             </button>
           )}
 
-          {!isCollapsed && item.children && (
+          {!isCompact && item.children && (
             <div
               className={clsx(
                 "grid transition-all duration-200 ease-in-out",
@@ -153,7 +158,7 @@ export function Sidebar({
 
     return (
       <div className="relative w-full">
-        {isCollapsed ? (
+        {isCompact ? (
           <Tooltip content={item.label} position="right" className="w-full">
             <NavLink
               to={item.to}
@@ -214,12 +219,12 @@ export function Sidebar({
         <div
           className={clsx(
             "h-16 flex items-center border-b border-slate-100 transition-all duration-300",
-            isCollapsed
+            isCompact
               ? "px-4 justify-center"
               : "px-5 justify-between md:px-6",
           )}
         >
-          {!isCollapsed ? (
+          {!isCompact ? (
             <>
               <div className="h-8 w-32">
                 <img
@@ -266,7 +271,7 @@ export function Sidebar({
         <nav
           className={clsx(
             "flex-1 py-4 space-y-1 scrollbar-hide transition-all duration-300",
-            isCollapsed ? "px-2 overflow-visible" : "px-3 overflow-y-auto",
+            isCompact ? "px-2 overflow-visible" : "px-3 overflow-y-auto",
           )}
         >
           {navItems.map((item) => (

@@ -37,6 +37,15 @@ const icon = (mime = "") =>
     : mime.includes("pdf")
       ? FileText
       : File;
+const fileKind = (file: any) => {
+  const name = String(file.original_name || file.name || "").toLowerCase();
+  if (/\.(xlsx|xls|xlsm|xlsb|ods)$/.test(name)) return "Excel workbook";
+  if (/\.csv$/.test(name)) return "CSV document";
+  if (/\.pdf$/.test(name)) return "PDF document";
+  if (file.mime_type?.startsWith("image/")) return "Image";
+  if (/\.(txt|md|json|xml|html|css|js)$/.test(name)) return "Text document";
+  return "Document";
+};
 
 export default function FileManagerPage() {
   const input = useRef<HTMLInputElement>(null);
@@ -165,7 +174,7 @@ export default function FileManagerPage() {
           <input ref={versionInput} className="hidden" type="file" onChange={(e) => { void uploadVersion(e.target.files); e.currentTarget.value = ""; }} />
         </div>
       </header>
-      <nav className="flex items-center gap-1 overflow-x-auto text-sm">
+      <nav className="flex min-w-0 items-center gap-1 overflow-x-auto pb-1 text-sm [scrollbar-width:none]">
         <button
           onClick={() => setFolderId(null)}
           className="whitespace-nowrap font-semibold text-primary-600"
@@ -173,11 +182,11 @@ export default function FileManagerPage() {
           My files
         </button>
         {(items.breadcrumbs ?? []).map((crumb: any) => (
-          <span key={crumb.id} className="flex items-center gap-1">
+          <span key={crumb.id} className="flex min-w-0 items-center gap-1">
             <ChevronRight className="h-4 w-4 text-slate-400" />
             <button
               onClick={() => setFolderId(crumb.id)}
-              className="whitespace-nowrap text-slate-600 hover:text-primary-600"
+              className="max-w-28 truncate whitespace-nowrap text-slate-600 hover:text-primary-600 sm:max-w-none"
             >
               {crumb.name}
             </button>
@@ -255,29 +264,31 @@ export default function FileManagerPage() {
                   return (
                     <article
                       key={file.id}
-                      className="flex flex-wrap items-start gap-3 rounded-xl border border-slate-100 p-3 hover:bg-slate-50 sm:items-center sm:flex-nowrap"
+                      className="flex flex-wrap items-start gap-3 rounded-xl border border-slate-100 bg-white p-3 shadow-sm transition hover:border-primary-100 hover:bg-primary-50/30 sm:items-center sm:flex-nowrap"
                     >
-                      <Icon className="h-5 w-5 shrink-0 text-primary-600" />
+                      <Icon className="h-6 w-6 shrink-0 text-primary-600 sm:h-5 sm:w-5" />
                       <div className="min-w-0 flex-[1_1_12rem]">
-                        <p className="truncate text-sm font-semibold text-slate-800">
+                        <p className="truncate text-[15px] font-semibold text-slate-800 sm:text-sm">
                           {file.original_name || file.name}
                         </p>
-                        <p className="mt-0.5 text-xs text-slate-500">
-                          {file.mime_type || "Unknown type"} · {size(file.size)}
+                        <p className="mt-1 truncate text-sm text-slate-500 sm:mt-0.5 sm:text-xs">
+                          {fileKind(file)} · {size(file.size)}
                         </p>
                       </div>
-                      <div className="flex w-full justify-end gap-1 border-t border-slate-100 pt-2 sm:w-auto sm:border-0 sm:pt-0">
-                        <button onClick={() => setPreviewFile(file)} className="rounded-lg p-2 text-slate-500 hover:bg-primary-50 hover:text-primary-600" title="Preview file"><Eye className="h-4 w-4" /></button>
-                        <button onClick={() => { setVersionTarget(file); versionInput.current?.click(); }} className="rounded-lg p-2 text-slate-500 hover:bg-primary-50 hover:text-primary-600" title="Upload new version"><Upload className="h-4 w-4" /></button>
+                      <div className="flex w-full items-center justify-end gap-1 border-t border-slate-100 pt-2 sm:w-auto sm:border-0 sm:pt-0">
+                        <span className="mr-auto text-[11px] font-semibold uppercase tracking-wide text-slate-400 sm:hidden">File actions</span>
+                        <button aria-label={`Preview ${file.original_name || file.name}`} onClick={() => setPreviewFile(file)} className="grid h-10 w-10 place-items-center rounded-lg text-slate-500 hover:bg-primary-50 hover:text-primary-600 sm:h-8 sm:w-8" title="Preview file"><Eye className="h-5 w-5 sm:h-4 sm:w-4" /></button>
+                        <button aria-label={`Upload new version of ${file.original_name || file.name}`} onClick={() => { setVersionTarget(file); versionInput.current?.click(); }} className="grid h-10 w-10 place-items-center rounded-lg text-slate-500 hover:bg-primary-50 hover:text-primary-600 sm:h-8 sm:w-8" title="Upload new version"><Upload className="h-5 w-5 sm:h-4 sm:w-4" /></button>
                         <button
                           onClick={() =>
                             void downloadFile(file.id).catch((e) =>
                               toast.error(e.message),
                             )
                           }
-                          className="rounded-lg p-2 text-slate-500 hover:bg-primary-50 hover:text-primary-600"
+                          aria-label={`Download ${file.original_name || file.name}`}
+                          className="grid h-10 w-10 place-items-center rounded-lg text-slate-500 hover:bg-primary-50 hover:text-primary-600 sm:h-8 sm:w-8"
                         >
-                          <Download className="h-4 w-4" />
+                          <Download className="h-5 w-5 sm:h-4 sm:w-4" />
                         </button>
                         <Menu
                           onRename={() => openDialog("rename", "files", file)}
