@@ -107,14 +107,14 @@ export function CaptchaField({
   }, [value, captchaCode, onValidChange]);
 
   return (
-    <div className="space-y-2">
+    <div className="min-w-0 space-y-2">
       <label
         htmlFor="captcha-input"
         className="block text-sm font-medium text-slate-700"
       >
         Security Code
       </label>
-      <div className="flex items-stretch gap-2">
+      <div className="flex min-w-0 items-stretch gap-2 max-[420px]:flex-wrap">
         <div className="shrink-0 w-[120px] border border-slate-300 rounded-lg overflow-hidden bg-white">
           <canvas
             ref={canvasRef}
@@ -145,7 +145,7 @@ export function CaptchaField({
           }
           placeholder="Enter code"
           disabled={disabled}
-          className="flex-1 min-w-0 px-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+          className="box-border min-w-0 flex-1 px-2.5 sm:px-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors max-[420px]:h-11 max-[420px]:basis-full max-[420px]:flex-none"
         />
       </div>
       {error && <p className="text-xs text-rose-600">{error}</p>}

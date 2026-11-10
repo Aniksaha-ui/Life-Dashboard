@@ -12,6 +12,7 @@ import { useExpenseTransactions } from "./hooks/useExpenseTransactions";
 import { BulkTransactionModal } from "./components/BulkTransactionModal";
 import { TransactionDetailsDrawer } from "./components/TransactionDetailsDrawer";
 import { getTransactionColumns } from "./components/columns";
+import { MobileTransactionList } from "./components/MobileTransactionList";
 import { TransactionsOverview } from "./components/TransactionsOverview";
 
 const tabs = [
@@ -135,10 +136,10 @@ export default function ExpenseTransactionsPage() {
           </button>
         </div>
       </div>
-      <TransactionsOverview loading={state.loading} metrics={state.metrics} />
-      <section className="app-filter-panel rounded-xl border border-slate-200 bg-white p-4">
+      <div className="hidden md:block"><TransactionsOverview loading={state.loading} metrics={state.metrics} /></div>
+      <section className="app-filter-panel transaction-filter-panel rounded-xl border border-slate-200 bg-white p-4">
         <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-nowrap gap-2 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible md:pb-0">
             {tabs.map((tab) => (
               <button
                 key={tab}
@@ -149,11 +150,11 @@ export default function ExpenseTransactionsPage() {
               </button>
             ))}
           </div>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-2 lg:grid-cols-5">
             <select
               value={state.accountFilter}
               onChange={(event) => state.setAccountFilter(event.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="col-span-2 rounded-lg border border-slate-300 px-3 py-2 text-sm lg:col-span-1"
               aria-label="Filter by account"
             >
               <option value="all">All accounts</option>
@@ -166,7 +167,7 @@ export default function ExpenseTransactionsPage() {
             <select
               value={state.categoryFilter}
               onChange={(event) => state.setCategoryFilter(event.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="col-span-2 rounded-lg border border-slate-300 px-3 py-2 text-sm lg:col-span-1"
               aria-label="Filter by category"
             >
               <option value="all">All categories</option>
@@ -204,7 +205,7 @@ export default function ExpenseTransactionsPage() {
               value={state.search}
               onChange={(event) => state.setSearch(event.target.value)}
               placeholder="Search transactions"
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="col-span-2 rounded-lg border border-slate-300 px-3 py-2 text-sm lg:col-span-1"
             />
             <button
               onClick={() => void state.refresh()}
@@ -227,6 +228,7 @@ export default function ExpenseTransactionsPage() {
           </div>
         </div>
       </section>
+      <div className="md:hidden"><MobileTransactionList rows={state.rows} loading={state.loading} onSelect={setSelectedTransaction} /></div>
       <DataTable
         data={state.rows}
         columns={columns}
@@ -235,7 +237,7 @@ export default function ExpenseTransactionsPage() {
         onRowClick={setSelectedTransaction}
         hideToolbarDateFilter
         hideViewColumn
-        className="transaction-table border-slate-200"
+        className="transaction-table hidden border-slate-200 md:block"
       />
       <TransactionDetailsDrawer
         transaction={selectedTransaction}

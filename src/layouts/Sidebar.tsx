@@ -11,10 +11,11 @@ import {
   Tags,
   Folder,
   BrainCircuit,
+  WalletCards,
+  LayoutDashboard,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import infinityLogo from "../assets/infinitycodehubltd.jpeg";
 import { Tooltip } from "../components/Tooltip";
 
 const navItems = [
@@ -23,6 +24,7 @@ const navItems = [
   { to: "/transactions", icon: CreditCard, label: "Transactions" },
   { to: "/transfers", icon: Shuffle, label: "Transfers" },
   { to: "/recurring-expenses", icon: Repeat, label: "Recurring Expenses" },
+  { to: "/budgets", icon: WalletCards, label: "Budgets" },
   { to: "/file-manager", icon: Folder, label: "File Manager" },
   { to: "/financial-intelligence", icon: BrainCircuit, label: "Financial Intelligence" },
   { to: "/reports", icon: BarChart3, label: "Reports" },
@@ -226,12 +228,13 @@ export function Sidebar({
         >
           {!isCompact ? (
             <>
-              <div className="h-8 w-32">
-                <img
-                  src={infinityLogo}
-                  alt="Infinity Code Hub"
-                  className="h-full w-full object-contain"
-                />
+              <div className="flex min-w-0 items-center gap-2.5" aria-label="Life Dashboard">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary-600 text-white shadow-sm">
+                  <LayoutDashboard className="h-4 w-4" />
+                </span>
+                <span className="truncate text-base font-bold tracking-tight text-slate-900">
+                  Life Dashboard
+                </span>
               </div>
               <button
                 onClick={onToggle}

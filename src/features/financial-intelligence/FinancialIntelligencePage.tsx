@@ -23,14 +23,14 @@ const amount = (value: unknown) =>
 const today = () => new Date().toISOString().slice(0, 10);
 function Card({ label, value, icon: Icon, tone }: any) {
   return (
-    <article className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <span className={`grid h-10 w-10 place-items-center rounded-xl ${tone}`}>
-        <Icon className="h-5 w-5" />
+    <article className="financial-intelligence-metric group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-5">
+      <span className={`grid h-9 w-9 place-items-center rounded-xl sm:h-10 sm:w-10 ${tone}`}>
+        <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
       </span>
-      <p className="mt-6 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+      <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500 sm:mt-6 sm:text-xs sm:tracking-[0.12em]">
         {label}
       </p>
-      <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+      <p className="mt-1 truncate text-lg font-bold tracking-tight text-slate-900 sm:text-2xl">
         {value}
       </p>
       <span
@@ -41,14 +41,14 @@ function Card({ label, value, icon: Icon, tone }: any) {
 }
 function Panel({ title, icon: Icon, children }: any) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="flex items-center gap-2 border-b border-slate-100 px-5 py-4">
+    <section className="financial-intelligence-panel overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="flex items-center gap-2 border-b border-slate-100 px-4 py-3.5 sm:px-5 sm:py-4">
         <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary-50 text-primary-600">
           <Icon className="h-4 w-4" />
         </span>
         <h2 className="font-semibold text-slate-900">{title}</h2>
       </div>
-      <div className="p-5">{children}</div>
+      <div className="p-4 sm:p-5">{children}</div>
     </section>
   );
 }
@@ -118,29 +118,16 @@ export default function FinancialIntelligencePage() {
     }
   };
   return (
-    <div className="space-y-5">
-      <header className="relative overflow-hidden rounded-2xl border border-primary-100 bg-gradient-to-br from-[#eaf2ff] via-white to-cyan-50 p-5 shadow-sm sm:p-6">
-        <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-primary-200/30 blur-3xl" />
-        <div className="flex flex-col justify-between gap-4 sm:flex-row">
-          <div className="relative">
-            <p className="text-xs font-semibold uppercase tracking-[.16em] text-primary-700">
-              Financial intelligence
-            </p>
-            <h1 className="mt-1 flex items-center gap-2 text-2xl font-bold text-slate-900">
-              <BrainCircuit className="h-6 w-6 text-primary-600" />
-              Financial Intelligence
-            </h1>
-            <p className="mt-2 text-sm text-slate-600">
-              Cash flow, forecasts, recommendations, and unusual spending in one
-              decision-ready view.
-            </p>
+    <div className="financial-intelligence-page space-y-4 sm:space-y-5">
+      <header className="financial-intelligence-hero rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+          <div>
+            <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900"><BrainCircuit className="h-6 w-6 text-primary-600" /> Financial Actions</h1>
+            <p className="mt-1 text-sm text-slate-500">Cash flow health, forecast signals, and prioritized actions for your finances.</p>
           </div>
-          <span className="relative inline-flex h-fit w-fit items-center gap-2 rounded-xl border border-primary-100 bg-white/90 px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm">
-            <CalendarRange className="h-4 w-4" />
-            Live analysis
-          </span>
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary-100 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700"><CalendarRange className="h-4 w-4" /> Live analysis</span>
         </div>
-        <div className="relative mt-6 grid gap-3 rounded-2xl border border-white/80 bg-white/75 p-3 shadow-sm sm:grid-cols-3">
+        <div className="mt-5 flex flex-wrap items-end gap-2 border-t border-slate-100 pt-4">
           <label className="grid gap-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
             From date
             <input
@@ -148,7 +135,7 @@ export default function FinancialIntelligencePage() {
               value={from}
               max={to}
               onChange={(e) => setFrom(e.target.value)}
-              className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal text-slate-700 outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
+              className="h-9 rounded-full border border-slate-200 bg-white px-3 text-sm font-normal normal-case text-slate-700 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
             />
           </label>
           <label className="grid gap-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
@@ -158,12 +145,12 @@ export default function FinancialIntelligencePage() {
               value={to}
               min={from}
               onChange={(e) => setTo(e.target.value)}
-              className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal text-slate-700 outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
+              className="h-9 rounded-full border border-slate-200 bg-white px-3 text-sm font-normal normal-case text-slate-700 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
             />
           </label>
           <button
             onClick={() => void load()}
-            className="mt-auto inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-600 px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:opacity-60"
+            className="mt-auto inline-flex h-9 items-center justify-center gap-2 rounded-full bg-primary-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:opacity-60"
           >
             <RefreshCcw
               className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
@@ -183,7 +170,9 @@ export default function FinancialIntelligencePage() {
         </div>
       ) : (
         <>
-          <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <section>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900">Overview</h2>
+            <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             <Card
               label="Current balance"
               value={amount(metrics.current_balance)}
@@ -208,11 +197,30 @@ export default function FinancialIntelligencePage() {
               icon={WalletCards}
               tone="bg-cyan-50 text-cyan-600"
             />
+            </div>
           </section>
-          <section className="grid gap-5 2xl:grid-cols-[minmax(0,1.55fr)_minmax(360px,.8fr)]">
+          <Panel title="Ask about your finances" icon={BrainCircuit}>
+            <form onSubmit={ask} className="flex flex-col gap-3 sm:flex-row">
+              <input
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder="For example: Why did my expenses increase?"
+                className="h-11 w-full min-w-0 flex-none rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 sm:w-auto sm:flex-1"
+              />
+              <button
+                disabled={asking}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+              >
+                <Send className="h-4 w-4" />
+                {asking ? "Thinking…" : "Ask question"}
+              </button>
+            </form>
+            {answer && <p className="mt-4 rounded-xl border border-primary-100 bg-primary-50 p-4 text-sm leading-6 text-slate-700">{answer}</p>}
+          </Panel>
+          <section className="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(280px,.85fr)]">
             <div className="space-y-5">
-              <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,.65fr)]">
-                <Panel title="Financial briefing" icon={BrainCircuit}>
+              <div className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(250px,.8fr)]">
+                <Panel title="Priority finance signals" icon={BrainCircuit}>
                   {insights.length ? (
                     <div className="space-y-3">
                       {insights.map((i: any) => (
@@ -236,7 +244,7 @@ export default function FinancialIntelligencePage() {
                     <Empty text="No insight is available for this date range yet." />
                   )}
                 </Panel>
-                <Panel title="Month-end forecast" icon={TrendingUp}>
+                <Panel title="Projected month end" icon={TrendingUp}>
                   {forecast.available ? (
                     <div className="space-y-3">
                       {["income", "expenses", "net_cash_flow"].map((key) => (
@@ -263,8 +271,8 @@ export default function FinancialIntelligencePage() {
                   )}
                 </Panel>
               </div>
-              <div className="grid gap-5 xl:grid-cols-2">
-                <Panel title="Recommended next steps" icon={Lightbulb}>
+              <div className="grid gap-5 lg:grid-cols-2">
+                <Panel title="Recommended actions" icon={Lightbulb}>
                   {recommendations.length ? (
                     recommendations.map((r: any) => (
                       <div
@@ -284,7 +292,7 @@ export default function FinancialIntelligencePage() {
                     <Empty text="No additional action is recommended." />
                   )}
                 </Panel>
-                <Panel title="Category spending" icon={TrendingDown}>
+                <Panel title="Spending exposure" icon={TrendingDown}>
                   {categories.length ? (
                     categories.slice(0, 5).map((c: any) => {
                       const share = metrics.total_expenses
@@ -312,8 +320,8 @@ export default function FinancialIntelligencePage() {
                 </Panel>
               </div>
             </div>
-            <aside className="space-y-5 2xl:sticky 2xl:top-6 2xl:self-start">
-              <Panel title="Unusual spending" icon={AlertTriangle}>
+            <aside className="space-y-5 xl:sticky xl:top-6 xl:self-start">
+              <Panel title="Action now · unusual spending" icon={AlertTriangle}>
                 {anomalies.length ? (
                   anomalies.slice(0, 5).map((a) => (
                     <article
@@ -338,7 +346,7 @@ export default function FinancialIntelligencePage() {
                   <Empty text="No unusual spending has been detected." />
                 )}
               </Panel>
-              <Panel title="Weekly spending" icon={CalendarRange}>
+              <Panel title="Recent spending pulse" icon={CalendarRange}>
                 {weeks.length ? (
                   weeks.map((w: any) => (
                     <div
@@ -362,28 +370,6 @@ export default function FinancialIntelligencePage() {
               </Panel>
             </aside>
           </section>
-          <Panel title="Ask about your finances" icon={BrainCircuit}>
-            <form onSubmit={ask} className="flex flex-col gap-3 sm:flex-row">
-              <input
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Why did my expenses increase?"
-                className="h-11 flex-1 rounded-lg border border-slate-300 px-3 text-sm"
-              />
-              <button
-                disabled={asking}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white"
-              >
-                <Send className="h-4 w-4" />
-                {asking ? "Thinking…" : "Ask question"}
-              </button>
-            </form>
-            {answer && (
-              <p className="mt-4 rounded-xl bg-primary-50 p-4 text-sm leading-6 text-slate-700">
-                {answer}
-              </p>
-            )}
-          </Panel>
         </>
       )}
     </div>
