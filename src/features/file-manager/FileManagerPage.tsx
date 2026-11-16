@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
-import { Loader } from "../../components/Loader";
+import { PageLoadingState } from "../../components/PageLoadingState";
 import {
   createFolder,
   deleteItem,
@@ -221,11 +221,7 @@ export default function FileManagerPage() {
           Upload to {items.folder?.name || "My files"}
         </p>
       </section>
-      {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <Loader size="lg" />
-        </div>
-      ) : (
+      {loading ? <PageLoadingState /> : (
         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="border-b border-slate-100 px-5 py-4 text-sm font-semibold text-slate-700">
             {all.length

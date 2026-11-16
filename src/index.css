@@ -99,6 +99,10 @@
   display: none;
 }
 
+.page-loading-state {
+  width: 100%;
+}
+
 /* Small-screen application shell: preserve readable controls and avoid horizontal page drift. */
 @media (max-width: 767px) {
   body {
@@ -185,6 +189,20 @@
 
   table {
     min-width: max-content;
+  }
+
+  .data-table-loading-cell {
+    height: calc(100dvh - 16rem) !important;
+    min-height: 18rem;
+  }
+
+  .data-table-loading-cell > div > span {
+    display: none;
+  }
+
+  .data-table-loading-cell .data-table-loader-spinner {
+    width: 3.5rem !important;
+    height: 3.5rem !important;
   }
 
   .card {

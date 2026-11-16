@@ -1,9 +1,12 @@
-import { CalendarDays, Plus, RefreshCcw, Search, WalletCards, X } from "lucide-react";
+import { CalendarDays, CircleCheck, Plus, RefreshCcw, Search, TrendingDown, WalletCards, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { PageLoadingState } from "../../components/PageLoadingState";
 import { BudgetForm } from "./components/BudgetForm";
 import { BudgetReportList } from "./components/BudgetReportList";
 import { useBudgets } from "./hooks/useBudgets";
 import type { BudgetApiItem } from "./types";
+
+const money = (value: number) => `BDT ${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export default function BudgetsPage() {
   const state = useBudgets();
@@ -12,26 +15,23 @@ export default function BudgetsPage() {
   const [draftDate, setDraftDate] = useState(state.date);
   const [search, setSearch] = useState("");
   useEffect(() => setDraftDate(state.date), [state.date]);
-  const save = async (values: Parameters<typeof state.save>[0]) => {
-    await state.save(values, editing);
-    setEditing(null);
-    setIsFormOpen(false);
-  };
-  const remove = async (budget: BudgetApiItem) => {
-    if (!window.confirm(`Remove the ${budget.category_name || "selected"} budget?`)) return;
-    await state.remove(budget.id);
-  };
-  const filteredBudgets = useMemo(
-    () => state.budgets.filter((budget) => `${budget.category_name || ""} ${budget.period_type || ""}`.toLowerCase().includes(search.toLowerCase())),
-    [search, state.budgets],
-  );
 
-  return (
-    <div className="app-management-page budgets-page space-y-6">
-      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"><div className="flex flex-col gap-5 border-b border-slate-100 px-4 py-5 sm:px-6"><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h1 className="flex items-center gap-2 text-xl font-bold text-slate-900"><WalletCards className="h-5 w-5 text-primary-600" /> Budget Report</h1><p className="mt-1 text-sm text-slate-500">Review category limits, spending, and available balance.</p></div><button type="button" onClick={() => { setEditing(null); setIsFormOpen(true); }} className="inline-flex items-center justify-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"><Plus className="h-4 w-4" /> Add Budget</button></div><div className="flex flex-col gap-2 lg:flex-row lg:items-center"><div className="relative"><CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input type="date" value={draftDate} onChange={(event) => setDraftDate(event.target.value)} className="h-10 w-full rounded-full border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm font-medium text-slate-700 outline-none transition-colors focus:border-primary-500 sm:w-auto" /></div><div className="relative"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search category" className="h-10 w-full rounded-full border border-slate-200 py-2 pl-9 pr-8 text-sm text-slate-700 outline-none transition-colors focus:border-primary-500 sm:w-52" />{search && <button type="button" onClick={() => setSearch("")} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600"><X className="h-3.5 w-3.5" /></button>}</div><button type="button" disabled={draftDate === state.date || state.isLoading} onClick={() => { setEditing(null); state.setDate(draftDate); }} className="h-10 rounded-full bg-primary-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:bg-slate-100 disabled:text-slate-400">Apply Filters</button><button type="button" onClick={() => { setSearch(""); setDraftDate(state.date); }} className="h-10 px-3 text-sm font-medium text-primary-700 hover:text-primary-900">Clear</button><button type="button" onClick={() => void state.refresh()} disabled={state.isLoading} aria-label="Refresh budgets" className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50"><RefreshCcw className={`h-4 w-4 ${state.isLoading ? "animate-spin" : ""}`} /></button></div></div>
-        <div className="bg-slate-50/40 p-4 sm:p-6">{state.isLoading ? <div className="space-y-4">{[1, 2, 3].map((item) => <div key={item} className="h-28 animate-pulse rounded-xl border border-slate-100 bg-slate-100" />)}</div> : <BudgetReportList budgets={filteredBudgets} onEdit={(budget) => { setEditing(budget); setIsFormOpen(true); }} onDelete={(budget) => void remove(budget)} />}</div>
-      </section>
-      <BudgetForm open={isFormOpen} categories={state.categories} editing={editing} onCancel={() => { setEditing(null); setIsFormOpen(false); }} onSave={save} />
-    </div>
-  );
+  const filteredBudgets = useMemo(() => state.budgets.filter((budget) => `${budget.category_name || ""} ${budget.period_type || ""}`.toLowerCase().includes(search.toLowerCase())), [search, state.budgets]);
+  const usedPercent = state.totals.planned ? Math.min(100, (state.totals.spent / state.totals.planned) * 100) : 0;
+  const save = async (values: Parameters<typeof state.save>[0]) => { await state.save(values, editing); setEditing(null); setIsFormOpen(false); };
+  const remove = async (budget: BudgetApiItem) => { if (window.confirm(`Remove the ${budget.category_name || "selected"} budget?`)) await state.remove(budget.id); };
+  const openNewBudget = () => { setEditing(null); setIsFormOpen(true); };
+
+  return <div className="budgets-page space-y-5">
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-wider text-primary-700">Plan with confidence</p><h1 className="mt-1 flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900"><WalletCards className="h-6 w-6 text-primary-600" /> Your budgets</h1><p className="mt-1 max-w-xl text-sm leading-6 text-slate-500">Set spending limits by category and stay ahead of your monthly plan.</p></div><button type="button" onClick={openNewBudget} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white shadow-sm shadow-primary-600/20 hover:bg-primary-700"><Plus className="h-4 w-4" /> Add budget</button></header>
+
+    <section className="grid gap-3 sm:grid-cols-3"><BudgetMetric icon={WalletCards} label="Planned" value={money(state.totals.planned)} tone="bg-primary-50 text-primary-600" /><BudgetMetric icon={TrendingDown} label="Spent so far" value={money(state.totals.spent)} helper={`${usedPercent.toFixed(0)}% of plan`} tone="bg-amber-50 text-amber-600" /><BudgetMetric icon={CircleCheck} label={state.totals.remaining < 0 ? "Over budget" : "Available"} value={money(state.totals.remaining)} tone={state.totals.remaining < 0 ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"} /></section>
+
+    <section className="rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="flex flex-col gap-4 border-b border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5"><div><h2 className="font-semibold text-slate-900">Budget plan</h2><p className="mt-1 text-sm text-slate-500">{filteredBudgets.length} {filteredBudgets.length === 1 ? "category" : "categories"} in this view</p></div><button type="button" onClick={() => void state.refresh()} disabled={state.isLoading} className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-60"><RefreshCcw className={`h-4 w-4 ${state.isLoading ? "animate-spin" : ""}`} /> Refresh</button></div><div className="grid gap-3 border-b border-slate-100 bg-slate-50/60 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] sm:p-5"><label className="relative"><CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input type="date" value={draftDate} onChange={(event) => setDraftDate(event.target.value)} className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-700 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100" /></label><label className="relative"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search a category" className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-8 text-sm text-slate-700 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100" />{search && <button type="button" onClick={() => setSearch("")} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600"><X className="h-4 w-4" /></button>}</label><button type="button" disabled={draftDate === state.date || state.isLoading} onClick={() => state.setDate(draftDate)} className="h-10 rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700 disabled:bg-slate-200 disabled:text-slate-400">Apply</button><button type="button" onClick={() => { setSearch(""); setDraftDate(state.date); }} className="h-10 rounded-lg px-3 text-sm font-semibold text-primary-700 hover:bg-primary-50">Clear</button></div><div className="bg-slate-50/50 p-4 sm:p-5">{state.isLoading ? <PageLoadingState /> : <BudgetReportList budgets={filteredBudgets} onEdit={(budget) => { setEditing(budget); setIsFormOpen(true); }} onDelete={(budget) => void remove(budget)} />}</div></section>
+    <BudgetForm open={isFormOpen} categories={state.categories} editing={editing} onCancel={() => { setEditing(null); setIsFormOpen(false); }} onSave={save} />
+  </div>;
+}
+
+function BudgetMetric({ icon: Icon, label, value, helper, tone }: { icon: typeof WalletCards; label: string; value: string; helper?: string; tone: string }) {
+  return <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><div className="flex items-start gap-3"><span className={`grid h-9 w-9 place-items-center rounded-xl ${tone}`}><Icon className="h-4 w-4" /></span><div className="min-w-0"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p><p className="mt-1 truncate text-lg font-bold text-slate-900">{value}</p>{helper && <p className="mt-0.5 text-xs text-slate-500">{helper}</p>}</div></div></article>;
 }

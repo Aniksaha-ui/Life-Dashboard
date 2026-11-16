@@ -10,7 +10,7 @@ import {
   WalletCards,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Loader } from "../../components/Loader";
+import { PageLoadingState } from "../../components/PageLoadingState";
 import {
   askFinance,
   getAnomalies,
@@ -164,11 +164,7 @@ export default function FinancialIntelligencePage() {
           {error}
         </p>
       )}
-      {loading ? (
-        <div className="grid h-72 place-items-center">
-          <Loader size="lg" />
-        </div>
-      ) : (
+      {loading ? <PageLoadingState /> : (
         <>
           <section>
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900">Overview</h2>

@@ -21,7 +21,7 @@ import { Tooltip } from "../components/Tooltip";
 const navItems = [
   { to: "/account", icon: CreditCard, label: "Accounts" },
   { to: "/categories", icon: Tags, label: "Categories" },
-  { to: "/transactions", icon: CreditCard, label: "Transactions" },
+  { to: "/transactions", icon: CreditCard, label: "Transaction" },
   { to: "/transfers", icon: Shuffle, label: "Transfers" },
   { to: "/recurring-expenses", icon: Repeat, label: "Recurring Expenses" },
   { to: "/budgets", icon: WalletCards, label: "Budgets" },

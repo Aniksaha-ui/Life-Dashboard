@@ -501,7 +501,7 @@ export function DataTable<TData, TValue>({
                   className="data-table-loading-cell h-36 text-center text-slate-500"
                 >
                   <div className="flex flex-col items-center justify-center gap-3">
-                    <Loader size="sm" />
+                    <Loader size="sm" className="data-table-loader-spinner" />
                     <span className="text-sm font-medium">{loadingText}</span>
                   </div>
                 </td>

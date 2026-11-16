@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Header } from "./Header";
+import { MobileBottomNavigation } from "./MobileBottomNavigation";
 import { Sidebar } from "./Sidebar";
 
 export function AppLayout() {
@@ -67,6 +68,7 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
+      <MobileBottomNavigation onOpenMenu={() => setIsMobileNavOpen(true)} />
     </div>
   );
 }

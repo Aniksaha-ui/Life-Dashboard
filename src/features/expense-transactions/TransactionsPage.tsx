@@ -98,11 +98,10 @@ export default function ExpenseTransactionsPage() {
       <div className="app-page-header flex flex-col gap-4 sm:flex-row sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Transaction Management
+            Transaction
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            Track income, expenses, and deposits while keeping account balances
-            in sync.
+            Track income, expenses, and deposits while keeping account balances in sync.
           </p>
         </div>
         <div className="app-page-actions flex flex-wrap gap-2">

@@ -1,4 +1,5 @@
 import { ChevronRight, ReceiptText } from "lucide-react";
+import { PageLoadingState } from "../../../components/PageLoadingState";
 
 interface MobileTransactionListProps {
   rows: any[];
@@ -14,9 +15,7 @@ const typeStyles: Record<string, string> = {
 };
 
 export function MobileTransactionList({ rows, loading, onSelect }: MobileTransactionListProps) {
-  if (loading) {
-    return <div className="space-y-3">{[1, 2, 3].map((item) => <div key={item} className="h-32 animate-pulse rounded-2xl border border-slate-200 bg-white" />)}</div>;
-  }
+  if (loading) return <PageLoadingState />;
 
   if (rows.length === 0) {
     return <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-14 text-center"><span className="mx-auto grid h-11 w-11 place-items-center rounded-xl bg-primary-50 text-primary-600"><ReceiptText className="h-5 w-5" /></span><h2 className="mt-4 font-semibold text-slate-900">No transactions found</h2><p className="mt-1 text-sm text-slate-500">Adjust your filters or add a new transaction.</p></div>;
