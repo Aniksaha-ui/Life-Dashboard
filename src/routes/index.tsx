@@ -13,6 +13,7 @@ import { RecurringExpensesPage } from "../features/recurring-expenses";
 import { FileManagerPage } from "../features/file-manager";
 import { FinancialIntelligencePage } from "../features/financial-intelligence";
 import { BudgetsPage } from "../features/budgets";
+import { BlogEditorPage, BlogsPage } from "../features/blogs";
 import {
   BurnRateAnalysisPage,
   CategoryBreakdownPage,
@@ -56,6 +57,9 @@ const routes: RouteObject[] = [
           { path: "transfers", element: <TransfersPage /> },
           { path: "recurring-expenses", element: <RecurringExpensesPage /> },
           { path: "budgets", element: <BudgetsPage /> },
+          { path: "blogs", element: <BlogsPage /> },
+          { path: "blogs/new", element: <BlogEditorPage /> },
+          { path: "blogs/:blogId/edit", element: <BlogEditorPage /> },
           { path: "file-manager", element: <FileManagerPage /> },
           { path: "financial-intelligence", element: <FinancialIntelligencePage /> },
           { path: "reports", element: <ReportsPage /> },

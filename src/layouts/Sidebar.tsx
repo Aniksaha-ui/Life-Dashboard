@@ -13,6 +13,7 @@ import {
   BrainCircuit,
   WalletCards,
   LayoutDashboard,
+  BookOpen,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -25,6 +26,7 @@ const navItems = [
   { to: "/transfers", icon: Shuffle, label: "Transfers" },
   { to: "/recurring-expenses", icon: Repeat, label: "Recurring Expenses" },
   { to: "/budgets", icon: WalletCards, label: "Budgets" },
+  { to: "/blogs", icon: BookOpen, label: "Blogs" },
   { to: "/file-manager", icon: Folder, label: "File Manager" },
   { to: "/financial-intelligence", icon: BrainCircuit, label: "Financial Intelligence" },
   { to: "/reports", icon: BarChart3, label: "Reports" },
