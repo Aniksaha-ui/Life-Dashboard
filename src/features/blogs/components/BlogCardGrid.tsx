@@ -6,11 +6,11 @@ import type { BlogRow } from "../types";
 interface Pagination { currentPage: number; lastPage: number; total: number; from: number; to: number; }
 
 export function BlogCardGrid({ rows, isLoading, pagination, onPageChange, onEdit, onDelete }: { rows: BlogRow[]; isLoading: boolean; pagination: Pagination; onPageChange: (page: number) => void; onEdit: (row: BlogRow) => void; onDelete: (row: BlogRow) => void; }) {
-  if (isLoading) return <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{Array.from({ length: 6 }, (_, index) => <div key={index} className="h-[380px] animate-pulse rounded-2xl border border-slate-200 bg-white" />)}</div>;
+  if (isLoading) return <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{Array.from({ length: 6 }, (_, index) => <div key={index} className="h-[380px] animate-pulse rounded-2xl border border-slate-200 bg-white" />)}</div>;
   if (!rows.length) return <div className="rounded-xl border border-slate-200 bg-white"><EmptyState title="No blog posts found" subtitle="Try another filter or create a new post." /></div>;
 
   return <section className="space-y-5">
-    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {rows.map((row) => <article key={row.id} className="group flex min-h-[380px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg">
         <div className="relative h-44 overflow-hidden bg-gradient-to-br from-primary-100 via-slate-100 to-violet-100">
           {row.blog.image ? <img src={row.blog.image} alt="" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" onError={(event) => { event.currentTarget.style.display = "none"; }} /> : <FileText className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 text-primary-300" />}

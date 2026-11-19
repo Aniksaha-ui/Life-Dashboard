@@ -83,11 +83,82 @@
 @media (max-width: 640px) {
   .blog-preview-content { font-size: 0.9375rem; line-height: 1.8; }
   .blog-preview-content h2 { font-size: 1.4rem; }
+
+  /* Compact management views keep controls reachable and avoid clipped filters. */
+  .blog-management-page .app-page-header .app-page-primary-action,
+  .experience-page > header > button {
+    width: 100%;
+  }
+
+  .blog-management-page .app-filter-panel > div > div:last-child,
+  .blog-management-page .app-filter-panel label,
+  .experience-page label {
+    flex: 1 1 auto;
+  }
+
+  .experience-page > header,
+  .experience-page section {
+    border-radius: 1rem;
+  }
+
+  .experience-page .grid > article {
+    min-height: 0;
+  }
+
+  /* Projects use the first table column as the mobile card heading. */
+  .projects-page .compact-mobile-table.mobile-card-table tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem 1rem;
+    padding: 1rem;
+  }
+
+  .projects-page .compact-mobile-table.mobile-card-table td {
+    display: block;
+    padding: 0 !important;
+  }
+
+  .projects-page .compact-mobile-table.mobile-card-table td:first-child {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
+  .projects-page .compact-mobile-table.mobile-card-table td:first-child::before {
+    display: none;
+  }
+
+  .projects-page .compact-mobile-table.mobile-card-table td:last-child {
+    grid-column: 1 / -1;
+    padding-top: 0.75rem !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .blog-management-page .app-filter-panel label {
+    min-width: 17rem;
+  }
+
+  .experience-page > header,
+  .blog-management-page .app-page-header {
+    padding: 1.5rem;
+  }
 }
 
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
   body {

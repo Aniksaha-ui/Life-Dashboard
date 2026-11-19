@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   BookOpen,
   BriefcaseBusiness,
+  Code2,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -29,6 +30,7 @@ const navItems = [
   { to: "/budgets", icon: WalletCards, label: "Budgets" },
   { to: "/blogs", icon: BookOpen, label: "Blogs" },
   { to: "/experiences", icon: BriefcaseBusiness, label: "Experiences" },
+  { to: "/projects", icon: Code2, label: "Projects" },
   { to: "/file-manager", icon: Folder, label: "File Manager" },
   { to: "/financial-intelligence", icon: BrainCircuit, label: "Financial Intelligence" },
   { to: "/reports", icon: BarChart3, label: "Reports" },

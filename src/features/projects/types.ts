@@ -1,0 +1,2 @@
+export interface Project { id: string|number; project_name:string; description:string; website_link:string; frontend_tech:string; backend_tech:string; database:string; github_link:string; image?:string|null; no_of_developers:number; developers_name:string; start_date?:string|null; end_date?:string|null; isPublished:boolean|number|string; published_at?:string|null; }
+export type ProjectValues = Omit<Project,"id"|"isPublished"> & { isPublished:boolean };

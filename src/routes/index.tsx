@@ -16,6 +16,7 @@ import { BudgetsPage } from "../features/budgets";
 import { BlogPreviewPage, BlogsPage } from "../features/blogs";
 import BlogEditorPage from "../features/blogs/BlogEditorPage";
 import { ExperiencesPage } from "../features/experiences";
+import { ProjectsPage } from "../features/projects";
 import {
   BurnRateAnalysisPage,
   CategoryBreakdownPage,
@@ -64,6 +65,7 @@ const routes: RouteObject[] = [
           { path: "blogs/:blogId/edit", element: <BlogEditorPage /> },
           { path: "blogs/:blogId", element: <BlogPreviewPage /> },
           { path: "experiences", element: <ExperiencesPage /> },
+          { path: "projects", element: <ProjectsPage /> },
           { path: "file-manager", element: <FileManagerPage /> },
           { path: "financial-intelligence", element: <FinancialIntelligencePage /> },
           { path: "reports", element: <ReportsPage /> },
