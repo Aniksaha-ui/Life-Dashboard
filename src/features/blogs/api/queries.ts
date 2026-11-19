@@ -55,10 +55,17 @@ export interface BlogCollection {
 }
 
 export async function getBlogs(page = 1, search = ""): Promise<BlogCollection> {
-  const params = new URLSearchParams({ page: String(page), per_page: "15" });
+  const params = new URLSearchParams({ page: String(page), per_page: "10" });
   if (search.trim()) params.set("search", search.trim());
   const response = await request<BlogApiItem[] | { data?: BlogApiItem[]; current_page?: number; last_page?: number; total?: number; from?: number; to?: number }>(`/blogs?${params}`);
-  if (Array.isArray(response)) return { rows: response, pagination: { currentPage: 1, lastPage: 1, total: response.length, from: response.length ? 1 : 0, to: response.length } };
+  if (Array.isArray(response)) {
+    const total = response.length;
+    const lastPage = Math.max(1, Math.ceil(total / 10));
+    const currentPage = Math.min(Math.max(1, page), lastPage);
+    const from = total ? (currentPage - 1) * 10 + 1 : 0;
+    const rows = response.slice(from ? from - 1 : 0, from ? from + 9 : 10);
+    return { rows, pagination: { currentPage, lastPage, total, from, to: from ? from + rows.length - 1 : 0 } };
+  }
   const rows = response.data ?? [];
   return { rows, pagination: { currentPage: response.current_page ?? 1, lastPage: response.last_page ?? 1, total: response.total ?? rows.length, from: response.from ?? 0, to: response.to ?? rows.length } };
 }
