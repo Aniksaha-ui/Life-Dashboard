@@ -37,3 +37,15 @@ export interface BlogFormValues {
 export interface BlogPayload extends BlogFormValues {
   components_json: string;
 }
+
+export interface BlogRow {
+  id: string | number;
+  serial: number;
+  title: string;
+  author: string;
+  category: string;
+  publishedDateLabel: string;
+  isPublished: boolean;
+  viewCount: number;
+  blog: BlogApiItem;
+}
