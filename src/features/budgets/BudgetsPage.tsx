@@ -1,14 +1,22 @@
-import { CircleCheck, Plus, RefreshCcw, TrendingDown, WalletCards } from "lucide-react";
+import { ArrowDownWideNarrow, CalendarDays, Plus, RefreshCcw, X } from "lucide-react";
 import { outlinedControlClass, OutlinedField } from "../../components/OutlinedField";
 import { SearchField } from "../../components/SearchField";
 import { useEffect, useMemo, useState } from "react";
 import { PageLoadingState } from "../../components/PageLoadingState";
 import { BudgetForm } from "./components/BudgetForm";
-import { BudgetReportList } from "./components/BudgetReportList";
+import { BudgetReportList, budgetStatusStyles, formatMoney, getBudgetStatus, getBudgetUsage, type BudgetStatus } from "./components/BudgetReportList";
 import { useBudgets } from "./hooks/useBudgets";
 import type { BudgetApiItem } from "./types";
 
-const money = (value: number) => `BDT ${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+type StatusFilter = "all" | BudgetStatus;
+type SortKey = "usage" | "name" | "amount";
+
+const statusOrder: BudgetStatus[] = ["on-track", "close", "over"];
+const budgetAmount = (budget: BudgetApiItem) => Number(budget.effective_budget ?? budget.amount) || 0;
+const formatPlanDate = (value: string) => {
+  const date = new Date(`${value}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+};
 
 export default function BudgetsPage() {
   const state = useBudgets();
@@ -16,13 +24,26 @@ export default function BudgetsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [draftDate, setDraftDate] = useState(state.date);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [sortKey, setSortKey] = useState<SortKey>("usage");
   useEffect(() => setDraftDate(state.date), [state.date]);
 
-  const filteredBudgets = useMemo(() => state.budgets.filter((budget) => `${budget.category_name || ""} ${budget.period_type || ""}`.toLowerCase().includes(search.toLowerCase())), [search, state.budgets]);
-  const usedPercent = state.totals.planned ? Math.min(100, (state.totals.spent / state.totals.planned) * 100) : 0;
+  const statusCounts = useMemo(() => state.budgets.reduce<Record<BudgetStatus, number>>((counts, budget) => ({ ...counts, [getBudgetStatus(budget)]: counts[getBudgetStatus(budget)] + 1 }), { "on-track": 0, close: 0, over: 0 }), [state.budgets]);
+  const visibleBudgets = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return state.budgets
+      .filter((budget) => `${budget.category_name || ""} ${budget.period_type || ""}`.toLowerCase().includes(term))
+      .filter((budget) => statusFilter === "all" || getBudgetStatus(budget) === statusFilter)
+      .sort((a, b) => sortKey === "name" ? String(a.category_name || "").localeCompare(String(b.category_name || "")) : sortKey === "amount" ? budgetAmount(b) - budgetAmount(a) : getBudgetUsage(b) - getBudgetUsage(a));
+  }, [search, sortKey, state.budgets, statusFilter]);
+
+  const usedPercent = state.totals.planned ? (state.totals.spent / state.totals.planned) * 100 : 0;
+  const overall: BudgetStatus = state.totals.remaining < 0 ? "over" : usedPercent >= 80 ? "close" : "on-track";
+  const hasFilters = Boolean(search.trim()) || statusFilter !== "all";
   const save = async (values: Parameters<typeof state.save>[0]) => { await state.save(values, editing); setEditing(null); setIsFormOpen(false); };
   const remove = async (budget: BudgetApiItem) => { if (window.confirm(`Remove the ${budget.category_name || "selected"} budget?`)) await state.remove(budget.id); };
   const openNewBudget = () => { setEditing(null); setIsFormOpen(true); };
+  const clearFilters = () => { setSearch(""); setStatusFilter("all"); setDraftDate(state.date); };
 
   return <div className="app-management-page budgets-page space-y-6">
     <div className="app-page-header flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -36,13 +57,59 @@ export default function BudgetsPage() {
       </button>
     </div>
 
-    <section className="grid gap-3 sm:grid-cols-3"><BudgetMetric icon={WalletCards} label="Planned" value={money(state.totals.planned)} tone="bg-primary-50 text-primary-600" /><BudgetMetric icon={TrendingDown} label="Spent so far" value={money(state.totals.spent)} helper={`${usedPercent.toFixed(0)}% of plan`} tone="bg-amber-50 text-amber-600" /><BudgetMetric icon={CircleCheck} label={state.totals.remaining < 0 ? "Over budget" : "Available"} value={money(state.totals.remaining)} tone={state.totals.remaining < 0 ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"} /></section>
+    <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 text-white shadow-sm">
+      <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-center">
+        <div>
+          <p className="inline-flex items-center gap-1.5 text-xs font-medium text-primary-100"><CalendarDays className="h-3.5 w-3.5" />Plan as of {formatPlanDate(state.date)}</p>
+          <p className="mt-3 text-sm text-primary-100">Spent so far</p>
+          <p className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">{formatMoney(state.totals.spent)}</p>
+          <p className="mt-1 text-sm text-primary-100">of {formatMoney(state.totals.planned)} planned</p>
+          <div className="mt-5">
+            <div className="h-2.5 overflow-hidden rounded-full bg-white/15"><div className={`h-full rounded-full transition-[width] duration-700 ${overall === "over" ? "bg-rose-400" : overall === "close" ? "bg-amber-300" : "bg-emerald-300"}`} style={{ width: `${Math.min(100, usedPercent)}%` }} /></div>
+            <div className="mt-2 flex justify-between text-xs text-primary-100"><span>{usedPercent.toFixed(0)}% of plan used</span><span>{state.totals.remaining < 0 ? `${formatMoney(Math.abs(state.totals.remaining))} over` : `${formatMoney(state.totals.remaining)} available`}</span></div>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          {statusOrder.map((status) => {
+            const active = statusFilter === status;
+            return <button key={status} type="button" onClick={() => setStatusFilter(active ? "all" : status)} aria-pressed={active} className={`rounded-xl p-3 text-left ring-1 transition sm:p-4 ${active ? "bg-white text-slate-900 ring-white" : "bg-white/10 ring-white/15 hover:bg-white/15"}`}>
+              <span className={`block h-2 w-2 rounded-full ${budgetStatusStyles[status].dot}`} />
+              <span className="mt-3 block text-2xl font-bold">{statusCounts[status]}</span>
+              <span className={`mt-0.5 block text-xs ${active ? "text-slate-500" : "text-primary-100"}`}>{budgetStatusStyles[status].label}</span>
+            </button>;
+          })}
+        </div>
+      </div>
+    </section>
 
-    <section className="rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="flex flex-col gap-4 border-b border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5"><div><h2 className="font-semibold text-slate-900">Budget plan</h2><p className="mt-1 text-sm text-slate-500">{filteredBudgets.length} {filteredBudgets.length === 1 ? "category" : "categories"} in this view</p></div><button type="button" onClick={() => void state.refresh()} disabled={state.isLoading} className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-60"><RefreshCcw className={`h-4 w-4 ${state.isLoading ? "animate-spin" : ""}`} /> Refresh</button></div><div className="grid items-center gap-3 border-b border-slate-100 bg-slate-50/60 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] sm:p-5"><OutlinedField label="Plan date"><input type="date" value={draftDate} onChange={(event) => setDraftDate(event.target.value)} className={outlinedControlClass} /></OutlinedField><SearchField value={search} onChange={setSearch} placeholder="Search a category" /><button type="button" disabled={draftDate === state.date || state.isLoading} onClick={() => state.setDate(draftDate)} className="h-10 rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700 disabled:bg-slate-200 disabled:text-slate-400">Apply</button><button type="button" onClick={() => { setSearch(""); setDraftDate(state.date); }} className="h-10 rounded-lg px-3 text-sm font-semibold text-primary-700 hover:bg-primary-50">Clear</button></div><div className="bg-slate-50/50 p-4 sm:p-5">{state.isLoading ? <PageLoadingState /> : <BudgetReportList budgets={filteredBudgets} onEdit={(budget) => { setEditing(budget); setIsFormOpen(true); }} onDelete={(budget) => void remove(budget)} />}</div></section>
+    <section className="space-y-4">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4 xl:flex-row xl:items-center">
+        <div className="grid flex-1 gap-3 sm:grid-cols-[minmax(0,12rem)_auto_minmax(0,1fr)] sm:items-center">
+          <OutlinedField label="Plan date"><input type="date" value={draftDate} onChange={(event) => setDraftDate(event.target.value)} className={outlinedControlClass} /></OutlinedField>
+          <button type="button" disabled={draftDate === state.date || state.isLoading} onClick={() => state.setDate(draftDate)} className="h-10 rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700 disabled:bg-slate-100 disabled:text-slate-400">Apply</button>
+          <SearchField value={search} onChange={setSearch} placeholder="Search a category" />
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex rounded-lg bg-slate-100 p-1" role="group" aria-label="Filter by status">
+            {(["all", ...statusOrder] as StatusFilter[]).map((status) => <button key={status} type="button" onClick={() => setStatusFilter(status)} aria-pressed={statusFilter === status} className={`rounded-md px-2.5 py-1.5 text-xs font-semibold whitespace-nowrap transition ${statusFilter === status ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}>{status === "all" ? `All ${state.budgets.length}` : budgetStatusStyles[status].label}</button>)}
+          </div>
+          <label className="relative inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50">
+            <ArrowDownWideNarrow className="h-3.5 w-3.5" />
+            <span className="sr-only">Sort budgets</span>
+            <select value={sortKey} onChange={(event) => setSortKey(event.target.value as SortKey)} className="cursor-pointer appearance-none bg-transparent pr-1 outline-none">
+              <option value="usage">Most used</option>
+              <option value="amount">Largest budget</option>
+              <option value="name">Name A–Z</option>
+            </select>
+          </label>
+          <button type="button" onClick={() => void state.refresh()} disabled={state.isLoading} aria-label="Refresh budgets" className="grid h-9 w-9 place-items-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-60"><RefreshCcw className={`h-4 w-4 ${state.isLoading ? "animate-spin" : ""}`} /></button>
+        </div>
+      </div>
+
+      {hasFilters && <div className="flex items-center justify-between gap-3 px-1 text-sm text-slate-500"><span>Showing {visibleBudgets.length} of {state.budgets.length} budgets</span><button type="button" onClick={clearFilters} className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-50"><X className="h-3.5 w-3.5" />Clear filters</button></div>}
+
+      {state.isLoading ? <PageLoadingState /> : <BudgetReportList budgets={visibleBudgets} hasFilters={hasFilters} onEdit={(budget) => { setEditing(budget); setIsFormOpen(true); }} onDelete={(budget) => void remove(budget)} />}
+    </section>
     <BudgetForm open={isFormOpen} categories={state.categories} editing={editing} onCancel={() => { setEditing(null); setIsFormOpen(false); }} onSave={save} />
   </div>;
-}
-
-function BudgetMetric({ icon: Icon, label, value, helper, tone }: { icon: typeof WalletCards; label: string; value: string; helper?: string; tone: string }) {
-  return <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><div className="flex items-start gap-3"><span className={`grid h-9 w-9 place-items-center rounded-xl ${tone}`}><Icon className="h-4 w-4" /></span><div className="min-w-0"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p><p className="mt-1 truncate text-lg font-bold text-slate-900">{value}</p>{helper && <p className="mt-0.5 text-xs text-slate-500">{helper}</p>}</div></div></article>;
 }
