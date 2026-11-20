@@ -69,7 +69,7 @@ export function BudgetReportList({ budgets, hasFilters = false, onEdit, onDelete
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
               <h3 className="truncate text-base font-semibold text-slate-900" title={name}>{name}</h3>
-              <div className="-mt-1 -mr-1 flex shrink-0 gap-0.5 opacity-100 transition sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
+              <div className="-mt-1 -mr-1 flex shrink-0 gap-0.5 transition [@media(hover:hover)]:opacity-0 group-focus-within:opacity-100 group-hover:opacity-100">
                 <button type="button" onClick={() => onEdit(budget)} className="rounded-lg p-1.5 text-slate-400 hover:bg-primary-50 hover:text-primary-600" aria-label={`Edit ${name}`}><Pencil className="h-4 w-4" /></button>
                 <button type="button" onClick={() => onDelete(budget)} className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600" aria-label={`Delete ${name}`}><Trash2 className="h-4 w-4" /></button>
               </div>
