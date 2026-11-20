@@ -18,6 +18,7 @@ import {
   GraduationCap,
   BriefcaseBusiness,
   Code2,
+  Quote,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -38,6 +39,7 @@ const navItems = [
       { to: "/publications", label: "Publications", icon: GraduationCap },
       { to: "/experiences", label: "Experiences", icon: BriefcaseBusiness },
       { to: "/projects", label: "Projects", icon: Code2 },
+      { to: "/testimonials", label: "Testimonials", icon: Quote },
     ],
   },
   { to: "/file-manager", icon: Folder, label: "File Manager" },
