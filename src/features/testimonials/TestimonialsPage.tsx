@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { EmptyState } from "../../components/EmptyState";
 import { SearchField } from "../../components/SearchField";
+import { resolveBlogImageUrl } from "../blogs/utils/imageUrl";
 import { createTestimonial, deleteTestimonial, getTestimonials, updateTestimonial } from "./api/queries";
 import { TestimonialForm } from "./components/TestimonialForm";
 import type { TestimonialApiItem, TestimonialFormValues } from "./types";
@@ -11,8 +12,9 @@ const visible = (status: TestimonialApiItem["status"]) => Number(status) === 1;
 
 function Portrait({ imageUrl, name }: { imageUrl?: string | null; name: string }) {
   const [failed, setFailed] = useState(false);
-  if (!imageUrl || failed) return <span className="text-sm font-extrabold text-primary-700">{name.slice(0, 1).toUpperCase()}</span>;
-  return <img src={imageUrl} alt="" className="h-full w-full object-cover" onError={() => setFailed(true)} />;
+  const src = resolveBlogImageUrl(imageUrl);
+  if (!src || failed) return <span className="text-sm font-extrabold text-primary-700">{name.slice(0, 1).toUpperCase()}</span>;
+  return <img src={src} alt="" className="h-full w-full object-cover" onError={() => setFailed(true)} />;
 }
 
 export default function TestimonialsPage() {
@@ -40,13 +42,13 @@ export default function TestimonialsPage() {
     [items, search],
   );
 
-  const save = async (values: TestimonialFormValues, id?: string | number) => {
+  const save = async (values: TestimonialFormValues, id?: string | number, image?: File | null) => {
     try {
       if (id) {
-        await updateTestimonial(id, values);
+        await updateTestimonial(id, values, image);
         toast.success("Testimonial updated successfully.");
       } else {
-        await createTestimonial(values);
+        await createTestimonial(values, image);
         toast.success("Testimonial added successfully.");
       }
       await refresh();

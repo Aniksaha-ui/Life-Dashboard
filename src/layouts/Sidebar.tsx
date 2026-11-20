@@ -19,19 +19,22 @@ import {
   BriefcaseBusiness,
   Code2,
   Quote,
+  Award,
+  Layers,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Tooltip } from "../components/Tooltip";
 
 const navItems = [
-  { to: "/account", icon: CreditCard, label: "Accounts" },
-  { to: "/categories", icon: Tags, label: "Categories" },
-  { to: "/transactions", icon: CreditCard, label: "Transaction" },
-  { to: "/transfers", icon: Shuffle, label: "Transfers" },
-  { to: "/recurring-expenses", icon: Repeat, label: "Recurring Expenses" },
-  { to: "/budgets", icon: WalletCards, label: "Budgets" },
+  { group: "Money", to: "/account", icon: CreditCard, label: "Accounts" },
+  { group: "Money", to: "/categories", icon: Tags, label: "Categories" },
+  { group: "Money", to: "/transactions", icon: CreditCard, label: "Transaction" },
+  { group: "Money", to: "/transfers", icon: Shuffle, label: "Transfers" },
+  { group: "Money", to: "/recurring-expenses", icon: Repeat, label: "Recurring Expenses" },
+  { group: "Money", to: "/budgets", icon: WalletCards, label: "Budgets" },
   {
+    group: "Portfolio",
     icon: Briefcase,
     label: "Portfolio Setup",
     children: [
@@ -40,11 +43,13 @@ const navItems = [
       { to: "/experiences", label: "Experiences", icon: BriefcaseBusiness },
       { to: "/projects", label: "Projects", icon: Code2 },
       { to: "/testimonials", label: "Testimonials", icon: Quote },
+      { to: "/trainings", label: "Trainings", icon: Award },
+      { to: "/services", label: "Services", icon: Layers },
     ],
   },
-  { to: "/file-manager", icon: Folder, label: "File Manager" },
-  { to: "/financial-intelligence", icon: BrainCircuit, label: "Financial Intelligence" },
-  { to: "/reports", icon: BarChart3, label: "Reports" },
+  { group: "Tools", to: "/file-manager", icon: Folder, label: "File Manager" },
+  { group: "Tools", to: "/financial-intelligence", icon: BrainCircuit, label: "Financial Intelligence" },
+  { group: "Tools", to: "/reports", icon: BarChart3, label: "Reports" },
 ];
 
 interface SidebarProps {
@@ -82,6 +87,15 @@ export function Sidebar({
     // Keep sidebar in sync with route: expand the active parent and collapse others.
     setExpandedItem(getActiveParentLabel(location.pathname));
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!isMobileOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isMobileOpen]);
 
   const toggleExpand = (label: string) => {
     if (isCompact) {
@@ -125,8 +139,9 @@ export function Sidebar({
             <button
               onClick={() => toggleExpand(item.label)}
               className={clsx(
-                "w-full flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors text-slate-600 hover:bg-slate-100",
-                expandedItem === item.label && "text-slate-900",
+                "flex w-full items-center justify-between rounded-lg px-3 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100",
+                isMobileOpen ? "min-h-11 py-2.5" : "py-2",
+                expandedItem === item.label && "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200",
               )}
             >
               {content}
@@ -149,7 +164,7 @@ export function Sidebar({
               )}
             >
               <div className="overflow-hidden">
-                <div className="ml-9 space-y-1 mt-1">
+                <div className={clsx("mt-1", isMobileOpen ? "grid grid-cols-2 gap-1" : "ml-9 space-y-1")}>
                   {item.children.map((child: any) => (
                     <NavLink
                       key={child.to}
@@ -157,10 +172,13 @@ export function Sidebar({
                       end
                       className={({ isActive }) =>
                         clsx(
-                          "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                          "flex rounded-lg font-medium transition-colors",
+                          isMobileOpen
+                            ? "min-h-16 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center text-[11px] leading-tight"
+                            : "items-center gap-2 px-3 py-1.5 text-sm",
                           isActive
-                            ? "text-primary-600 bg-slate-100"
-                            : "text-slate-500 hover:text-slate-800 hover:bg-slate-100",
+                            ? "bg-white text-primary-600 shadow-sm ring-1 ring-slate-200"
+                            : "text-slate-500 hover:bg-slate-100 hover:text-slate-800",
                         )
                       }
                     >
@@ -195,11 +213,12 @@ export function Sidebar({
             </NavLink>
           </Tooltip>
         ) : (
-          <NavLink
+            <NavLink
             to={item.to}
             className={({ isActive }) =>
               clsx(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors",
+                isMobileOpen ? "min-h-11 py-2.5" : "py-2",
                 isActive
                   ? "bg-white text-primary-600 shadow-sm ring-1 ring-slate-200"
                   : "text-slate-600 hover:bg-slate-100",
@@ -291,20 +310,26 @@ export function Sidebar({
 
         <nav
           className={clsx(
-            "flex-1 py-4 space-y-1 scrollbar-hide transition-all duration-300",
-            isCompact ? "px-2 overflow-visible" : "px-3 overflow-y-auto",
+            "flex-1 py-3 scrollbar-hide transition-all duration-300",
+            isCompact ? "space-y-1 overflow-visible px-2" : "space-y-0.5 overflow-y-auto px-3 pb-6",
           )}
         >
-          {navItems.map((item) => (
-            <div key={item.label}>
-              <div onClick={handleNavigation}>
-                <NavItem item={item} />
+          {navItems.map((item, index) => {
+            const previousGroup = index > 0 ? navItems[index - 1].group : "";
+            const showGroup = !isCompact && item.group !== previousGroup;
+            return (
+              <div key={item.label}>
+                {showGroup && (
+                  <p className={clsx("px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400", index === 0 ? "pt-1" : "pt-4")}>
+                    {item.group}
+                  </p>
+                )}
+                <div onClick={handleNavigation}>
+                  <NavItem item={item} />
+                </div>
               </div>
-              {item.hasDivider && (
-                <div className="my-4 border-t border-slate-200 mx-1"></div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </nav>
       </div>
     </>

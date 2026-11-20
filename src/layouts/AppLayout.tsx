@@ -68,7 +68,7 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
-      <MobileBottomNavigation onOpenMenu={() => setIsMobileNavOpen(true)} />
+      <MobileBottomNavigation hidden={isMobileNavOpen} onOpenMenu={() => setIsMobileNavOpen(true)} />
     </div>
   );
 }

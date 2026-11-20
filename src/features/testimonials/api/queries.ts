@@ -15,7 +15,7 @@ const getToken = () => {
 const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   const token = getToken();
   if (!baseUrl() || !token) throw new Error("Your session is missing. Please sign in again.");
-  const response = await fetch(`${baseUrl()}${path}`, { ...init, headers: { Accept: "application/json", "Content-Type": "application/json", Authorization: `Bearer ${token}`, ...init?.headers } });
+  const response = await fetch(`${baseUrl()}${path}`, { ...init, headers: { Accept: "application/json", ...(init?.body instanceof FormData ? {} : { "Content-Type": "application/json" }), Authorization: `Bearer ${token}`, ...init?.headers } });
   const payload = await response.json().catch(() => null);
   if (isUnauthenticatedResponse(response, payload)) { endUnauthenticatedSession(); throw new Error("Your session has expired. Please sign in again."); }
   if (!response.ok || payload?.isExecute !== "success") throw new Error(payload?.msg || payload?.message || "Unable to complete the testimonial request.");
@@ -33,7 +33,14 @@ export async function getTestimonials(page = 1, search = ""): Promise<Testimonia
   return { rows, pagination: { currentPage: response.current_page ?? 1, lastPage: response.last_page ?? 1, total: response.total ?? rows.length, from: response.from ?? 0, to: response.to ?? rows.length } };
 }
 
-const toPayload = (values: TestimonialFormValues) => ({ ...values, image_url: values.image_url.trim() || null, status: Number(values.status) });
-export const createTestimonial = (values: TestimonialFormValues) => request<TestimonialApiItem>("/testimonials", { method: "POST", body: JSON.stringify(toPayload(values)) });
-export const updateTestimonial = (id: string | number, values: TestimonialFormValues) => request<TestimonialApiItem>(`/testimonials/${id}`, { method: "PUT", body: JSON.stringify(toPayload(values)) });
+const toBody = (values: TestimonialFormValues, image?: File | null) => {
+  const payload = { ...values, status: Number(values.status) };
+  if (!image) return JSON.stringify(payload);
+  const form = new FormData();
+  Object.entries(payload).forEach(([key, value]) => form.append(key, String(value)));
+  form.append("image", image);
+  return form;
+};
+export const createTestimonial = (values: TestimonialFormValues, image?: File | null) => request<TestimonialApiItem>("/testimonials", { method: "POST", body: toBody(values, image) });
+export const updateTestimonial = (id: string | number, values: TestimonialFormValues, image?: File | null) => request<TestimonialApiItem>(`/testimonials/${id}`, { method: image ? "POST" : "PUT", body: toBody(values, image) });
 export const deleteTestimonial = (id: string | number) => request<void>(`/testimonials/${id}`, { method: "DELETE" });

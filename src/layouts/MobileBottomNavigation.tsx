@@ -1,19 +1,61 @@
 import { BrainCircuit, CreditCard, Menu, ReceiptText, WalletCards } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { clsx } from "clsx";
 
 const items = [
   { to: "/account", label: "Accounts", icon: CreditCard },
   { to: "/budgets", label: "Budgets", icon: WalletCards },
-  { to: "/transactions", label: "Transaction", icon: ReceiptText },
+  { to: "/transactions", label: "Activity", icon: ReceiptText },
   { to: "/financial-intelligence", label: "Insights", icon: BrainCircuit },
 ];
 
-export function MobileBottomNavigation({ onOpenMenu }: { onOpenMenu: () => void }) {
-  return <nav className="fixed inset-x-0 bottom-0 z-[80] border-t border-slate-200 bg-white/95 px-2 pb-[max(0.45rem,env(safe-area-inset-bottom))] pt-1.5 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur md:hidden" aria-label="Mobile navigation">
-    <div className="mx-auto grid max-w-lg grid-cols-5">
-      {items.map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} className={({ isActive }) => clsx("flex min-w-0 flex-col items-center gap-1 rounded-xl px-1 py-1.5 text-[10px] font-semibold transition-colors", isActive ? "text-primary-700" : "text-slate-400 hover:text-slate-600")}><span className="grid h-7 w-9 place-items-center rounded-lg"><Icon className="h-5 w-5" /></span><span className="truncate">{label}</span></NavLink>)}
-      <button type="button" onClick={onOpenMenu} className="flex min-w-0 flex-col items-center gap-1 rounded-xl px-1 py-1.5 text-[10px] font-semibold text-slate-400 transition-colors hover:text-slate-600"><span className="grid h-7 w-9 place-items-center rounded-lg"><Menu className="h-5 w-5" /></span><span>More</span></button>
-    </div>
-  </nav>;
+const isItemActive = (pathname: string, to: string) => pathname === to || pathname.startsWith(`${to}/`);
+
+export function MobileBottomNavigation({
+  hidden = false,
+  onOpenMenu,
+}: {
+  hidden?: boolean;
+  onOpenMenu: () => void;
+}) {
+  const { pathname } = useLocation();
+  const moreActive = !items.some((item) => isItemActive(pathname, item.to));
+
+  if (hidden) return null;
+
+  return (
+    <nav
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-[80] px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] md:hidden"
+      aria-label="Mobile navigation"
+    >
+      <div className="pointer-events-auto mx-auto grid max-w-md grid-cols-5 gap-1 rounded-[1.35rem] border border-slate-200/90 bg-white/95 p-1.5 shadow-[0_12px_32px_rgba(15,23,42,0.16)] backdrop-blur-md">
+        {items.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              clsx(
+                "flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-semibold leading-none transition-colors",
+                isActive ? "bg-primary-600 text-white shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700",
+              )
+            }
+          >
+            <Icon className="h-[1.15rem] w-[1.15rem]" />
+            <span className="max-w-full truncate">{label}</span>
+          </NavLink>
+        ))}
+        <button
+          type="button"
+          onClick={onOpenMenu}
+          className={clsx(
+            "flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-semibold leading-none transition-colors",
+            moreActive ? "bg-primary-50 text-primary-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700",
+          )}
+        >
+          <Menu className="h-[1.15rem] w-[1.15rem]" />
+          <span>More</span>
+        </button>
+      </div>
+    </nav>
+  );
 }

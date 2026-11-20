@@ -24,8 +24,17 @@ export default function BudgetsPage() {
   const remove = async (budget: BudgetApiItem) => { if (window.confirm(`Remove the ${budget.category_name || "selected"} budget?`)) await state.remove(budget.id); };
   const openNewBudget = () => { setEditing(null); setIsFormOpen(true); };
 
-  return <div className="budgets-page space-y-5">
-    <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-wider text-primary-700">Plan with confidence</p><h1 className="mt-1 flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900"><WalletCards className="h-6 w-6 text-primary-600" /> Your budgets</h1><p className="mt-1 max-w-xl text-sm leading-6 text-slate-500">Set spending limits by category and stay ahead of your monthly plan.</p></div><button type="button" onClick={openNewBudget} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white shadow-sm shadow-primary-600/20 hover:bg-primary-700"><Plus className="h-4 w-4" /> Add budget</button></header>
+  return <div className="app-management-page budgets-page space-y-6">
+    <div className="app-page-header flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Your budgets</h1>
+        <p className="mt-1 text-sm text-slate-500">Set spending limits by category and stay ahead of your monthly plan.</p>
+      </div>
+      <button type="button" onClick={openNewBudget} className="app-page-primary-action inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700">
+        <Plus className="h-4 w-4" />
+        Add budget
+      </button>
+    </div>
 
     <section className="grid gap-3 sm:grid-cols-3"><BudgetMetric icon={WalletCards} label="Planned" value={money(state.totals.planned)} tone="bg-primary-50 text-primary-600" /><BudgetMetric icon={TrendingDown} label="Spent so far" value={money(state.totals.spent)} helper={`${usedPercent.toFixed(0)}% of plan`} tone="bg-amber-50 text-amber-600" /><BudgetMetric icon={CircleCheck} label={state.totals.remaining < 0 ? "Over budget" : "Available"} value={money(state.totals.remaining)} tone={state.totals.remaining < 0 ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"} /></section>
 

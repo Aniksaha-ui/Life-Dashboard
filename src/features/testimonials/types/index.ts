@@ -15,6 +15,5 @@ export interface TestimonialFormValues {
   designation: string;
   feedback: string;
   rating: string;
-  image_url: string;
   status: number;
 }

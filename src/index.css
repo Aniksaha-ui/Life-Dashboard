@@ -301,9 +301,25 @@
   outline: none !important;
 }
 
-.outlined-field :is(input, select) {
+.outlined-field :is(input, select):not([type="file"]) {
   height: 1.5rem !important;
   padding: 0 !important;
+}
+
+.outlined-field:has(input[type="file"]) {
+  height: auto;
+  min-height: 2.5rem;
+  align-items: center;
+  padding-top: 0.7rem;
+  padding-bottom: 0.45rem;
+}
+
+.outlined-field input[type="file"] {
+  height: auto !important;
+  padding: 0 !important;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #334155;
 }
 
 .outlined-field :is(input, select, textarea):hover,

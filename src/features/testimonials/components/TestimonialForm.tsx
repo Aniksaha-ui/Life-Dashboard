@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Modal } from "../../../components/Modal";
 import { outlinedControlClass, OutlinedField } from "../../../components/OutlinedField";
+import { resolveBlogImageUrl } from "../../blogs/utils/imageUrl";
 import type { TestimonialApiItem, TestimonialFormValues } from "../types";
 
 const emptyValues: TestimonialFormValues = {
@@ -8,7 +9,6 @@ const emptyValues: TestimonialFormValues = {
   designation: "",
   feedback: "",
   rating: "5",
-  image_url: "",
   status: 1,
 };
 
@@ -21,9 +21,11 @@ export function TestimonialForm({
   testimonial: TestimonialApiItem | null;
   open: boolean;
   onClose: () => void;
-  onSave: (values: TestimonialFormValues, id?: string | number) => Promise<void>;
+  onSave: (values: TestimonialFormValues, id?: string | number, image?: File | null) => Promise<void>;
 }) {
   const [values, setValues] = useState<TestimonialFormValues>(emptyValues);
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -34,18 +36,19 @@ export function TestimonialForm({
             designation: testimonial.designation,
             feedback: testimonial.feedback,
             rating: String(testimonial.rating || "5"),
-            image_url: testimonial.image_url || "",
             status: Number(testimonial.status) === 0 ? 0 : 1,
           }
         : emptyValues,
     );
+    setImage(null);
+    setPreview(testimonial?.image_url ? resolveBlogImageUrl(testimonial.image_url) : "");
   }, [testimonial, open]);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setSaving(true);
     try {
-      await onSave(values, testimonial?.id);
+      await onSave(values, testimonial?.id, image);
       onClose();
     } finally {
       setSaving(false);
@@ -82,8 +85,20 @@ export function TestimonialForm({
             ))}
           </select>
         </OutlinedField>
-        <OutlinedField label="Image URL">
-          <input type="url" maxLength={191} value={values.image_url} onChange={(event) => setValues({ ...values, image_url: event.target.value })} className={outlinedControlClass} placeholder="https://example.com/photo.jpg" />
+        <OutlinedField label="Image">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            {preview ? <img src={preview} alt="" className="h-8 w-8 shrink-0 rounded object-cover" /> : null}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(event) => {
+                const file = event.target.files?.[0] ?? null;
+                setImage(file);
+                setPreview(file ? URL.createObjectURL(file) : testimonial?.image_url ? resolveBlogImageUrl(testimonial.image_url) : "");
+              }}
+              className="min-w-0 flex-1 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-primary-50 file:px-2 file:py-1 file:text-xs file:font-semibold file:text-primary-700"
+            />
+          </div>
         </OutlinedField>
         <OutlinedField label="Feedback" className="sm:col-span-2">
           <textarea required maxLength={191} value={values.feedback} onChange={(event) => setValues({ ...values, feedback: event.target.value })} className={`${outlinedControlClass} min-h-20 resize-y`} placeholder="A short recommendation" />
