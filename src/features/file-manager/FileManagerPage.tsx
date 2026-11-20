@@ -16,6 +16,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { PageLoadingState } from "../../components/PageLoadingState";
+import { OutlinedField } from "../../components/OutlinedField";
 import {
   createFolder,
   deleteItem,
@@ -334,14 +335,16 @@ export default function FileManagerPage() {
             </div>
             {dialog.action !== "delete" && (
               <div className="p-5">
+                <OutlinedField label={dialog.action === "create" ? "Folder name" : "New name"}>
                 <input
                   autoFocus
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
+                  className="h-8 w-full border-0 bg-transparent p-0 text-sm outline-none focus:bg-transparent focus:shadow-none"
                   placeholder="Name"
                 />
+                </OutlinedField>
               </div>
             )}
             <div className="grid grid-cols-2 gap-2 border-t border-slate-100 p-4 sm:flex sm:justify-end">

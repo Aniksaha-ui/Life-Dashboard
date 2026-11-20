@@ -1,4 +1,5 @@
 import { RefreshCcw } from "lucide-react";
+import { outlinedControlClass, OutlinedField } from "../../../../components/OutlinedField";
 import type { AccountType } from "../types";
 
 const options: Array<{ value: AccountType; label: string }> = [
@@ -24,15 +25,14 @@ export function AccountBalanceFilters({
 }) {
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <label className="w-full max-w-md text-xs font-semibold uppercase tracking-wide text-slate-500">
-          Account type
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <OutlinedField label="Account type" className="w-full max-w-md">
           <select
             value={typeFilter}
             onChange={(event) =>
               onTypeChange(event.target.value as AccountType)
             }
-            className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-normal text-slate-700"
+            className={outlinedControlClass}
           >
             {options.map((option) => (
               <option key={option.value} value={option.value}>
@@ -40,12 +40,12 @@ export function AccountBalanceFilters({
               </option>
             ))}
           </select>
-        </label>
+        </OutlinedField>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={onClear}
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+            className="inline-flex h-10 items-center rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50"
           >
             Clear filters
           </button>
@@ -53,7 +53,7 @@ export function AccountBalanceFilters({
             type="button"
             disabled={loading}
             onClick={onRefresh}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-600 px-3 text-sm font-semibold text-white disabled:opacity-60"
           >
             <RefreshCcw
               className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}

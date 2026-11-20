@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal } from "../../../components/Modal";
+import { OutlinedField } from "../../../components/OutlinedField";
 import type { RecurringExpenseFormValues } from "../types";
 const empty = (): RecurringExpenseFormValues => ({
   title: "",
@@ -81,8 +82,7 @@ export function RecurringExpenseForm({
           ["next_run_date", "Next Run Date", "date"],
           ["end_date", "End Date", "date"],
         ].map(([key, label, type]) => (
-          <label key={key} className="text-sm font-medium text-slate-700">
-            {label}
+          <OutlinedField key={key} label={label}>
             <input
               required={key !== "end_date"}
               type={type}
@@ -95,17 +95,16 @@ export function RecurringExpenseForm({
                   event.target.value,
                 )
               }
-              className="mt-1 w-full rounded-lg border border-slate-300 p-2"
+              className="h-8 w-full border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
             />
-          </label>
+          </OutlinedField>
         ))}
-        <label className="text-sm font-medium text-slate-700">
-          Account
+        <OutlinedField label="Account">
           <select
             required
             value={values.account_id}
             onChange={(event) => update("account_id", event.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 p-2"
+            className="h-8 w-full border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
           >
             <option value="">Select account</option>
             {accounts.map((account: any) => (
@@ -114,14 +113,13 @@ export function RecurringExpenseForm({
               </option>
             ))}
           </select>
-        </label>
-        <label className="text-sm font-medium text-slate-700">
-          Expense Category
+        </OutlinedField>
+        <OutlinedField label="Expense Category">
           <select
             required
             value={values.category_id}
             onChange={(event) => update("category_id", event.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 p-2"
+            className="h-8 w-full border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
           >
             <option value="">Select category</option>
             {categories.map((category: any) => (
@@ -130,20 +128,19 @@ export function RecurringExpenseForm({
               </option>
             ))}
           </select>
-        </label>
-        <label className="text-sm font-medium text-slate-700">
-          Frequency
+        </OutlinedField>
+        <OutlinedField label="Frequency">
           <select
             value={values.frequency}
             onChange={(event) => update("frequency", event.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 p-2"
+            className="h-8 w-full border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
           >
             {["DAILY", "WEEKLY", "MONTHLY", "YEARLY"].map((frequency) => (
               <option key={frequency}>{frequency}</option>
             ))}
           </select>
-        </label>
-        <label className="flex items-end gap-2 pb-2 text-sm font-medium text-slate-700">
+        </OutlinedField>
+        <label className="flex h-10 items-center gap-2 rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700">
           <input
             type="checkbox"
             checked={values.is_active}
@@ -151,14 +148,13 @@ export function RecurringExpenseForm({
           />
           Active plan
         </label>
-        <label className="sm:col-span-2 text-sm font-medium text-slate-700">
-          Note
+        <OutlinedField label="Note" className="sm:col-span-2">
           <textarea
             value={values.note}
             onChange={(event) => update("note", event.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 p-2"
+            className="min-h-20 w-full resize-y border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
           />
-        </label>
+        </OutlinedField>
       </form>
     </Modal>
   );

@@ -1,5 +1,6 @@
 import { RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { outlinedControlClass, OutlinedField } from "../../../components/OutlinedField";
 
 const DIGIT_COLORS = [
   "#e07a5f",
@@ -107,20 +108,14 @@ export function CaptchaField({
   }, [value, captchaCode, onValidChange]);
 
   return (
-    <div className="min-w-0 space-y-2">
-      <label
-        htmlFor="captcha-input"
-        className="block text-sm font-medium text-slate-700"
-      >
-        Security Code
-      </label>
-      <div className="flex min-w-0 items-stretch gap-2 max-[420px]:flex-wrap">
-        <div className="shrink-0 w-[120px] border border-slate-300 rounded-lg overflow-hidden bg-white">
+    <div className="min-w-0">
+      <div className="flex min-w-0 items-center gap-2 max-[420px]:flex-wrap">
+        <div className="h-10 w-[120px] shrink-0 overflow-hidden rounded-md border border-slate-300 bg-white">
           <canvas
             ref={canvasRef}
             width={120}
-            height={42}
-            className="w-full h-[42px] block"
+            height={40}
+            className="block h-10 w-full"
             aria-hidden
           />
         </div>
@@ -128,27 +123,29 @@ export function CaptchaField({
           type="button"
           onClick={refreshCaptcha}
           disabled={disabled}
-          className="shrink-0 w-10 flex items-center justify-center border border-slate-300 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-slate-300 text-slate-500 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-50"
           title="Refresh captcha"
           aria-label="Refresh captcha"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="h-4 w-4" />
         </button>
-        <input
-          id="captcha-input"
-          type="text"
-          inputMode="numeric"
-          autoComplete="off"
-          value={value}
-          onChange={(e) =>
-            onChange(e.target.value.replace(/\D/g, "").slice(0, 4))
-          }
-          placeholder="Enter code"
-          disabled={disabled}
-          className="box-border min-w-0 flex-1 px-2.5 sm:px-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors max-[420px]:h-11 max-[420px]:basis-full max-[420px]:flex-none"
-        />
+        <OutlinedField label="Security code" className="min-w-0 flex-1 max-[420px]:basis-full">
+          <input
+            id="captcha-input"
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            value={value}
+            onChange={(e) =>
+              onChange(e.target.value.replace(/\D/g, "").slice(0, 4))
+            }
+            placeholder="Enter code"
+            disabled={disabled}
+            className={outlinedControlClass}
+          />
+        </OutlinedField>
       </div>
-      {error && <p className="text-xs text-rose-600">{error}</p>}
+      {error && <p className="mt-2 text-xs text-rose-600">{error}</p>}
     </div>
   );
 }

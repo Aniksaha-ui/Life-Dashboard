@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Modal } from "../../../components/Modal";
+import { OutlinedField } from "../../../components/OutlinedField";
 export function TransferForm({
   open,
   onClose,
@@ -60,8 +61,7 @@ export function TransferForm({
       setSaving(false);
     }
   };
-  const inputClass =
-    "mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm";
+  const inputClass = "h-8 w-full border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none";
   return (
     <Modal
       isOpen={open}
@@ -93,8 +93,7 @@ export function TransferForm({
         onSubmit={save}
         className="grid gap-4 sm:grid-cols-2"
       >
-        <label className="text-sm font-medium text-slate-700">
-          Source Account
+        <OutlinedField label="Source Account">
           <select
             required
             value={values.from_account_id}
@@ -110,9 +109,8 @@ export function TransferForm({
               </option>
             ))}
           </select>
-        </label>
-        <label className="text-sm font-medium text-slate-700">
-          Destination Account
+        </OutlinedField>
+        <OutlinedField label="Destination Account">
           <select
             required
             value={values.to_account_id}
@@ -128,9 +126,8 @@ export function TransferForm({
               </option>
             ))}
           </select>
-        </label>
-        <label className="text-sm font-medium text-slate-700">
-          Amount
+        </OutlinedField>
+        <OutlinedField label="Amount">
           <input
             required
             min="0.01"
@@ -140,9 +137,8 @@ export function TransferForm({
             onChange={(e) => setValues({ ...values, amount: e.target.value })}
             className={inputClass}
           />
-        </label>
-        <label className="text-sm font-medium text-slate-700">
-          Transfer Date
+        </OutlinedField>
+        <OutlinedField label="Transfer Date">
           <input
             type="date"
             value={values.transfer_date}
@@ -151,15 +147,14 @@ export function TransferForm({
             }
             className={inputClass}
           />
-        </label>
-        <label className="sm:col-span-2 text-sm font-medium text-slate-700">
-          Note
+        </OutlinedField>
+        <OutlinedField label="Note" className="sm:col-span-2">
           <textarea
             value={values.note}
             onChange={(e) => setValues({ ...values, note: e.target.value })}
-            className={inputClass}
+            className={`${inputClass} min-h-20 resize-y`}
           />
-        </label>
+        </OutlinedField>
       </form>
     </Modal>
   );

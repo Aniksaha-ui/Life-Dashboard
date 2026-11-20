@@ -1,4 +1,5 @@
 import { DataTable } from "../../../../components/DataTable";
+import { SearchField } from "../../../../components/SearchField";
 import { accountBalanceColumns } from "./columns";
 import type { AccountBalanceRow } from "../types";
 
@@ -31,11 +32,11 @@ export function AccountBalanceTable({
         hideToolbarDateFilter
         hideViewColumn
         filterActions={
-          <input
+          <SearchField
             value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
+            onChange={onSearchChange}
             placeholder="Search accounts"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm md:w-64"
+            className="w-full md:w-72"
           />
         }
       />

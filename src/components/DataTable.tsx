@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { clsx } from "clsx";
 import { Loader } from "./Loader";
+import { outlinedControlClass, OutlinedField } from "./OutlinedField";
+import { SearchField } from "./SearchField";
 
 // ----------------------------------------------------------------------
 // DataTable Component
@@ -256,24 +258,19 @@ export function DataTable<TData, TValue>({
       {showToolbar && (
         <div className="data-table-toolbar flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {/* Filter Pills Placeholder */}
             {filterColumnName && (
-              <div className="relative">
-                <input
-                  placeholder="Search"
-                  value={
-                    (table
-                      .getColumn(filterColumnName)
-                      ?.getFilterValue() as string) ?? ""
-                  }
-                  onChange={(event) =>
-                    table
-                      .getColumn(filterColumnName)
-                      ?.setFilterValue(event.target.value)
-                  }
-                  className="h-8 w-[150px] lg:w-[250px] rounded border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
+              <SearchField
+                value={
+                  (table
+                    .getColumn(filterColumnName)
+                    ?.getFilterValue() as string) ?? ""
+                }
+                onChange={(value) =>
+                  table.getColumn(filterColumnName)?.setFilterValue(value)
+                }
+                placeholder="Search"
+                className="w-full min-w-40 lg:w-64"
+              />
             )}
             {/* Add more filter pills here in future */}
             {filterActions}
@@ -326,13 +323,10 @@ export function DataTable<TData, TValue>({
                         Custom Range
                       </h4>
                       <div className="space-y-3">
-                        <div>
-                          <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1 block">
-                            From
-                          </label>
+                        <OutlinedField label="From">
                           <input
                             type="date"
-                            className="w-full px-2 py-1.5 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none"
+                            className={outlinedControlClass}
                             value={customDateRange.from}
                             onChange={(e) =>
                               setCustomDateRange((prev) => ({
@@ -341,14 +335,11 @@ export function DataTable<TData, TValue>({
                               }))
                             }
                           />
-                        </div>
-                        <div>
-                          <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1 block">
-                            To
-                          </label>
+                        </OutlinedField>
+                        <OutlinedField label="To">
                           <input
                             type="date"
-                            className="w-full px-2 py-1.5 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none"
+                            className={outlinedControlClass}
                             value={customDateRange.to}
                             onChange={(e) =>
                               setCustomDateRange((prev) => ({
@@ -357,11 +348,11 @@ export function DataTable<TData, TValue>({
                               }))
                             }
                           />
-                        </div>
-                        <div className="flex gap-2 pt-2">
+                        </OutlinedField>
+                        <div className="flex items-center gap-2">
                           <button
                             onClick={() => setShowDatePicker(false)}
-                            className="flex-1 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 rounded hover:bg-slate-200"
+                            className="inline-flex h-10 flex-1 items-center justify-center rounded-md bg-slate-100 px-3 text-xs font-medium text-slate-600 hover:bg-slate-200"
                           >
                             Cancel
                           </button>
@@ -370,7 +361,7 @@ export function DataTable<TData, TValue>({
                               setSelectedPeriod("custom");
                               setShowDatePicker(false);
                             }}
-                            className="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-primary-600 rounded hover:bg-primary-700 shadow-sm shadow-primary-200"
+                            className="inline-flex h-10 flex-1 items-center justify-center rounded-md bg-primary-600 px-3 text-xs font-medium text-white shadow-sm shadow-primary-200 hover:bg-primary-700"
                           >
                             Apply
                           </button>

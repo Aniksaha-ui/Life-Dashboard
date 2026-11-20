@@ -1,4 +1,5 @@
 import { RefreshCcw } from "lucide-react";
+import { outlinedControlClass, OutlinedField } from "../../../components/OutlinedField";
 
 interface ReportFiltersProps {
   supportsDateRange?: boolean;
@@ -23,29 +24,27 @@ export function ReportFilters({
 }: ReportFiltersProps) {
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex flex-col gap-3 md:flex-row md:items-end">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center">
         {supportsDateRange && (
           <>
-            <label className="flex-1 text-xs font-semibold uppercase text-slate-500">
-              From date
+            <OutlinedField label="From date" className="min-w-0 flex-1">
               <input
                 type="date"
                 value={fromDate}
                 max={toDate || undefined}
                 onChange={(event) => onFromDateChange(event.target.value)}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-normal text-slate-700"
+                className={outlinedControlClass}
               />
-            </label>
-            <label className="flex-1 text-xs font-semibold uppercase text-slate-500">
-              To date
+            </OutlinedField>
+            <OutlinedField label="To date" className="min-w-0 flex-1">
               <input
                 type="date"
                 value={toDate}
                 min={fromDate || undefined}
                 onChange={(event) => onToDateChange(event.target.value)}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-normal text-slate-700"
+                className={outlinedControlClass}
               />
-            </label>
+            </OutlinedField>
           </>
         )}
         <div className="flex gap-2">
@@ -53,7 +52,7 @@ export function ReportFilters({
             <button
               type="button"
               onClick={onClear}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+              className="inline-flex h-10 items-center rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50"
             >
               This month
             </button>
@@ -62,7 +61,7 @@ export function ReportFilters({
             type="button"
             onClick={onRefresh}
             disabled={isLoading}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-600 px-3 text-sm font-semibold text-white disabled:opacity-60"
           >
             <RefreshCcw
               className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}

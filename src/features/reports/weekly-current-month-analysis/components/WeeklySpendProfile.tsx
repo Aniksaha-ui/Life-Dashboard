@@ -1,4 +1,5 @@
-import { ArrowRight, FolderTree, ReceiptText, Search } from "lucide-react";
+import { ArrowRight, FolderTree, ReceiptText } from "lucide-react";
+import { SearchField } from "../../../../components/SearchField";
 import { useEffect, useMemo, useState } from "react";
 import { Drawer } from "../../../../components/Drawer";
 import { Loader } from "../../../../components/Loader";
@@ -209,19 +210,16 @@ function WeeklyDetailDrawer({
                     Group by Category
                   </button>
                 </div>
-                <label className="relative w-full sm:w-64">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <input
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    placeholder={
-                      tab === "transactions"
-                        ? "Search transactions"
-                        : "Search categories"
-                    }
-                    className="h-10 w-full rounded-lg border border-slate-300 pl-9 pr-3 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
-                  />
-                </label>
+                <SearchField
+                  value={search}
+                  onChange={setSearch}
+                  placeholder={
+                    tab === "transactions"
+                      ? "Search transactions"
+                      : "Search categories"
+                  }
+                  className="w-full sm:w-72"
+                />
               </div>
               {loading ? (
                 <div className="flex min-h-72 items-center justify-center">

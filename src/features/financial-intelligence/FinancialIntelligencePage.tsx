@@ -10,7 +10,9 @@ import {
   WalletCards,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { outlinedControlClass, OutlinedField } from "../../components/OutlinedField";
 import { PageLoadingState } from "../../components/PageLoadingState";
+import { SearchField } from "../../components/SearchField";
 import {
   askFinance,
   getAnomalies,
@@ -127,30 +129,28 @@ export default function FinancialIntelligencePage() {
           </div>
           <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary-100 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700"><CalendarRange className="h-4 w-4" /> Live analysis</span>
         </div>
-        <div className="mt-5 flex flex-wrap items-end gap-2 border-t border-slate-100 pt-4">
-          <label className="grid gap-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-            From date
+        <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4">
+          <OutlinedField label="From date" className="w-full sm:w-44">
             <input
               type="date"
               value={from}
               max={to}
               onChange={(e) => setFrom(e.target.value)}
-              className="h-9 rounded-full border border-slate-200 bg-white px-3 text-sm font-normal normal-case text-slate-700 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+              className={outlinedControlClass}
             />
-          </label>
-          <label className="grid gap-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-            To date
+          </OutlinedField>
+          <OutlinedField label="To date" className="w-full sm:w-44">
             <input
               type="date"
               value={to}
               min={from}
               onChange={(e) => setTo(e.target.value)}
-              className="h-9 rounded-full border border-slate-200 bg-white px-3 text-sm font-normal normal-case text-slate-700 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+              className={outlinedControlClass}
             />
-          </label>
+          </OutlinedField>
           <button
             onClick={() => void load()}
-            className="mt-auto inline-flex h-9 items-center justify-center gap-2 rounded-full bg-primary-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:opacity-60"
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:opacity-60"
           >
             <RefreshCcw
               className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
@@ -196,16 +196,17 @@ export default function FinancialIntelligencePage() {
             </div>
           </section>
           <Panel title="Ask about your finances" icon={BrainCircuit}>
-            <form onSubmit={ask} className="flex flex-col gap-3 sm:flex-row">
-              <input
+            <form onSubmit={ask} className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <SearchField
+                label="Question"
                 value={question}
-                onChange={(e) => setQuestion(e.target.value)}
+                onChange={setQuestion}
                 placeholder="For example: Why did my expenses increase?"
-                className="h-11 w-full min-w-0 flex-none rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 sm:w-auto sm:flex-1"
+                className="w-full min-w-0 sm:flex-1"
               />
               <button
                 disabled={asking}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+                className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
               >
                 <Send className="h-4 w-4" />
                 {asking ? "Thinking…" : "Ask question"}

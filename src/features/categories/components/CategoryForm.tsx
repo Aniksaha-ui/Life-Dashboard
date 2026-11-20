@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Modal } from "../../../components/Modal";
+import { outlinedControlClass, OutlinedField } from "../../../components/OutlinedField";
 import type { CategoryFormValues, CategoryRow } from "../types";
 
 const defaults: CategoryFormValues = { name: "", type: "EXPENSE" };
@@ -31,8 +32,6 @@ export function CategoryForm({
       setSaving(false);
     }
   };
-  const inputClass =
-    "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100";
   return (
     <Modal
       isOpen={open}
@@ -57,9 +56,8 @@ export function CategoryForm({
         </>
       }
     >
-      <form id="category-form" onSubmit={submit} className="space-y-4">
-        <label className="block text-sm font-medium text-slate-700">
-          Category Name
+      <form id="category-form" onSubmit={submit} className="grid items-center gap-4">
+        <OutlinedField label="Category name">
           <input
             required
             maxLength={255}
@@ -67,12 +65,11 @@ export function CategoryForm({
             onChange={(event) =>
               setValues({ ...values, name: event.target.value })
             }
-            className={inputClass}
+            className={outlinedControlClass}
             placeholder="Groceries"
           />
-        </label>
-        <label className="block text-sm font-medium text-slate-700">
-          Type
+        </OutlinedField>
+        <OutlinedField label="Type">
           <select
             value={values.type}
             onChange={(event) =>
@@ -81,12 +78,12 @@ export function CategoryForm({
                 type: event.target.value as CategoryFormValues["type"],
               })
             }
-            className={inputClass}
+            className={outlinedControlClass}
           >
             <option value="EXPENSE">Expense</option>
             <option value="INCOME">Income</option>
           </select>
-        </label>
+        </OutlinedField>
       </form>
     </Modal>
   );

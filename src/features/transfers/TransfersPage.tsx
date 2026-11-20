@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import { DataTable } from "../../components/DataTable";
 import { MobileRecordDrawer } from "../../components/MobileRecordDrawer";
 import { MetricCard } from "../../components/MetricCard";
+import { outlinedControlClass, OutlinedField } from "../../components/OutlinedField";
+import { SearchField } from "../../components/SearchField";
 import { TransferForm } from "./components/TransferForm";
 import { getTransferColumns } from "./components/columns";
 import { useTransfers } from "./hooks/useTransfers";
@@ -79,53 +81,60 @@ export default function TransfersPage() {
       </div>
       <section className="app-filter-panel rounded-xl border border-slate-200 bg-white p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:justify-between">
-          <div className="flex flex-wrap gap-2">
+          <div className="grid gap-2 sm:grid-cols-2 lg:flex lg:flex-wrap">
             {filters.map(([value, label]) => (
               <button
                 key={value}
                 onClick={() => state.setFlow(value)}
-                className={`rounded-lg px-3 py-2 text-sm font-semibold ${state.flow === value ? "bg-primary-600 text-white" : "bg-slate-100 text-slate-600"}`}
+                className={`inline-flex h-10 items-center rounded-lg px-3 text-sm font-semibold ${state.flow === value ? "bg-primary-600 text-white" : "bg-slate-100 text-slate-600"}`}
               >
                 {label}
               </button>
             ))}
           </div>
-          <div className="flex flex-wrap gap-2">
-            <select
-              value={state.accountId}
-              onChange={(e) => state.setAccountId(e.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-            >
-              <option value="all">All accounts</option>
-              {state.accounts.map((account: any) => (
-                <option key={account.id} value={account.id}>
-                  {account.name}
-                </option>
-              ))}
-            </select>
-            <input
-              type="date"
-              value={state.fromDate}
-              max={state.toDate || undefined}
-              onChange={(e) => state.setFromDate(e.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-            />
-            <input
-              type="date"
-              value={state.toDate}
-              min={state.fromDate || undefined}
-              onChange={(e) => state.setToDate(e.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-            />
-            <input
+          <div className="grid w-full grid-cols-1 items-center gap-3 sm:grid-cols-2 xl:grid-cols-5 lg:min-w-0 lg:flex-1">
+            <OutlinedField label="Account" className="sm:col-span-2 xl:col-span-1">
+              <select
+                value={state.accountId}
+                onChange={(e) => state.setAccountId(e.target.value)}
+                className={outlinedControlClass}
+              >
+                <option value="all">All accounts</option>
+                {state.accounts.map((account: any) => (
+                  <option key={account.id} value={account.id}>
+                    {account.name}
+                  </option>
+                ))}
+              </select>
+            </OutlinedField>
+            <OutlinedField label="From date">
+              <input
+                type="date"
+                value={state.fromDate}
+                max={state.toDate || undefined}
+                onChange={(e) => state.setFromDate(e.target.value)}
+                className={outlinedControlClass}
+              />
+            </OutlinedField>
+            <OutlinedField label="To date">
+              <input
+                type="date"
+                value={state.toDate}
+                min={state.fromDate || undefined}
+                onChange={(e) => state.setToDate(e.target.value)}
+                className={outlinedControlClass}
+              />
+            </OutlinedField>
+            <SearchField
               value={state.search}
-              onChange={(e) => state.setSearch(e.target.value)}
+              onChange={state.setSearch}
               placeholder="Search transfers"
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="sm:col-span-2 xl:col-span-1"
             />
             <button
               onClick={() => void state.refresh()}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-slate-600"
+              className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 px-3 text-slate-600 sm:col-span-2 xl:col-span-1"
+              aria-label="Refresh transfers"
             >
               <RefreshCcw className="h-4 w-4" />
             </button>

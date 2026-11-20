@@ -8,6 +8,8 @@ import {
 import { useMemo, useState, type FormEvent } from "react";
 import { DataTable } from "../../components/DataTable";
 import { Modal } from "../../components/Modal";
+import { outlinedControlClass, OutlinedField } from "../../components/OutlinedField";
+import { SearchField } from "../../components/SearchField";
 import { useExpenseTransactions } from "./hooks/useExpenseTransactions";
 import { BulkTransactionModal } from "./components/BulkTransactionModal";
 import { TransactionDetailsDrawer } from "./components/TransactionDetailsDrawer";
@@ -143,72 +145,71 @@ export default function ExpenseTransactionsPage() {
               <button
                 key={tab}
                 onClick={() => state.setType(tab)}
-                className={`rounded-lg px-3 py-2 text-xs font-semibold ${state.type === tab ? "bg-primary-600 text-white" : "bg-slate-100 text-slate-600"}`}
+                className={`inline-flex h-10 items-center rounded-lg px-3 text-xs font-semibold ${state.type === tab ? "bg-primary-600 text-white" : "bg-slate-100 text-slate-600"}`}
               >
                 {tab === "all" ? "All Transactions" : tab.replace(/_/g, " ")}
               </button>
             ))}
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-2 lg:grid-cols-5">
-            <select
-              value={state.accountFilter}
-              onChange={(event) => state.setAccountFilter(event.target.value)}
-              className="col-span-2 rounded-lg border border-slate-300 px-3 py-2 text-sm lg:col-span-1"
-              aria-label="Filter by account"
-            >
-              <option value="all">All accounts</option>
-              {state.accounts.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.name}
-                </option>
-              ))}
-            </select>
-            <select
-              value={state.categoryFilter}
-              onChange={(event) => state.setCategoryFilter(event.target.value)}
-              className="col-span-2 rounded-lg border border-slate-300 px-3 py-2 text-sm lg:col-span-1"
-              aria-label="Filter by category"
-            >
-              <option value="all">All categories</option>
-              {state.categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            <label className="sr-only" htmlFor="transactions-from-date">
-              From date
-            </label>
-            <input
-              id="transactions-from-date"
-              type="date"
-              value={state.fromDate}
-              max={state.toDate || undefined}
-              onChange={(event) => state.setFromDate(event.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-              aria-label="From date"
-            />
-            <label className="sr-only" htmlFor="transactions-to-date">
-              To date
-            </label>
-            <input
-              id="transactions-to-date"
-              type="date"
-              value={state.toDate}
-              min={state.fromDate || undefined}
-              onChange={(event) => state.setToDate(event.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-              aria-label="To date"
-            />
-            <input
+          <div className="grid grid-cols-2 items-center gap-3 lg:grid-cols-5">
+            <OutlinedField label="Account" className="col-span-2 lg:col-span-1">
+              <select
+                value={state.accountFilter}
+                onChange={(event) => state.setAccountFilter(event.target.value)}
+                className={outlinedControlClass}
+              >
+                <option value="all">All accounts</option>
+                {state.accounts.map((account) => (
+                  <option key={account.id} value={account.id}>
+                    {account.name}
+                  </option>
+                ))}
+              </select>
+            </OutlinedField>
+            <OutlinedField label="Category" className="col-span-2 lg:col-span-1">
+              <select
+                value={state.categoryFilter}
+                onChange={(event) => state.setCategoryFilter(event.target.value)}
+                className={outlinedControlClass}
+              >
+                <option value="all">All categories</option>
+                {state.categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </OutlinedField>
+            <OutlinedField label="From date">
+              <input
+                id="transactions-from-date"
+                type="date"
+                value={state.fromDate}
+                max={state.toDate || undefined}
+                onChange={(event) => state.setFromDate(event.target.value)}
+                className={outlinedControlClass}
+              />
+            </OutlinedField>
+            <OutlinedField label="To date">
+              <input
+                id="transactions-to-date"
+                type="date"
+                value={state.toDate}
+                min={state.fromDate || undefined}
+                onChange={(event) => state.setToDate(event.target.value)}
+                className={outlinedControlClass}
+              />
+            </OutlinedField>
+            <SearchField
               value={state.search}
-              onChange={(event) => state.setSearch(event.target.value)}
+              onChange={state.setSearch}
               placeholder="Search transactions"
-              className="col-span-2 rounded-lg border border-slate-300 px-3 py-2 text-sm lg:col-span-1"
+              className="col-span-2 lg:col-span-1"
             />
             <button
               onClick={() => void state.refresh()}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-slate-600"
+              className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 px-3 text-slate-600"
+              aria-label="Refresh transactions"
             >
               <RefreshCcw className="h-4 w-4" />
             </button>
@@ -220,7 +221,7 @@ export default function ExpenseTransactionsPage() {
                 state.setToDate(state.defaultDateRange.toDate);
                 state.setSearch("");
               }}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+              className="h-10 rounded-lg border border-slate-300 px-3 text-sm font-medium text-slate-600 hover:bg-slate-50"
             >
               Clear filters
             </button>
@@ -275,8 +276,7 @@ export default function ExpenseTransactionsPage() {
             ["amount", "Amount"],
             ["transaction_date", "Date"],
           ].map(([key, label]) => (
-            <label key={key} className="text-sm font-medium text-slate-700">
-              {label}
+            <OutlinedField key={key} label={label}>
               {key === "account_id" ? (
                 <select
                   required
@@ -284,7 +284,7 @@ export default function ExpenseTransactionsPage() {
                   onChange={(event) =>
                     setValues({ ...values, account_id: event.target.value })
                   }
-                  className="mt-1 w-full rounded-lg border border-slate-300 p-2"
+                  className="h-8 w-full border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
                 >
                   <option value="">Select account</option>
                   {state.accounts.map((account) => (
@@ -301,21 +301,20 @@ export default function ExpenseTransactionsPage() {
                   onChange={(event) =>
                     setValues({ ...values, [key]: event.target.value })
                   }
-                  className="mt-1 w-full rounded-lg border border-slate-300 p-2"
+                  className="h-8 w-full border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
                 />
               )}
-            </label>
+            </OutlinedField>
           ))}
           {entryType !== "DEPOSIT" && (
-            <label className="text-sm font-medium text-slate-700">
-              Category
+            <OutlinedField label="Category">
               <select
                 value={values.category_id}
                 onChange={(event) =>
                   setValues({ ...values, category_id: event.target.value })
                 }
                 required={entryType === "EXPENSE"}
-                className="mt-1 w-full rounded-lg border border-slate-300 p-2"
+                className="h-8 w-full border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
               >
                 <option value="">Select category</option>
                 {state.categories.map((category) => (
@@ -324,18 +323,17 @@ export default function ExpenseTransactionsPage() {
                   </option>
                 ))}
               </select>
-            </label>
+            </OutlinedField>
           )}
-          <label className="sm:col-span-2 text-sm font-medium text-slate-700">
-            Note
+          <OutlinedField label="Note" className="sm:col-span-2">
             <textarea
               value={values.note}
               onChange={(event) =>
                 setValues({ ...values, note: event.target.value })
               }
-              className="mt-1 w-full rounded-lg border border-slate-300 p-2"
+              className="min-h-20 w-full resize-y border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
             />
-          </label>
+          </OutlinedField>
         </form>
       </Modal>
       <BulkTransactionModal

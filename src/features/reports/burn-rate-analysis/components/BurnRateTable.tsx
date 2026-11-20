@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { DataTable } from "../../../../components/DataTable";
+import { SearchField } from "../../../../components/SearchField";
 import type { BurnRateRow } from "../types";
 import { burnRateColumns } from "./columns";
 
@@ -33,11 +34,11 @@ export function BurnRateTable({
         hideToolbarDateFilter
         hideViewColumn
         filterActions={
-          <input
+          <SearchField
             value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
+            onChange={onSearchChange}
             placeholder="Search month or amount"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm md:w-64"
+            className="w-full md:w-72"
           />
         }
       />

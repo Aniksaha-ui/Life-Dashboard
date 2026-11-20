@@ -2,6 +2,7 @@ import { ArrowLeft, BarChart3, RefreshCcw } from "lucide-react";
 import { useMemo } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { DataTable } from "../../components/DataTable";
+import { SearchField } from "../../components/SearchField";
 import { getReportColumns } from "./components/columns";
 import { ReportChart } from "./components/ReportChart";
 import { ReportFilters } from "./components/ReportFilters";
@@ -80,17 +81,12 @@ function ReportContent({ definition }: { definition: ReportDefinition }) {
           hideToolbarDateFilter
           hideViewColumn
           filterActions={
-            <label className="relative block w-full md:w-80">
-              <span className="sr-only">Search report data</span>
-              <input
-                type="search"
-                value={state.search}
-                onChange={(event) => state.setSearch(event.target.value)}
-                placeholder={isCategoryUsage ? "Search category, usage count, amount, or share" : "Search report data"}
-                className="h-10 w-full rounded-xl border border-slate-300 bg-white py-2 pl-3 pr-9 text-sm text-slate-700 shadow-sm transition placeholder:text-slate-400 hover:border-slate-400 focus:border-primary-500 focus:outline-none focus:ring-4 focus:ring-primary-100"
-              />
-              {state.search && <button type="button" onClick={() => state.setSearch("")} aria-label="Clear search" className="absolute inset-y-0 right-2 my-auto grid h-7 w-7 place-items-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700">×</button>}
-            </label>
+            <SearchField
+              value={state.search}
+              onChange={state.setSearch}
+              placeholder={isCategoryUsage ? "Search category, usage count, amount, or share" : "Search report data"}
+              className="w-full md:w-80"
+            />
           }
         />
       )}

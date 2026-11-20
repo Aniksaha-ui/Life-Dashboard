@@ -1,9 +1,10 @@
 import clsx from "clsx";
-import { ChevronDown, X, Check } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { DatePicker } from "./DatePicker";
 import { DateRangePicker } from "./DateRangePicker";
+import { SearchField } from "./SearchField";
 
 export interface FilterOption {
   label: string;
@@ -122,33 +123,14 @@ export function FilterBar({
 
         if (filter.type === "input") {
           return (
-            <div key={filter.key} className="relative flex items-center">
-              {Icon && (
-                <div className="absolute left-3 text-slate-400 pointer-events-none">
-                  <Icon className="w-4 h-4" />
-                </div>
-              )}
-              <input
-                type="text"
-                placeholder={filter.placeholder || filter.label}
-                value={value || ""}
-                onChange={(e) => onFilterChange(filter.key, e.target.value)}
-                className={clsx(
-                  "py-1.5 bg-white border border-slate-200 rounded-full text-sm font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 transition-all",
-                  Icon ? "pl-9" : "pl-3",
-                  value ? "pr-8" : "pr-3",
-                )}
-                style={{ width: value ? "200px" : "140px" }}
-              />
-              {value && (
-                <button
-                  onClick={() => onFilterChange(filter.key, "")}
-                  className="absolute right-2 text-slate-400 hover:text-slate-600"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              )}
-            </div>
+            <SearchField
+              key={filter.key}
+              label={filter.label}
+              placeholder={filter.placeholder || filter.label}
+              value={value || ""}
+              onChange={(next) => onFilterChange(filter.key, next)}
+              className={clsx("w-full max-w-xs", filter.className)}
+            />
           );
         }
 

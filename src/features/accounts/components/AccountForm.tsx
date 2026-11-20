@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Modal } from "../../../components/Modal";
+import { outlinedControlClass, OutlinedField } from "../../../components/OutlinedField";
 import type { AccountApiItem, AccountFormValues } from "../types";
 
 const defaults: AccountFormValues = {
@@ -57,8 +58,6 @@ export function AccountForm({
       setSaving(false);
     }
   };
-  const fieldClass =
-    "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100";
   return (
     <Modal
       isOpen={open}
@@ -86,20 +85,18 @@ export function AccountForm({
       <form
         id="account-form"
         onSubmit={submit}
-        className="grid gap-4 sm:grid-cols-2"
+        className="grid items-center gap-4 sm:grid-cols-2"
       >
-        <label className="sm:col-span-2 text-sm font-medium text-slate-700">
-          Account Name
+        <OutlinedField label="Account name" className="sm:col-span-2">
           <input
             required
             value={values.name}
             onChange={(e) => setValues({ ...values, name: e.target.value })}
-            className={fieldClass}
+            className={outlinedControlClass}
             placeholder="Main Bank"
           />
-        </label>
-        <label className="text-sm font-medium text-slate-700">
-          Type
+        </OutlinedField>
+        <OutlinedField label="Type">
           <select
             value={values.type}
             onChange={(e) =>
@@ -108,7 +105,7 @@ export function AccountForm({
                 type: e.target.value as AccountFormValues["type"],
               })
             }
-            className={fieldClass}
+            className={outlinedControlClass}
           >
             {[
               ["BANK", "Bank"],
@@ -121,21 +118,19 @@ export function AccountForm({
               </option>
             ))}
           </select>
-        </label>
-        <label className="text-sm font-medium text-slate-700">
-          Institution Name
+        </OutlinedField>
+        <OutlinedField label="Institution name">
           <input
             value={values.institution_name}
             onChange={(e) =>
               setValues({ ...values, institution_name: e.target.value })
             }
-            className={fieldClass}
+            className={outlinedControlClass}
             placeholder="DBBL / Visa / bKash"
           />
-        </label>
+        </OutlinedField>
         {!account && (
-          <label className="text-sm font-medium text-slate-700">
-            Opening Balance
+          <OutlinedField label="Opening balance">
             <input
               type="number"
               min="0"
@@ -144,13 +139,12 @@ export function AccountForm({
               onChange={(e) =>
                 setValues({ ...values, opening_balance: e.target.value })
               }
-              className={fieldClass}
+              className={outlinedControlClass}
               placeholder="0.00"
             />
-          </label>
+          </OutlinedField>
         )}
-        <label className="text-sm font-medium text-slate-700">
-          Low Balance Alert
+        <OutlinedField label="Low balance alert">
           <input
             type="number"
             min="0"
@@ -159,23 +153,22 @@ export function AccountForm({
             onChange={(e) =>
               setValues({ ...values, low_balance_threshold: e.target.value })
             }
-            className={fieldClass}
+            className={outlinedControlClass}
             placeholder="Optional threshold"
           />
-        </label>
-        <label className="text-sm font-medium text-slate-700">
-          Status
+        </OutlinedField>
+        <OutlinedField label="Status">
           <select
             value={values.is_active}
             onChange={(e) =>
               setValues({ ...values, is_active: e.target.value as "1" | "0" })
             }
-            className={fieldClass}
+            className={outlinedControlClass}
           >
             <option value="1">Active</option>
             <option value="0">Inactive</option>
           </select>
-        </label>
+        </OutlinedField>
       </form>
     </Modal>
   );

@@ -2,6 +2,7 @@ import { CalendarCheck, Play, Plus, RefreshCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 import { DataTable } from "../../components/DataTable";
 import { MetricCard } from "../../components/MetricCard";
+import { SearchField } from "../../components/SearchField";
 import { RecurringExpenseForm } from "./components/RecurringExpenseForm";
 import { getRecurringExpenseColumns } from "./components/columns";
 import { useRecurringExpenses } from "./hooks/useRecurringExpenses";
@@ -86,22 +87,23 @@ export default function RecurringExpensesPage() {
               <button
                 key={value}
                 onClick={() => state.setStatus(value)}
-                className={`rounded-lg px-3 py-2 text-sm font-semibold ${state.status === value ? "bg-primary-600 text-white" : "bg-slate-100 text-slate-600"}`}
+                className={`inline-flex h-10 items-center rounded-lg px-3 text-sm font-semibold ${state.status === value ? "bg-primary-600 text-white" : "bg-slate-100 text-slate-600"}`}
               >
                 {label}
               </button>
             ))}
           </div>
-          <div className="flex gap-2">
-            <input
+          <div className="flex w-full items-center gap-2 lg:w-auto">
+            <SearchField
               value={state.search}
-              onChange={(event) => state.setSearch(event.target.value)}
+              onChange={state.setSearch}
               placeholder="Search recurring expenses"
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="min-w-0 w-full flex-1 sm:w-72 sm:flex-none"
             />
             <button
               onClick={() => void state.refresh()}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-slate-600"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-300 text-slate-600"
+              aria-label="Refresh recurring expenses"
             >
               <RefreshCcw className="h-4 w-4" />
             </button>

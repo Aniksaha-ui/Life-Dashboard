@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { AlertCircle, BarChart3, CheckCircle2, Eye, EyeOff, LayoutDashboard, Shield } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { outlinedControlClass, OutlinedField } from "../../components/OutlinedField";
 import { useLoginMutation } from "./api/auth";
 import { CaptchaField } from "./components/CaptchaField";
 
@@ -75,7 +76,7 @@ export default function LoginPage() {
         <section className="flex min-h-dvh min-w-0 flex-col justify-center px-4 py-7 sm:min-h-[min(680px,calc(100dvh-3rem))] sm:px-10 sm:py-10 lg:min-h-[620px] lg:px-12">
           <div className="mb-6 flex items-center gap-3 lg:hidden" aria-label="Life Dashboard"><span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-600 text-white shadow-sm"><LayoutDashboard className="h-5 w-5" /></span><span className="text-xl font-bold tracking-tight text-slate-900">Life Dashboard</span></div>
           <div className="mb-6 sm:mb-7"><p className="text-sm font-semibold text-primary-700">Welcome back</p><h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Sign in to your account</h2><p className="mt-2 text-sm leading-6 text-slate-500">Enter your credentials to access your financial overview.</p></div>
-          <form onSubmit={handleSubmit} className="w-full min-w-0 space-y-4 sm:space-y-5">
+          <form onSubmit={handleSubmit} className="grid w-full min-w-0 items-center gap-4 sm:gap-5">
             {error && (
               <div className="flex items-start gap-3 p-3 bg-rose-50 border border-rose-200 rounded-lg">
                 <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
@@ -90,56 +91,43 @@ export default function LoginPage() {
                 </p>
               </div>
             )}
-            <div className="min-w-0">
-              <label
-                htmlFor="loginId"
-                className="mb-2 block text-sm font-semibold text-slate-700"
-              >
-                Login ID
-              </label>
+            <OutlinedField label="Login ID">
               <input
                 id="loginId"
                 type="text"
                 value={loginId}
                 onChange={(event) => setLoginId(event.target.value)}
                 placeholder="Enter your login ID"
-                className="box-border w-full max-w-full rounded-lg border border-slate-300 px-4 py-3 text-sm transition-colors outline-none placeholder:text-slate-400 focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
+                className={outlinedControlClass}
                 disabled={isLoading}
                 autoComplete="username"
               />
-            </div>
-            <div className="min-w-0">
-              <label
-                htmlFor="password"
-                className="mb-2 block text-sm font-semibold text-slate-700"
+            </OutlinedField>
+            <OutlinedField label="Password">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Enter your password"
+                className={outlinedControlClass}
+                disabled={isLoading}
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="grid h-8 w-8 shrink-0 place-items-center text-slate-400 hover:text-slate-600"
+                tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Enter your password"
-                  className="box-border w-full max-w-full rounded-lg border border-slate-300 px-4 py-3 pr-12 text-sm transition-colors outline-none placeholder:text-slate-400 focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
-                  disabled={isLoading}
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-            </div>
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </OutlinedField>
             <CaptchaField
               value={captchaInput}
               onChange={(next) => {
@@ -154,7 +142,7 @@ export default function LoginPage() {
               type="submit"
               disabled={!isFormValid || isLoading}
               className={clsx(
-                "box-border w-full max-w-full rounded-lg px-4 py-3 text-sm font-semibold transition-all",
+                "box-border h-10 w-full max-w-full rounded-lg px-4 text-sm font-semibold transition-all",
                 isFormValid && !isLoading
                   ? "bg-primary-600 text-white shadow-sm shadow-primary-600/25 hover:bg-primary-700"
                   : "bg-slate-200 text-slate-400 cursor-not-allowed",

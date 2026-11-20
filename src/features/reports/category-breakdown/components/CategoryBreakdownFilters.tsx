@@ -1,4 +1,5 @@
 import { RefreshCcw } from "lucide-react";
+import { outlinedControlClass, OutlinedField } from "../../../../components/OutlinedField";
 import type { CategoryType } from "../types";
 export function CategoryBreakdownFilters({
   fromDate,
@@ -24,45 +25,42 @@ export function CategoryBreakdownFilters({
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-          Category type
+        <OutlinedField label="Category type">
           <select
             value={typeFilter}
             onChange={(event) =>
               onTypeChange(event.target.value as CategoryType)
             }
-            className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-normal text-slate-700"
+            className={outlinedControlClass}
           >
             <option value="all">All categories</option>
             <option value="EXPENSE">Expense</option>
             <option value="INCOME">Income</option>
           </select>
-        </label>
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-          From date
+        </OutlinedField>
+        <OutlinedField label="From date">
           <input
             type="date"
             value={fromDate}
             max={toDate || undefined}
             onChange={(event) => onFromDateChange(event.target.value)}
-            className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-normal text-slate-700"
+            className={outlinedControlClass}
           />
-        </label>
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-          To date
+        </OutlinedField>
+        <OutlinedField label="To date">
           <input
             type="date"
             value={toDate}
             min={fromDate || undefined}
             onChange={(event) => onToDateChange(event.target.value)}
-            className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-normal text-slate-700"
+            className={outlinedControlClass}
           />
-        </label>
-        <div className="flex items-end gap-2">
+        </OutlinedField>
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onClear}
-            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+            className="inline-flex h-10 flex-1 items-center justify-center rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50"
           >
             Clear filters
           </button>
@@ -70,7 +68,7 @@ export function CategoryBreakdownFilters({
             type="button"
             onClick={onRefresh}
             disabled={loading}
-            className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-3 py-2 text-white disabled:opacity-60"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary-600 px-3 text-white disabled:opacity-60"
           >
             <RefreshCcw
               className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}

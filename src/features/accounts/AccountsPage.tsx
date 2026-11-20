@@ -1,6 +1,7 @@
 import { Plus, RefreshCcw } from "lucide-react";
 import { useState } from "react";
 import { MetricCard } from "../../components/MetricCard";
+import { SearchField } from "../../components/SearchField";
 import type { AccountApiItem } from "./types";
 import { AccountForm } from "./components/AccountForm";
 import { AccountTable } from "./components/AccountTable";
@@ -101,23 +102,23 @@ export default function AccountsPage() {
               <button
                 key={value}
                 onClick={() => setTypeFilter(value)}
-                className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${typeFilter === value ? "bg-primary-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+                className={`inline-flex h-10 items-center rounded-lg px-3 text-sm font-medium transition-colors ${typeFilter === value ? "bg-primary-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
               >
                 {label}
               </button>
             ))}
           </div>
-          <div className="flex gap-2">
-            <input
+          <div className="flex w-full items-center gap-2 lg:w-auto">
+            <SearchField
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              className="min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500"
+              onChange={setSearch}
               placeholder="Search accounts"
+              className="min-w-0 w-full flex-1 sm:w-72 sm:flex-none"
             />
             <button
               onClick={() => void refresh()}
               disabled={isLoading}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-60"
+              className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-60"
             >
               <RefreshCcw className="h-4 w-4" />
               Refresh

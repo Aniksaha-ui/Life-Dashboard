@@ -102,7 +102,9 @@
 
   .blog-management-page .app-filter-panel > div > div:last-child,
   .blog-management-page .app-filter-panel label,
-  .experience-page label {
+  .blog-management-page .app-filter-panel .search-field,
+  .experience-page label,
+  .experience-page .search-field {
     flex: 1 1 auto;
   }
 
@@ -144,7 +146,8 @@
 }
 
 @media (min-width: 641px) and (max-width: 1023px) {
-  .blog-management-page .app-filter-panel label {
+  .blog-management-page .app-filter-panel label,
+  .blog-management-page .app-filter-panel .search-field {
     min-width: 17rem;
   }
 
@@ -196,6 +199,7 @@
      gain the same calm surface, responsive feedback, and accessible focus. */
   form :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea) {
     background-color: #fff;
+    border-radius: 0.7rem;
     box-shadow: inset 0 1px 1px rgb(15 23 42 / 0.02);
     transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
   }
@@ -210,6 +214,13 @@
   }
 
   form :is(input, textarea)::placeholder {
+    color: var(--color-slate-400);
+  }
+
+
+  form :is(input, select, textarea):disabled {
+    cursor: not-allowed;
+    background: var(--color-slate-100);
     color: var(--color-slate-400);
   }
 
@@ -247,6 +258,94 @@
 
 .page-loading-state {
   width: 100%;
+}
+
+/* Outlined fields match the 40px action buttons beside them. The label sits on the border and does not add height. */
+.outlined-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 2.5rem;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0 0.75rem;
+}
+
+.outlined-field:has(textarea) {
+  height: auto;
+  align-items: stretch;
+  padding: 0.5rem 0.75rem;
+}
+
+.outlined-field > .outlined-field__label {
+  position: absolute;
+  top: 0;
+  left: 0.5rem;
+  z-index: 1;
+  width: max-content;
+  max-width: calc(100% - 1rem);
+  margin: 0;
+  padding: 0 0.25rem;
+  transform: translateY(-50%);
+  background-color: #fff;
+  line-height: 1;
+}
+
+.outlined-field :is(input, select, textarea) {
+  min-width: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.outlined-field :is(input, select) {
+  height: 1.5rem !important;
+  padding: 0 !important;
+}
+
+.outlined-field :is(input, select, textarea):hover,
+.outlined-field :is(input, select, textarea):focus {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.search-field input::-webkit-search-decoration,
+.search-field input::-webkit-search-cancel-button,
+.search-field input::-webkit-search-results-button,
+.search-field input::-webkit-search-results-decoration {
+  display: none;
+}
+
+:is(div, section, form):has(> .outlined-field) > button,
+:is(div, section, form):has(> .outlined-field) > :is(div, span) > button {
+  height: 2.5rem;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 639px) {
+  .search-field { width: 100%; }
+}
+
+/* Shared headers for Blogs, Experiences, Projects, and Publications. */
+.app-page-header {
+  border: 1px solid var(--color-primary-100);
+  border-radius: 1rem;
+  background: linear-gradient(135deg, var(--color-primary-50), #fff 62%);
+  padding: 1.1rem;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+}
+.app-page-header h1 { font-size: 1.4rem; line-height: 1.2; }
+.app-page-header .app-page-primary-action { width: 100%; min-height: 2.75rem; }
+@media (min-width: 640px) {
+  .app-page-header { padding: 1.5rem; }
+  .app-page-header h1 { font-size: 1.7rem; }
+  .app-page-header .app-page-primary-action { width: auto; min-width: 9.5rem; }
 }
 
 /* Small-screen application shell: preserve readable controls and avoid horizontal page drift. */
@@ -954,26 +1053,11 @@
     width: 100%;
   }
 
-  .accounts-page .app-filter-panel input,
-  .categories-page .app-filter-panel input,
-  .recurring-expenses-page .app-filter-panel input {
+  .accounts-page .app-filter-panel .search-field,
+  .categories-page .app-filter-panel .search-field,
+  .recurring-expenses-page .app-filter-panel .search-field {
     flex: 1 1 auto;
     min-width: 0;
-  }
-
-  .transfers-page .app-filter-panel > div > div:last-child {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .transfers-page .app-filter-panel input[placeholder] {
-    grid-column: 1 / -1;
-    min-width: 0;
-  }
-
-  .transfers-page .app-filter-panel button {
-    grid-column: 1 / -1;
-    justify-content: center;
   }
 
   .transactions-page .app-filter-panel > div > div:first-child {
