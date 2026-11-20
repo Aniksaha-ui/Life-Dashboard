@@ -13,10 +13,11 @@ import {
   BrainCircuit,
   WalletCards,
   LayoutDashboard,
+  Briefcase,
   BookOpen,
+  GraduationCap,
   BriefcaseBusiness,
   Code2,
-  LibraryBig,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -29,10 +30,16 @@ const navItems = [
   { to: "/transfers", icon: Shuffle, label: "Transfers" },
   { to: "/recurring-expenses", icon: Repeat, label: "Recurring Expenses" },
   { to: "/budgets", icon: WalletCards, label: "Budgets" },
-  { to: "/blogs", icon: BookOpen, label: "Blogs" },
-  { to: "/experiences", icon: BriefcaseBusiness, label: "Experiences" },
-  { to: "/projects", icon: Code2, label: "Projects" },
-  { to: "/publications", icon: LibraryBig, label: "Publications" },
+  {
+    icon: Briefcase,
+    label: "Portfolio Setup",
+    children: [
+      { to: "/blogs", label: "Blogs", icon: BookOpen },
+      { to: "/publications", label: "Publications", icon: GraduationCap },
+      { to: "/experiences", label: "Experiences", icon: BriefcaseBusiness },
+      { to: "/projects", label: "Projects", icon: Code2 },
+    ],
+  },
   { to: "/file-manager", icon: Folder, label: "File Manager" },
   { to: "/financial-intelligence", icon: BrainCircuit, label: "Financial Intelligence" },
   { to: "/reports", icon: BarChart3, label: "Reports" },
@@ -148,14 +155,15 @@ export function Sidebar({
                       end
                       className={({ isActive }) =>
                         clsx(
-                          "block px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                          "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
                           isActive
                             ? "text-primary-600 bg-slate-100"
                             : "text-slate-500 hover:text-slate-800 hover:bg-slate-100",
                         )
                       }
                     >
-                      {child.label}
+                      <child.icon className="h-4 w-4 shrink-0" />
+                      <span className="truncate">{child.label}</span>
                     </NavLink>
                   ))}
                 </div>

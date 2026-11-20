@@ -13,7 +13,7 @@ import { toast } from "react-hot-toast";
 import { DataTable } from "../../components/DataTable";
 import { EmptyState } from "../../components/EmptyState";
 import { Modal } from "../../components/Modal";
-import { OutlinedField } from "../../components/OutlinedField";
+import { outlinedControlClass, OutlinedField } from "../../components/OutlinedField";
 import { SearchField } from "../../components/SearchField";
 import {
   createPublication,
@@ -34,7 +34,6 @@ const blank: PublicationValues = {
   pdf_url: "",
   status: 1,
 };
-const input = "h-8 w-full border-0 bg-transparent p-0 text-sm outline-none focus:bg-transparent focus:shadow-none";
 const externalUrl = (value: string) =>
   /^https?:\/\//i.test(value.trim()) ? value.trim() : `https://${value.trim()}`;
 
@@ -76,7 +75,7 @@ function PublicationForm({
         onChange={(event) =>
           setValues({ ...values, [key]: event.target.value })
         }
-        className={input}
+        className={outlinedControlClass}
       />
     </OutlinedField>
   );
@@ -116,47 +115,45 @@ function PublicationForm({
             setSaving(false);
           }
         }}
-        className="max-h-[65vh] space-y-4 overflow-y-auto pr-1"
+        className="grid max-h-[65vh] items-center gap-4 overflow-y-auto pr-1 sm:grid-cols-2"
       >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <OutlinedField label="Title" className="sm:col-span-2">
-            <input
-              required
-              value={values.title}
-              onChange={(event) =>
-                setValues({ ...values, title: event.target.value })
-              }
-              className={input}
-            />
-          </OutlinedField>
-          {field("authors", "Author(s)")}
-          {field("publication_date", "Publication date", "date")}
-          {field("publisher", "Publisher")}
-          {field("doi", "DOI")}
-          {field("url", "Publication URL", "url")}
-          <OutlinedField label="PDF URL">
-            <input
-              required
-              type="url"
-              value={values.pdf_url}
-              onChange={(event) =>
-                setValues({ ...values, pdf_url: event.target.value })
-              }
-              className={input}
-            />
-          </OutlinedField>
-        </div>
-        <OutlinedField label="Abstract">
+        <OutlinedField label="Title" className="sm:col-span-2">
+          <input
+            required
+            value={values.title}
+            onChange={(event) =>
+              setValues({ ...values, title: event.target.value })
+            }
+            className={outlinedControlClass}
+          />
+        </OutlinedField>
+        {field("authors", "Author(s)")}
+        {field("publication_date", "Publication date", "date")}
+        {field("publisher", "Publisher")}
+        {field("doi", "DOI")}
+        {field("url", "Publication URL", "url")}
+        <OutlinedField label="PDF URL">
+          <input
+            required
+            type="url"
+            value={values.pdf_url}
+            onChange={(event) =>
+              setValues({ ...values, pdf_url: event.target.value })
+            }
+            className={outlinedControlClass}
+          />
+        </OutlinedField>
+        <OutlinedField label="Abstract" className="sm:col-span-2">
           <textarea
             required
             value={values.abstract}
             onChange={(event) =>
               setValues({ ...values, abstract: event.target.value })
             }
-            className="min-h-24 w-full resize-y border-0 bg-transparent p-0 text-sm outline-none focus:bg-transparent focus:shadow-none"
+            className="min-h-20 w-full resize-y border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
           />
         </OutlinedField>
-        <label className="flex h-10 items-center gap-3 rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700">
+        <label className="flex h-10 items-center gap-3 rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 sm:col-span-2">
           <input
             type="checkbox"
             checked={values.status === 1}
@@ -377,39 +374,50 @@ export default function PublicationsPage() {
     [],
   );
   return (
-    <div className="app-management-page space-y-6">
-      <header className="app-page-header flex flex-col gap-4 sm:flex-row sm:justify-between">
+    <div className="app-management-page publications-page space-y-6">
+      <div className="app-page-header flex flex-col gap-4 sm:flex-row sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Publications</h1>
           <p className="mt-1 text-sm text-slate-500">
             Manage research publications, citations, and reader links.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setEditing(null)}
-          className="app-page-primary-action inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
-        >
-          <Plus className="h-4 w-4" />
-          Add publication
-        </button>
-      </header>
-      <section className="app-filter-panel flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <SearchField
-          value={search}
-          onChange={setSearch}
-          placeholder="Search publications"
-          className="min-w-0 w-full sm:w-80"
-        />
-        <button
-          type="button"
-          onClick={() => void refresh()}
-          disabled={loading}
-          className="inline-flex h-10 items-center gap-2 rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-60"
-        >
-          <RefreshCcw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-          Refresh
-        </button>
+        <div className="app-page-actions flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setEditing(null)}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-3 py-2 text-sm font-semibold text-white"
+          >
+            <Plus className="h-4 w-4" />
+            Add publication
+          </button>
+        </div>
+      </div>
+      <section className="app-filter-panel rounded-xl border border-slate-200 bg-white p-4">
+        <div className="grid grid-cols-2 items-center gap-3 lg:grid-cols-[minmax(0,18rem)_auto_auto] lg:justify-start">
+          <SearchField
+            value={search}
+            onChange={setSearch}
+            placeholder="Search publications"
+            className="col-span-2 lg:col-span-1"
+          />
+          <button
+            type="button"
+            onClick={() => void refresh()}
+            disabled={loading}
+            className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 px-3 text-slate-600 disabled:opacity-60"
+            aria-label="Refresh publications"
+          >
+            <RefreshCcw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setSearch("")}
+            className="h-10 rounded-lg border border-slate-300 px-3 text-sm font-medium text-slate-600 hover:bg-slate-50"
+          >
+            Clear filters
+          </button>
+        </div>
       </section>
       {!loading && !rows.length ? (
         <div className="rounded-xl border border-slate-200 bg-white">
