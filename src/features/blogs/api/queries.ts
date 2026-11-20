@@ -31,7 +31,7 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
     ...init,
     headers: {
       Accept: "application/json",
-      "Content-Type": "application/json",
+      ...(init?.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
       Authorization: `Bearer ${token}`,
       ...init?.headers,
     },
@@ -72,11 +72,25 @@ export async function getBlogs(page = 1, search = ""): Promise<BlogCollection> {
 
 export const getBlog = (id: string | number) => request<BlogApiItem>(`/blogs/${id}`);
 
-export const createBlog = (values: BlogPayload | BlogFormValues) =>
-  request<BlogApiItem>("/blogs", { method: "POST", body: JSON.stringify(values) });
+const withCoverImage = (values: BlogPayload | BlogFormValues, coverImage?: File | null) => {
+  if (!coverImage) {
+    const { image: _image, ...valuesWithoutImage } = values;
+    return JSON.stringify(valuesWithoutImage);
+  }
 
-export const updateBlog = (id: string | number, values: BlogPayload | BlogFormValues) =>
-  request<BlogApiItem>(`/blogs/${id}`, { method: "PUT", body: JSON.stringify(values) });
+  const form = new FormData();
+  Object.entries(values).forEach(([key, value]) => {
+    if (key !== "image") form.append(key, key === "isPublished" ? (value ? "1" : "0") : String(value));
+  });
+  form.append("image", coverImage);
+  return form;
+};
+
+export const createBlog = (values: BlogPayload | BlogFormValues, coverImage?: File | null) =>
+  request<BlogApiItem>("/blogs", { method: "POST", body: withCoverImage(values, coverImage) });
+
+export const updateBlog = (id: string | number, values: BlogPayload | BlogFormValues, coverImage?: File | null) =>
+  request<BlogApiItem>(`/blogs/${id}`, { method: coverImage ? "POST" : "PUT", body: withCoverImage(values, coverImage) });
 
 export const deleteBlog = (id: string | number) =>
   request<void>(`/blogs/${id}`, { method: "DELETE" });

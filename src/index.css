@@ -76,9 +76,19 @@
 .blog-preview-content img { width: 100%; margin-top: 2rem; border-radius: 1rem; }
 .blog-preview-content figure { margin: 2rem 0; }
 .blog-preview-content figcaption { margin-top: 0.625rem; color: var(--color-slate-500); font-size: 0.8125rem; line-height: 1.5; text-align: center; }
-.blog-preview-content blockquote { border-left: 4px solid var(--color-primary-500); border-radius: 0 0.75rem 0.75rem 0; background: var(--color-primary-50); color: var(--color-slate-700); font-size: 1.1rem; font-style: italic; font-weight: 600; padding: 1.25rem 1.5rem; }
-.blog-preview-content pre { overflow-x: auto; border-radius: 0.875rem; background: var(--color-slate-900); color: #e2e8f0; font-size: 0.8125rem; line-height: 1.65; padding: 1.25rem; }
-.blog-preview-content aside { border: 1px solid var(--color-primary-100); border-radius: 0.875rem; padding: 1rem 1.25rem; }
+.blog-preview-content .blog-block-paragraph > * + * { margin-top: 1rem; }
+.blog-preview-content .blog-block-paragraph ul, .blog-preview-content .blog-block-paragraph ol { max-width: 68ch; padding-left: 1.5rem; }
+.blog-preview-content .blog-block-paragraph ul { list-style: disc; }
+.blog-preview-content .blog-block-paragraph ol { list-style: decimal; }
+.blog-preview-content .blog-block-paragraph li + li { margin-top: 0.35rem; }
+.blog-preview-content .blog-block-heading { padding-bottom: 0.75rem; border-bottom: 1px solid var(--color-primary-100); }
+.blog-preview-content .blog-block-subheading { color: var(--color-primary-800); }
+.blog-preview-content .blog-block-quote { position: relative; border-left: 4px solid var(--color-primary-500); border-radius: 0 0.875rem 0.875rem 0; background: linear-gradient(135deg, var(--color-primary-50), #fff); color: var(--color-slate-700); font-size: 1.1rem; font-style: italic; font-weight: 600; padding: 1.4rem 1.5rem 1.35rem 1.75rem; box-shadow: 0 8px 20px rgb(41 92 171 / 0.08); }
+.blog-preview-content .blog-block-quote::before { content: "“"; position: absolute; top: -0.3rem; left: 0.65rem; color: var(--color-primary-200); font-family: Georgia, serif; font-size: 4rem; line-height: 1; }
+.blog-preview-content .blog-block-code { position: relative; overflow-x: auto; border: 1px solid #1e293b; border-radius: 1rem; background: linear-gradient(135deg, #0f172a, #1e293b); color: #e2e8f0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8125rem; line-height: 1.7; padding: 3rem 1.25rem 1.25rem; box-shadow: 0 12px 24px rgb(15 23 42 / 0.18); }
+.blog-preview-content .blog-block-code::before { content: "CODE"; position: absolute; top: 0.85rem; left: 1.25rem; color: #94a3b8; font-family: var(--font-sans); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.14em; }
+.blog-preview-content .blog-block-highlight { border: 1px solid #bfdbfe; border-radius: 0.875rem; background: linear-gradient(135deg, #eff6ff, #f8fafc); color: var(--color-slate-700); padding: 1.1rem 1.25rem; box-shadow: inset 4px 0 0 var(--color-primary-500); }
+.blog-preview-content .blog-block-footer { margin-top: 2.5rem; border-top: 1px solid var(--color-slate-200); color: var(--color-slate-500); font-size: 0.875rem; font-style: italic; padding-top: 1.25rem; }
 
 @media (max-width: 640px) {
   .blog-preview-content { font-size: 0.9375rem; line-height: 1.8; }
@@ -180,6 +190,38 @@
   [type="reset"]:disabled,
   [aria-disabled="true"] {
     cursor: not-allowed;
+  }
+
+  /* Shared form language: every page keeps its existing layout while fields
+     gain the same calm surface, responsive feedback, and accessible focus. */
+  form :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea) {
+    background-color: #fff;
+    box-shadow: inset 0 1px 1px rgb(15 23 42 / 0.02);
+    transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  }
+
+  form :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea):hover {
+    border-color: var(--color-slate-400);
+  }
+
+  form :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea):focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgb(41 92 171 / 0.12), inset 0 1px 1px rgb(15 23 42 / 0.02);
+  }
+
+  form :is(input, textarea)::placeholder {
+    color: var(--color-slate-400);
+  }
+
+  form input[type="checkbox"],
+  form input[type="radio"] {
+    accent-color: var(--color-primary-600);
+  }
+
+  form input[type="file"] {
+    border-color: var(--color-slate-300);
+    background: var(--color-slate-50);
+    color: var(--color-slate-600);
   }
 }
 

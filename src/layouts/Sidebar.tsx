@@ -16,6 +16,7 @@ import {
   BookOpen,
   BriefcaseBusiness,
   Code2,
+  LibraryBig,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -31,6 +32,7 @@ const navItems = [
   { to: "/blogs", icon: BookOpen, label: "Blogs" },
   { to: "/experiences", icon: BriefcaseBusiness, label: "Experiences" },
   { to: "/projects", icon: Code2, label: "Projects" },
+  { to: "/publications", icon: LibraryBig, label: "Publications" },
   { to: "/file-manager", icon: Folder, label: "File Manager" },
   { to: "/financial-intelligence", icon: BrainCircuit, label: "Financial Intelligence" },
   { to: "/reports", icon: BarChart3, label: "Reports" },
