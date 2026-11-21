@@ -4,7 +4,7 @@ import { SearchField } from "../../components/SearchField";
 import { useEffect, useMemo, useState } from "react";
 import { PageLoadingState } from "../../components/PageLoadingState";
 import { BudgetForm } from "./components/BudgetForm";
-import { BudgetReportList, budgetStatusStyles, formatMoney, getBudgetStatus, getBudgetUsage, type BudgetStatus } from "./components/BudgetReportList";
+import { BudgetReportList, budgetStatusStyles, formatMoney, getBudgetStatus, type BudgetStatus } from "./components/BudgetReportList";
 import { useBudgets } from "./hooks/useBudgets";
 import type { BudgetApiItem } from "./types";
 
@@ -34,7 +34,7 @@ export default function BudgetsPage() {
     return state.budgets
       .filter((budget) => `${budget.category_name || ""} ${budget.period_type || ""}`.toLowerCase().includes(term))
       .filter((budget) => statusFilter === "all" || getBudgetStatus(budget) === statusFilter)
-      .sort((a, b) => sortKey === "name" ? String(a.category_name || "").localeCompare(String(b.category_name || "")) : sortKey === "amount" ? budgetAmount(b) - budgetAmount(a) : getBudgetUsage(b) - getBudgetUsage(a));
+      .sort((a, b) => sortKey === "name" ? String(a.category_name || "").localeCompare(String(b.category_name || "")) : sortKey === "amount" ? budgetAmount(b) - budgetAmount(a) : (Number(b.progress_percent) || 0) - (Number(a.progress_percent) || 0));
   }, [search, sortKey, state.budgets, statusFilter]);
 
   const usedPercent = state.totals.planned ? (state.totals.spent / state.totals.planned) * 100 : 0;

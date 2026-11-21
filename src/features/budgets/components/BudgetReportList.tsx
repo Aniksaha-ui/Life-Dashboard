@@ -54,7 +54,7 @@ export function BudgetReportList({ budgets, hasFilters = false, onEdit, onDelete
     return <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-14 text-center"><span className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-primary-50 text-primary-600"><WalletCards className="h-6 w-6" /></span><h2 className="mt-4 text-base font-semibold text-slate-900">{hasFilters ? "No budgets match your filters" : "No budgets for this period"}</h2><p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-slate-500">{hasFilters ? "Try a different search or status filter." : "Create a category budget to start tracking where your money is going."}</p></div>;
   }
 
-  return <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
+  return <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
     {budgets.map((budget) => {
       const percent = getBudgetUsage(budget);
       const status = getBudgetStatus(budget);
@@ -69,7 +69,7 @@ export function BudgetReportList({ budgets, hasFilters = false, onEdit, onDelete
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
               <h3 className="truncate text-base font-semibold text-slate-900" title={name}>{name}</h3>
-              <div className="-mt-1 -mr-1 flex shrink-0 gap-0.5 opacity-100 transition sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
+              <div className="-mt-1 -mr-1 flex shrink-0 gap-0.5 transition [@media(hover:hover)]:opacity-0 group-focus-within:opacity-100 group-hover:opacity-100">
                 <button type="button" onClick={() => onEdit(budget)} className="rounded-lg p-1.5 text-slate-400 hover:bg-primary-50 hover:text-primary-600" aria-label={`Edit ${name}`}><Pencil className="h-4 w-4" /></button>
                 <button type="button" onClick={() => onDelete(budget)} className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600" aria-label={`Delete ${name}`}><Trash2 className="h-4 w-4" /></button>
               </div>
@@ -84,9 +84,9 @@ export function BudgetReportList({ budgets, hasFilters = false, onEdit, onDelete
         </div>
 
         <div className="mx-4 grid grid-cols-3 divide-x divide-slate-200 rounded-xl bg-slate-50 py-3 text-center sm:mx-5">
-          <div className="px-2"><p className="text-[11px] font-medium text-slate-500">Spent</p><p className="mt-0.5 truncate text-sm font-bold text-slate-900">{formatMoney(budget.spent)}</p></div>
-          <div className="px-2"><p className="text-[11px] font-medium text-slate-500">Budget</p><p className="mt-0.5 truncate text-sm font-bold text-slate-900">{formatMoney(budget.effective_budget ?? budget.amount)}</p></div>
-          <div className="px-2"><p className="text-[11px] font-medium text-slate-500">{remaining < 0 ? "Over by" : "Left"}</p><p className={`mt-0.5 truncate text-sm font-bold ${remaining < 0 ? "text-rose-600" : "text-emerald-700"}`}>{formatMoney(Math.abs(remaining))}</p></div>
+          <div className="px-2"><p className="text-[11px] font-medium text-slate-500">Spent</p><p className="mt-0.5 truncate text-sm font-bold text-slate-900" title={formatMoney(budget.spent)}>{formatMoney(budget.spent)}</p></div>
+          <div className="px-2"><p className="text-[11px] font-medium text-slate-500">Budget</p><p className="mt-0.5 truncate text-sm font-bold text-slate-900" title={formatMoney(budget.effective_budget ?? budget.amount)}>{formatMoney(budget.effective_budget ?? budget.amount)}</p></div>
+          <div className="px-2"><p className="text-[11px] font-medium text-slate-500">{remaining < 0 ? "Over by" : "Left"}</p><p className={`mt-0.5 truncate text-sm font-bold ${remaining < 0 ? "text-rose-600" : "text-emerald-700"}`} title={formatMoney(Math.abs(remaining))}>{formatMoney(Math.abs(remaining))}</p></div>
         </div>
 
         <div className="mt-auto flex flex-wrap items-center justify-between gap-2 px-4 py-3.5 text-xs text-slate-500 sm:px-5">
