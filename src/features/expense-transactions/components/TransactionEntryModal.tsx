@@ -25,6 +25,7 @@ export function TransactionEntryModal({
   accounts,
   categories,
   saving,
+  error,
   onClose,
   onSubmit,
 }: {
@@ -35,6 +36,7 @@ export function TransactionEntryModal({
   accounts: any[];
   categories: any[];
   saving: boolean;
+  error?: string;
   onClose: () => void;
   onSubmit: (event: FormEvent) => void;
 }) {
@@ -80,6 +82,11 @@ export function TransactionEntryModal({
       }
     >
       <form id="entry-form" onSubmit={onSubmit} className="space-y-5">
+        {error && (
+          <p role="alert" className="rounded-lg bg-rose-50 p-3 text-sm text-rose-700">
+            {error}
+          </p>
+        )}
         <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3">
           <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${meta.iconClassName}`}>
             <Icon className="h-5 w-5" />
@@ -128,19 +135,8 @@ export function TransactionEntryModal({
               ))}
             </select>
           </OutlinedField>
-          <OutlinedField label="Date">
-            <input
-              type="date"
-              value={values.transaction_date}
-              onChange={(event) => set("transaction_date", event.target.value)}
-              className={outlinedControlClass}
-            />
-          </OutlinedField>
           {entryType !== "DEPOSIT" && (
-            <OutlinedField
-              label={entryType === "EXPENSE" ? "Category *" : "Category"}
-              className="sm:col-span-2"
-            >
+            <OutlinedField label={entryType === "EXPENSE" ? "Category *" : "Category"}>
               <select
                 value={values.category_id}
                 onChange={(event) => set("category_id", event.target.value)}
@@ -156,6 +152,17 @@ export function TransactionEntryModal({
               </select>
             </OutlinedField>
           )}
+          <OutlinedField
+            label="Date"
+            className={entryType === "DEPOSIT" ? "" : "sm:col-span-2"}
+          >
+            <input
+              type="date"
+              value={values.transaction_date}
+              onChange={(event) => set("transaction_date", event.target.value)}
+              className={outlinedControlClass}
+            />
+          </OutlinedField>
           <OutlinedField label="Note" className="sm:col-span-2">
             <textarea
               value={values.note}

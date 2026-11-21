@@ -57,6 +57,22 @@ const parseText = (text: string) => {
   return { entries, invalidLines };
 };
 
+const todayInput = () => {
+  const today = new Date();
+  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+};
+
+const getEntryErrors = (entry: BulkEntry) => ({
+  account: !entry.account_id,
+  category: entry.entry_type === "EXPENSE" && !entry.category_id,
+  amount: !(Number(entry.amount) > 0),
+});
+
+const hasEntryErrors = (entry: BulkEntry) =>
+  Object.values(getEntryErrors(entry)).some(Boolean);
+
+const invalidFieldClass = "border-rose-400! focus-within:border-rose-500!";
+
 const formatPreviewDate = (value: string) => {
   const [year, month, day] = value.split("-");
 
@@ -76,12 +92,13 @@ export function BulkTransactionModal({
   categories: any[];
   onSave: (entries: BulkEntry[]) => Promise<void>;
 }) {
-  const [entries, setEntries] = useState<BulkEntry[]>([newEntry()]);
+  const [entries, setEntries] = useState<BulkEntry[]>(() => [newEntry(todayInput())]);
   const [text, setText] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [showErrors, setShowErrors] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const parsed = parseText(text);
   const update = (index: number, patch: Partial<BulkEntry>) =>
@@ -98,6 +115,7 @@ export function BulkTransactionModal({
       return;
     }
     setEntries(parsed.entries.slice(0, 100));
+    setShowErrors(false);
     setError("");
     setMessage(
       `${Math.min(parsed.entries.length, 100)} entries added from text.${parsed.invalidLines.length ? ` ${parsed.invalidLines.length} invalid lines were skipped.` : ""}`,
@@ -116,7 +134,7 @@ export function BulkTransactionModal({
         throw new Error("No line items were found in this receipt.");
       setEntries(
         items.slice(0, 100).map((item: any) => ({
-          ...newEntry(item.transaction_date || result.transaction_date || ""),
+          ...newEntry(item.transaction_date || result.transaction_date || todayInput()),
           entry_type: ["EXPENSE", "INCOME", "DEPOSIT"].includes(item.type)
             ? item.type
             : "EXPENSE",
@@ -139,31 +157,39 @@ export function BulkTransactionModal({
       setScanning(false);
     }
   };
+  const invalidCount = entries.filter(hasEntryErrors).length;
   const save = async () => {
-    if (
-      entries.some(
-        (entry) =>
-          !entry.account_id ||
-          !entry.amount ||
-          (entry.entry_type === "EXPENSE" && !entry.category_id),
-      )
-    ) {
+    setMessage("");
+    if (invalidCount > 0) {
+      setShowErrors(true);
       setError(
-        "Each entry needs an account and amount; expenses also need a category.",
+        `${invalidCount} ${invalidCount === 1 ? "entry needs" : "entries need"} attention. Each entry needs an account and an amount above 0; expenses also need a category.`,
       );
       return;
     }
+    setError("");
     setSaving(true);
     try {
       await onSave(entries);
-      setEntries([newEntry()]);
+      setEntries([newEntry(todayInput())]);
+      setShowErrors(false);
       setText("");
       setMessage("");
       setError("");
       onClose();
+    } catch (saveError) {
+      setError(
+        saveError instanceof Error ? saveError.message : "Unable to save transactions.",
+      );
     } finally {
       setSaving(false);
     }
+  };
+  const categoryOptionsFor = (type: BulkEntry["entry_type"]) => {
+    const typed = categories.filter(
+      (category) => String(category.type).toUpperCase() === type,
+    );
+    return typed.length ? typed : categories;
   };
   const total = entries.reduce((sum, entry) => sum + (Number(entry.amount) || 0), 0);
   const typeOptions: Array<{ value: BulkEntry["entry_type"]; label: string; active: string }> = [
@@ -179,6 +205,11 @@ export function BulkTransactionModal({
       size="5xl"
       footer={
         <>
+          {showErrors && invalidCount > 0 ? (
+            <p className="mr-auto text-xs font-semibold text-rose-600 sm:text-sm">
+              {invalidCount} {invalidCount === 1 ? "entry needs" : "entries need"} attention
+            </p>
+          ) : (
           <p className="mr-auto text-xs text-slate-500 sm:text-sm">
             <span className="font-semibold text-slate-800">{entries.length}</span>{" "}
             {entries.length === 1 ? "entry" : "entries"} ·{" "}
@@ -186,6 +217,7 @@ export function BulkTransactionModal({
               BDT {total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </p>
+          )}
           <button
             type="button"
             onClick={onClose}
@@ -292,14 +324,17 @@ export function BulkTransactionModal({
           <p className="rounded-lg bg-cyan-50 p-3 text-sm text-cyan-700">{message}</p>
         )}
         <div className="space-y-3">
-          {entries.map((entry, index) => (
+          {entries.map((entry, index) => {
+            const fieldErrors = showErrors ? getEntryErrors(entry) : null;
+            const invalid = Boolean(fieldErrors && Object.values(fieldErrors).some(Boolean));
+            return (
             <div
               key={index}
-              className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4"
+              className={`rounded-2xl border bg-white p-3 shadow-sm sm:p-4 ${invalid ? "border-rose-300" : "border-slate-200"}`}
             >
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2.5">
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+                  <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-bold ${invalid ? "bg-rose-100 text-rose-700" : "bg-slate-100 text-slate-600"}`}>
                     {index + 1}
                   </span>
                   <div
@@ -345,7 +380,7 @@ export function BulkTransactionModal({
                 </button>
               </div>
               <div className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <OutlinedField label="Account">
+                <OutlinedField label="Account *" className={fieldErrors?.account ? invalidFieldClass : ""}>
                   <select
                     value={entry.account_id}
                     onChange={(event) => update(index, { account_id: event.target.value })}
@@ -360,19 +395,17 @@ export function BulkTransactionModal({
                   </select>
                 </OutlinedField>
                 {entry.entry_type !== "DEPOSIT" ? (
-                  <OutlinedField label="Category">
+                  <OutlinedField
+                    label={entry.entry_type === "EXPENSE" ? "Category *" : "Category"}
+                    className={fieldErrors?.category ? invalidFieldClass : ""}
+                  >
                     <select
                       value={entry.category_id}
                       onChange={(event) => update(index, { category_id: event.target.value })}
                       className={outlinedControlClass}
                     >
                       <option value="">Select category</option>
-                      {categories
-                        .filter(
-                          (category) =>
-                            String(category.type).toUpperCase() === entry.entry_type,
-                        )
-                        .map((category) => (
+                      {categoryOptionsFor(entry.entry_type).map((category) => (
                           <option key={category.id} value={category.id}>
                             {category.name}
                           </option>
@@ -384,12 +417,12 @@ export function BulkTransactionModal({
                     No category needed
                   </div>
                 )}
-                <OutlinedField label="Amount">
+                <OutlinedField label="Amount *" className={fieldErrors?.amount ? invalidFieldClass : ""}>
                   <span className="text-xs font-semibold text-slate-400">BDT</span>
                   <input
                     type="number"
                     inputMode="decimal"
-                    min="0"
+                    min="0.01"
                     step="0.01"
                     value={entry.amount}
                     onChange={(event) => update(index, { amount: event.target.value })}
@@ -415,14 +448,29 @@ export function BulkTransactionModal({
                   />
                 </OutlinedField>
               </div>
+              {invalid && (
+                <p className="mt-3 text-xs font-medium text-rose-600">
+                  Missing:{" "}
+                  {[
+                    fieldErrors?.account && "account",
+                    fieldErrors?.category && "category",
+                    fieldErrors?.amount && "amount above 0",
+                  ]
+                    .filter(Boolean)
+                    .join(", ")}
+                </p>
+              )}
             </div>
-          ))}
+            );
+          })}
         </div>
         <button
           type="button"
           onClick={() =>
             setEntries((current) =>
-              current.length < 100 ? [...current, newEntry()] : current,
+              current.length < 100
+                ? [...current, newEntry(current[current.length - 1]?.transaction_date || todayInput())]
+                : current,
             )
           }
           disabled={entries.length >= 100}

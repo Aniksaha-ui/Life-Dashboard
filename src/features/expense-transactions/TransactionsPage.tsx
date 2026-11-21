@@ -55,13 +55,16 @@ export default function ExpenseTransactionsPage() {
   const [values, setValues] = useState(createEmptyValues);
   const [saving, setSaving] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const openCreate = (type: string) => {
     setEditingTransaction(null);
     setValues(createEmptyValues());
+    setSaveError("");
     setEntryType(type);
   };
   const openEdit = (transaction: any) => {
     setSelectedTransaction(null);
+    setSaveError("");
     setEditingTransaction(transaction);
     setValues({
       account_id: String(
@@ -96,6 +99,8 @@ export default function ExpenseTransactionsPage() {
         await state.create(entryType, values);
       }
       closeEntryModal();
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Unable to save the transaction.");
     } finally {
       setSaving(false);
     }
@@ -348,6 +353,7 @@ export default function ExpenseTransactionsPage() {
         accounts={state.accounts}
         categories={state.categories}
         saving={saving}
+        error={saveError}
         onClose={closeEntryModal}
         onSubmit={save}
       />
