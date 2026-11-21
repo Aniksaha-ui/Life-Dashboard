@@ -58,7 +58,10 @@ export default function ExpenseTransactionsPage() {
   const [saveError, setSaveError] = useState("");
   const openCreate = (type: string) => {
     setEditingTransaction(null);
-    setValues(createEmptyValues());
+    setValues({
+      ...createEmptyValues(),
+      account_id: state.accounts.length === 1 ? String(state.accounts[0].id) : "",
+    });
     setSaveError("");
     setEntryType(type);
   };

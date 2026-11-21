@@ -107,6 +107,7 @@ export function TransactionEntryModal({
             <span className="text-sm font-semibold text-slate-400">BDT</span>
             <input
               required
+              autoFocus
               type="number"
               inputMode="decimal"
               min="0.01"
