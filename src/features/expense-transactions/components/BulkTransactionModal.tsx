@@ -39,6 +39,7 @@ const parseText = (text: string) => {
   let date = todayInput();
   const entries: BulkEntry[] = [];
   const invalidLines: number[] = [];
+  const sourceLines: Array<{ raw: string; kind: "date" | "entry" | "invalid" }> = [];
   text.split(/\r?\n/).forEach((rawLine, index) => {
     const line = rawLine.trim();
     if (!line) return;
@@ -47,6 +48,7 @@ const parseText = (text: string) => {
     );
     if (dateMatch) {
       date = `${dateMatch[3]}-${dateMatch[2].padStart(2, "0")}-${dateMatch[1].padStart(2, "0")}`;
+      sourceLines.push({ raw: line, kind: "date" });
       return;
     }
     const entryMatch = line.match(/^(.+?)\s+([0-9][0-9,]*(?:\.\d{1,2})?)$/);
@@ -55,6 +57,7 @@ const parseText = (text: string) => {
       Number(entryMatch[2].replaceAll(",", "")) <= 0
     ) {
       invalidLines.push(index + 1);
+      sourceLines.push({ raw: line, kind: "invalid" });
       return;
     }
     entries.push({
@@ -62,8 +65,31 @@ const parseText = (text: string) => {
       note: entryMatch[1].trim(),
       amount: entryMatch[2].replaceAll(",", ""),
     });
+    sourceLines.push({ raw: line, kind: "entry" });
   });
-  return { entries, invalidLines };
+  return { entries, invalidLines, sourceLines };
+};
+
+const getUnimportedText = (
+  sourceLines: ReturnType<typeof parseText>["sourceLines"],
+  importedCount: number,
+) => {
+  const kept: string[] = [];
+  let pendingDate = "";
+  let entryIndex = 0;
+  sourceLines.forEach((line) => {
+    if (line.kind === "date") {
+      pendingDate = line.raw;
+      return;
+    }
+    if (line.kind === "entry" && entryIndex++ < importedCount) return;
+    if (pendingDate) {
+      kept.push(pendingDate);
+      pendingDate = "";
+    }
+    kept.push(line.raw);
+  });
+  return kept.join("\n");
 };
 
 const getEntryErrors = (entry: BulkEntry) => ({
@@ -136,9 +162,10 @@ export function BulkTransactionModal({
     }
     const added = addEntries(parsed.entries);
     if (!added) return;
-    setText("");
+    const unimported = getUnimportedText(parsed.sourceLines, added);
+    setText(unimported);
     setMessage(
-      `${describeAdded(added, parsed.entries.length, "text")}${parsed.invalidLines.length ? ` ${parsed.invalidLines.length} invalid ${parsed.invalidLines.length === 1 ? "line was" : "lines were"} skipped.` : ""}`,
+      `${describeAdded(added, parsed.entries.length, "text")}${unimported ? " Lines that were not added are still in the Quick fill box." : ""}`,
     );
   };
   const onReceipt = async (event: ChangeEvent<HTMLInputElement>) => {
