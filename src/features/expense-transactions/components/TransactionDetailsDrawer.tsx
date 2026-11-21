@@ -1,4 +1,6 @@
+import { Pencil } from "lucide-react";
 import { Drawer } from "../../../components/Drawer";
+import { getTransactionTypeMeta, isTransactionEditable } from "./transactionTypes";
 
 type Transaction = Record<string, unknown>;
 
@@ -83,9 +85,11 @@ function InformationCard({ children }: { children: React.ReactNode }) {
 export function TransactionDetailsDrawer({
   transaction,
   onClose,
+  onEdit,
 }: {
   transaction: Transaction | null;
   onClose: () => void;
+  onEdit?: (transaction: Transaction) => void;
 }) {
   const type = humanizeType(transaction?.type);
   const note = String(transaction?.note || "Transaction details");
@@ -135,7 +139,7 @@ export function TransactionDetailsDrawer({
       subtitle={
         transaction ? (
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+            <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${getTransactionTypeMeta(transaction.type).badgeClassName}`}>
               {type}
             </span>
             <span className="font-semibold text-slate-500">
@@ -148,6 +152,18 @@ export function TransactionDetailsDrawer({
         ) : undefined
       }
       width="4xl"
+      headerAction={
+        transaction && onEdit && isTransactionEditable(transaction) ? (
+          <button
+            type="button"
+            onClick={() => onEdit(transaction)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            <Pencil className="h-4 w-4" />
+            Edit
+          </button>
+        ) : undefined
+      }
     >
       {transaction && (
         <div className="space-y-7">
