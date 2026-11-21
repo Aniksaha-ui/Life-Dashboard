@@ -1,6 +1,10 @@
 import { FileScan, Plus, Trash2 } from "lucide-react";
 import { useRef, useState, type ChangeEvent } from "react";
 import { Modal } from "../../../components/Modal";
+import {
+  OutlinedField,
+  outlinedControlClass,
+} from "../../../components/OutlinedField";
 import { scanReceipt } from "../api/queries";
 
 export type BulkEntry = {
@@ -269,99 +273,131 @@ export function BulkTransactionModal({
           {entries.map((entry, index) => (
             <div
               key={index}
-              className="grid gap-3 rounded-lg border border-slate-200 p-4 md:grid-cols-6"
+              className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
             >
-              <select
-                value={entry.entry_type}
-                onChange={(event) =>
-                  update(index, {
-                    entry_type: event.target.value as BulkEntry["entry_type"],
-                    category_id: "",
-                  })
-                }
-                className="rounded-lg border border-slate-300 p-2 text-sm"
-              >
-                <option value="EXPENSE">Expense</option>
-                <option value="INCOME">Income</option>
-                <option value="DEPOSIT">Deposit</option>
-              </select>
-              <select
-                value={entry.account_id}
-                onChange={(event) =>
-                  update(index, { account_id: event.target.value })
-                }
-                className="rounded-lg border border-slate-300 p-2 text-sm"
-              >
-                <option value="">Account</option>
-                {accounts.map((account) => (
-                  <option key={account.id} value={account.id}>
-                    {account.name}
-                  </option>
-                ))}
-              </select>
-              {entry.entry_type !== "DEPOSIT" ? (
-                <select
-                  value={entry.category_id}
-                  onChange={(event) =>
-                    update(index, { category_id: event.target.value })
-                  }
-                  className="rounded-lg border border-slate-300 p-2 text-sm"
-                >
-                  <option value="">Category</option>
-                  {categories
-                    .filter(
-                      (category) =>
-                        String(category.type).toUpperCase() ===
-                        entry.entry_type,
+              <div className="mb-4 flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <p className="text-sm font-semibold text-slate-700">
+                  Transaction {index + 1}
+                </p>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setEntries((current) =>
+                      current.length > 1
+                        ? current.filter(
+                            (_, entryIndex) => entryIndex !== index,
+                          )
+                        : current,
                     )
-                    .map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
+                  }
+                  disabled={entries.length === 1}
+                  aria-label={`Remove transaction ${index + 1}`}
+                  title={
+                    entries.length === 1
+                      ? "At least one transaction is required"
+                      : "Remove transaction"
+                  }
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:text-slate-300 disabled:hover:bg-transparent"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <OutlinedField label="Type">
+                  <select
+                    value={entry.entry_type}
+                    onChange={(event) =>
+                      update(index, {
+                        entry_type: event.target
+                          .value as BulkEntry["entry_type"],
+                        category_id: "",
+                      })
+                    }
+                    className={outlinedControlClass}
+                  >
+                    <option value="EXPENSE">Expense</option>
+                    <option value="INCOME">Income</option>
+                    <option value="DEPOSIT">Deposit</option>
+                  </select>
+                </OutlinedField>
+                <OutlinedField label="Account">
+                  <select
+                    value={entry.account_id}
+                    onChange={(event) =>
+                      update(index, { account_id: event.target.value })
+                    }
+                    className={outlinedControlClass}
+                  >
+                    <option value="">Select account</option>
+                    {accounts.map((account) => (
+                      <option key={account.id} value={account.id}>
+                        {account.name}
                       </option>
                     ))}
-                </select>
-              ) : (
-                <div className="p-2 text-sm text-slate-400">No category</div>
-              )}
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={entry.amount}
-                onChange={(event) =>
-                  update(index, { amount: event.target.value })
-                }
-                placeholder="Amount"
-                className="rounded-lg border border-slate-300 p-2 text-sm"
-              />
-              <input
-                type="date"
-                value={entry.transaction_date}
-                onChange={(event) =>
-                  update(index, { transaction_date: event.target.value })
-                }
-                className="rounded-lg border border-slate-300 p-2 text-sm"
-              />
-              <button
-                onClick={() =>
-                  setEntries((current) =>
-                    current.length > 1
-                      ? current.filter((_, entryIndex) => entryIndex !== index)
-                      : current,
-                  )
-                }
-                className="inline-flex items-center justify-center rounded-lg text-rose-600 hover:bg-rose-50"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-              <input
-                value={entry.note}
-                onChange={(event) =>
-                  update(index, { note: event.target.value })
-                }
-                placeholder="Note"
-                className="md:col-span-5 rounded-lg border border-slate-300 p-2 text-sm"
-              />
+                  </select>
+                </OutlinedField>
+                {entry.entry_type !== "DEPOSIT" && (
+                  <OutlinedField label="Category">
+                    <select
+                      value={entry.category_id}
+                      onChange={(event) =>
+                        update(index, { category_id: event.target.value })
+                      }
+                      className={outlinedControlClass}
+                    >
+                      <option value="">Select category</option>
+                      {categories
+                        .filter(
+                          (category) =>
+                            String(category.type).toUpperCase() ===
+                            entry.entry_type,
+                        )
+                        .map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                    </select>
+                  </OutlinedField>
+                )}
+                <OutlinedField label="Amount">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={entry.amount}
+                    onChange={(event) =>
+                      update(index, { amount: event.target.value })
+                    }
+                    placeholder="0.00"
+                    className={outlinedControlClass}
+                  />
+                </OutlinedField>
+                <OutlinedField label="Date">
+                  <input
+                    type="date"
+                    value={entry.transaction_date}
+                    onChange={(event) =>
+                      update(index, { transaction_date: event.target.value })
+                    }
+                    className={outlinedControlClass}
+                  />
+                </OutlinedField>
+                <OutlinedField
+                  label="Note"
+                  className="sm:col-span-2 xl:col-span-3"
+                >
+                  <textarea
+                    value={entry.note}
+                    onChange={(event) =>
+                      update(index, { note: event.target.value })
+                    }
+                    placeholder="Add a note (optional)"
+                    rows={2}
+                    className="min-h-16 w-full resize-y border-0 bg-transparent p-0 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:bg-transparent focus:shadow-none"
+                  />
+                </OutlinedField>
+              </div>
             </div>
           ))}
         </div>
