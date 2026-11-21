@@ -68,7 +68,7 @@ export function ServiceForm({
         </>
       }
     >
-      <form id="service-form" onSubmit={submit} className="grid max-h-[65vh] items-start gap-x-4 gap-y-5 overflow-y-auto px-1 pt-3 pb-1 sm:grid-cols-2">
+      <form id="service-form" onSubmit={submit} className="grid items-start gap-x-4 gap-y-5 sm:grid-cols-2">
         <OutlinedField label="Title">
           <input required maxLength={191} value={values.title} onChange={(event) => setValues({ ...values, title: event.target.value })} className={outlinedControlClass} placeholder="API development" />
         </OutlinedField>

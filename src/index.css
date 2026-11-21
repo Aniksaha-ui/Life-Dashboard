@@ -831,17 +831,12 @@
     text-transform: none !important;
   }
 
-  input,
-  select,
-  textarea {
-    font-size: 11px !important;
-  }
-
-  /* Make filter section elements and sibling buttons smaller */
+  /* Make filter section elements and sibling buttons smaller.
+     Form controls are excluded so a focused field stays at 16px and does not zoom the page. */
   .filter-bar-container,
-  .filter-bar-container *,
+  .filter-bar-container *:not(input):not(select):not(textarea),
   .filter-bar-container ~ button,
-  .filter-bar-container ~ button * {
+  .filter-bar-container ~ button *:not(input):not(select):not(textarea) {
     font-size: 11px !important;
   }
 
@@ -1282,5 +1277,15 @@
     width: 100%;
     align-items: center;
     justify-content: center;
+  }
+}
+
+/* iOS zooms the page when a focused field is under 16px. This must win over the compact table rules. */
+@media (max-width: 767px) {
+  :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="hidden"]),
+  table td :is(input, select, textarea),
+  .filter-bar-container :is(input, select, textarea),
+  .outlined-field :is(input, select, textarea) {
+    font-size: 16px !important;
   }
 }

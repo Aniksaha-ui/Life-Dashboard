@@ -120,9 +120,9 @@ function ProjectForm({
             setSaving(false);
           }
         }}
-        className="max-h-[65vh] space-y-4 overflow-y-auto pr-1"
+        className="space-y-5"
       >
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid items-start gap-x-4 gap-y-5 sm:grid-cols-2">
           {field("project_name", "Project name")}
           {field("website_link", "Website URL")}
           {field("github_link", "GitHub URL")}

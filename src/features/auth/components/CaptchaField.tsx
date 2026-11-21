@@ -109,39 +109,42 @@ export function CaptchaField({
 
   return (
     <div className="min-w-0">
-      <div className="flex min-w-0 items-center gap-2 max-[420px]:flex-wrap">
-        <div className="h-10 w-[120px] shrink-0 overflow-hidden rounded-md border border-slate-300 bg-white">
-          <canvas
-            ref={canvasRef}
-            width={120}
-            height={40}
-            className="block h-10 w-full"
-            aria-hidden
-          />
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-2">
+        <div className="flex shrink-0 items-center gap-2">
+          <div className="h-10 w-[120px] shrink-0 overflow-hidden rounded-md border border-slate-300 bg-white">
+            <canvas
+              ref={canvasRef}
+              width={120}
+              height={40}
+              className="block h-10 w-full"
+              aria-hidden
+            />
+          </div>
+          <button
+            type="button"
+            onClick={refreshCaptcha}
+            disabled={disabled}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-slate-300 text-slate-500 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-50"
+            title="Refresh captcha"
+            aria-label="Refresh captcha"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={refreshCaptcha}
-          disabled={disabled}
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-slate-300 text-slate-500 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-50"
-          title="Refresh captcha"
-          aria-label="Refresh captcha"
-        >
-          <RefreshCw className="h-4 w-4" />
-        </button>
-        <OutlinedField label="Security code" className="min-w-0 flex-1 max-[420px]:basis-full">
+        <OutlinedField label="Security code" className="min-w-0 w-full sm:flex-1">
           <input
             id="captcha-input"
             type="text"
             inputMode="numeric"
             autoComplete="off"
+            maxLength={4}
             value={value}
             onChange={(e) =>
               onChange(e.target.value.replace(/\D/g, "").slice(0, 4))
             }
             placeholder="Enter code"
             disabled={disabled}
-            className={outlinedControlClass}
+            className={`${outlinedControlClass} text-base sm:text-sm`}
           />
         </OutlinedField>
       </div>

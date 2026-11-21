@@ -1,4 +1,5 @@
 import { BrainCircuit, CreditCard, Menu, ReceiptText, WalletCards } from "lucide-react";
+import { createPortal } from "react-dom";
 import { NavLink, useLocation } from "react-router-dom";
 import { clsx } from "clsx";
 
@@ -23,9 +24,10 @@ export function MobileBottomNavigation({
 
   if (hidden) return null;
 
-  return (
+  return createPortal(
     <nav
       className="pointer-events-none fixed inset-x-0 bottom-0 z-[80] px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] md:hidden"
+      style={{ position: "fixed", left: 0, right: 0, bottom: 0 }}
       aria-label="Mobile navigation"
     >
       <div className="pointer-events-auto mx-auto grid max-w-md grid-cols-5 gap-1 rounded-[1.35rem] border border-slate-200/90 bg-white/95 p-1.5 shadow-[0_12px_32px_rgba(15,23,42,0.16)] backdrop-blur-md">
@@ -56,6 +58,7 @@ export function MobileBottomNavigation({
           <span>More</span>
         </button>
       </div>
-    </nav>
+    </nav>,
+    document.body,
   );
 }

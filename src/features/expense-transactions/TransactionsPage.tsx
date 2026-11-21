@@ -228,15 +228,17 @@ export default function ExpenseTransactionsPage() {
           </div>
         </div>
       </section>
-      <div className="md:hidden"><MobileTransactionList rows={state.rows} loading={state.loading} onSelect={setSelectedTransaction} /></div>
+      <div className="md:hidden"><MobileTransactionList rows={state.pageRows} loading={state.loading} onSelect={setSelectedTransaction} /></div>
       <DataTable
-        data={state.rows}
+        data={state.pageRows}
         columns={columns}
         isLoading={state.loading}
         loadingText="Loading transactions..."
         onRowClick={setSelectedTransaction}
         hideToolbarDateFilter
         hideViewColumn
+        externalPagination={state.pagination}
+        onPageChange={state.setPage}
         className="transaction-table hidden border-slate-200 md:block"
       />
       <TransactionDetailsDrawer

@@ -50,7 +50,7 @@ export function AppLayout() {
   }, [location.hash, location.pathname, location.search]);
 
   return (
-    <div className="min-h-[100dvh] bg-white">
+    <div className="h-dvh overflow-hidden bg-white">
       <Sidebar
         isCollapsed={isCollapsed}
         onToggle={() => setIsCollapsed(!isCollapsed)}
@@ -59,12 +59,12 @@ export function AppLayout() {
       />
       <div
         className={clsx(
-          "flex flex-col min-h-[100dvh] transition-all duration-300 ease-in-out md:pl-20",
+          "flex h-full min-h-0 flex-col overflow-hidden transition-[padding] duration-300 ease-in-out md:pl-20",
           !isCollapsed && "md:pl-64",
         )}
       >
         <Header onOpenMobileNav={() => setIsMobileNavOpen(true)} />
-        <main className="flex-1 min-w-0 p-4 pb-24 bg-slate-50 overflow-auto sm:p-5 md:p-6 md:pb-6">
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-y-contain bg-slate-50 p-4 pb-28 sm:p-5 md:p-6 md:pb-6">
           <Outlet />
         </main>
       </div>

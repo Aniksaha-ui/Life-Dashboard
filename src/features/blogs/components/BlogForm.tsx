@@ -54,11 +54,11 @@ export function BlogForm({
     }
   };
   return <Modal isOpen={open} onClose={onClose} title={blog ? "Edit blog post" : "New blog post"} footer={<><button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-600">Cancel</button><button form="blog-form" type="submit" disabled={saving} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60">{saving ? "Saving..." : "Save post"}</button></>}>
-    <form id="blog-form" onSubmit={submit} className="grid max-h-[65vh] items-center gap-4 overflow-y-auto pr-1">
+    <form id="blog-form" onSubmit={submit} className="grid items-start gap-y-5">
       <OutlinedField label="Title"><input required maxLength={191} value={values.title} onChange={(event) => setValues({ ...values, title: event.target.value })} className={outlinedControlClass} placeholder="A clear, descriptive title" /></OutlinedField>
       <OutlinedField label="Short description"><textarea required value={values.short_description} onChange={(event) => setValues({ ...values, short_description: event.target.value })} className={`${outlinedControlClass} min-h-20 resize-y`} placeholder="A concise summary for listing cards" /></OutlinedField>
       <OutlinedField label="Content"><textarea required value={values.content} onChange={(event) => setValues({ ...values, content: event.target.value })} className={`${outlinedControlClass} min-h-44 resize-y`} placeholder="Write the blog post content" /></OutlinedField>
-      <div className="grid items-center gap-4 sm:grid-cols-2">
+      <div className="grid items-start gap-x-4 gap-y-5 sm:grid-cols-2">
         <OutlinedField label="Category"><input maxLength={191} value={values.category} onChange={(event) => setValues({ ...values, category: event.target.value })} className={outlinedControlClass} placeholder="react" /></OutlinedField>
         <OutlinedField label="Author"><input required maxLength={191} value={values.author_name} onChange={(event) => setValues({ ...values, author_name: event.target.value })} className={outlinedControlClass} placeholder="Author name" /></OutlinedField>
         <OutlinedField label="Icon class"><input required maxLength={191} value={values.fa_icon} onChange={(event) => setValues({ ...values, fa_icon: event.target.value })} className={outlinedControlClass} placeholder="fa-solid fa-newspaper" /></OutlinedField>

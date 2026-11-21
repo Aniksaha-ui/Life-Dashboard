@@ -71,7 +71,7 @@ export function TestimonialForm({
         </>
       }
     >
-      <form id="testimonial-form" onSubmit={submit} className="grid max-h-[65vh] items-start gap-x-4 gap-y-5 overflow-y-auto px-1 pt-3 pb-1 sm:grid-cols-2">
+      <form id="testimonial-form" onSubmit={submit} className="grid items-start gap-x-4 gap-y-5 sm:grid-cols-2">
         <OutlinedField label="Name">
           <input required maxLength={191} value={values.name} onChange={(event) => setValues({ ...values, name: event.target.value })} className={outlinedControlClass} placeholder="Jane Cooper" />
         </OutlinedField>

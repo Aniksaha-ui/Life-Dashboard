@@ -84,7 +84,7 @@ export function Header({ onOpenMobileNav }: HeaderProps) {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between gap-3 px-4 sticky top-0 z-30 sm:px-5 md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 sm:px-5 md:px-6">
       <div className="flex items-center flex-1 min-w-0 max-w-xl gap-2">
         <button
           type="button"

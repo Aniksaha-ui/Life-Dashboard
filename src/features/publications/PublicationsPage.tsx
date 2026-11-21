@@ -115,7 +115,7 @@ function PublicationForm({
             setSaving(false);
           }
         }}
-        className="grid max-h-[65vh] items-center gap-4 overflow-y-auto pr-1 sm:grid-cols-2"
+        className="grid items-start gap-x-4 gap-y-5 sm:grid-cols-2"
       >
         <OutlinedField label="Title" className="sm:col-span-2">
           <input

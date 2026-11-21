@@ -86,9 +86,9 @@ export function ExperienceForm({
       <form
         id="experience-form"
         onSubmit={submit}
-        className="max-h-[65vh] space-y-4 overflow-y-auto pr-1"
+        className="space-y-5"
       >
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid items-start gap-x-4 gap-y-5 sm:grid-cols-2">
           <OutlinedField label="Job title">
             <input
               required

@@ -35,7 +35,9 @@ export function useExpenseTransactions() {
   const [search, setSearch] = useState("");
   const [fromDate, setFromDate] = useState(defaultDateRange.fromDate);
   const [toDate, setToDate] = useState(defaultDateRange.toDate);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const pageSize = 10;
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
@@ -130,6 +132,21 @@ export function useExpenseTransactions() {
       })),
     [filteredTransactions],
   );
+  useEffect(() => {
+    setPage(1);
+  }, [type, search, fromDate, toDate, accountFilter, categoryFilter]);
+  const pagination = useMemo(() => {
+    const total = rows.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const currentPage = Math.min(page, totalPages);
+    const from = total === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+    const to = Math.min(currentPage * pageSize, total);
+    return { currentPage, totalPages, total, from, to };
+  }, [page, rows.length]);
+  const pageRows = useMemo(
+    () => rows.slice(pagination.from === 0 ? 0 : pagination.from - 1, pagination.to),
+    [pagination.from, pagination.to, rows],
+  );
   const metrics = useMemo(
     () => ({
       total: filteredTransactions.length,
@@ -196,6 +213,9 @@ export function useExpenseTransactions() {
   };
   return {
     rows,
+    pageRows,
+    pagination,
+    setPage,
     accounts,
     categories,
     type,

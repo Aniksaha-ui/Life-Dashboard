@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Keep real files and folders (JS, CSS, images).
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Dashboard routes exist only in the browser. Send a reload back to the app.
+    RewriteRule ^ index.html [L]
+</IfModule>
