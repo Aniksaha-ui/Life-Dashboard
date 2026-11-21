@@ -448,9 +448,10 @@ export function BulkTransactionModal({
                         type="button"
                         role="radio"
                         aria-checked={entry.entry_type === option.value}
-                        onClick={() =>
-                          update(index, { entry_type: option.value, category_id: "" })
-                        }
+                        onClick={() => {
+                          if (entry.entry_type !== option.value)
+                            update(index, { entry_type: option.value, category_id: "" });
+                        }}
                         className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors sm:px-3 ${entry.entry_type === option.value ? `${option.active} shadow-sm` : "text-slate-600 hover:text-slate-900"}`}
                       >
                         {option.label}
