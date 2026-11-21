@@ -1,5 +1,4 @@
 import { ReceiptText } from "lucide-react";
-import { PageLoadingState } from "../../../components/PageLoadingState";
 import {
   amountPrefix,
   amountToneClass,
@@ -14,7 +13,26 @@ interface MobileTransactionListProps {
 }
 
 export function MobileTransactionList({ rows, loading, onSelect }: MobileTransactionListProps) {
-  if (loading) return <PageLoadingState />;
+  if (loading) {
+    return (
+      <div
+        className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+        aria-busy="true"
+        aria-label="Loading transactions"
+      >
+        {Array.from({ length: 5 }, (_, index) => (
+          <div key={index} className="flex items-center gap-3 px-3.5 py-3">
+            <span className="h-10 w-10 shrink-0 animate-pulse rounded-full bg-slate-100" />
+            <span className="flex-1 space-y-2">
+              <span className="block h-3.5 w-2/3 animate-pulse rounded bg-slate-100" />
+              <span className="block h-3 w-1/2 animate-pulse rounded bg-slate-100" />
+            </span>
+            <span className="h-3.5 w-16 animate-pulse rounded bg-slate-100" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   if (rows.length === 0) {
     return (

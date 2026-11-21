@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { useMemo, useState, type FormEvent } from "react";
 import { DataTable } from "../../components/DataTable";
-import { Modal } from "../../components/Modal";
 import { outlinedControlClass, OutlinedField } from "../../components/OutlinedField";
 import { useExpenseTransactions } from "./hooks/useExpenseTransactions";
 import { BulkTransactionModal } from "./components/BulkTransactionModal";
@@ -18,6 +17,7 @@ import { TransactionDetailsDrawer } from "./components/TransactionDetailsDrawer"
 import { getTransactionColumns } from "./components/columns";
 import { MobileTransactionList } from "./components/MobileTransactionList";
 import { TransactionsOverview } from "./components/TransactionsOverview";
+import { TransactionEntryModal } from "./components/TransactionEntryModal";
 import { TransactionPagination } from "./components/TransactionPagination";
 import { getTransactionTypeLabel } from "./components/transactionTypes";
 
@@ -340,99 +340,17 @@ export default function ExpenseTransactionsPage() {
         onClose={() => setSelectedTransaction(null)}
         onEdit={openEdit}
       />
-      <Modal
-        isOpen={!!entryType}
+      <TransactionEntryModal
+        entryType={entryType}
+        isEditing={!!editingTransaction}
+        values={values}
+        setValues={setValues}
+        accounts={state.accounts}
+        categories={state.categories}
+        saving={saving}
         onClose={closeEntryModal}
-        title={
-          entryType
-            ? `${editingTransaction ? "Edit" : "New"} ${entryType.toLowerCase()}`
-            : ""
-        }
-        footer={
-          <button
-            form="entry-form"
-            type="submit"
-            disabled={saving}
-            className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white"
-          >
-            {saving
-              ? "Saving..."
-              : editingTransaction
-                ? "Update Transaction"
-                : "Save Transaction"}
-          </button>
-        }
-      >
-        <form
-          id="entry-form"
-          onSubmit={save}
-          className="grid gap-4 sm:grid-cols-2"
-        >
-          {[
-            ["account_id", "Account"],
-            ["amount", "Amount"],
-            ["transaction_date", "Date"],
-          ].map(([key, label]) => (
-            <OutlinedField key={key} label={label}>
-              {key === "account_id" ? (
-                <select
-                  required
-                  value={values.account_id}
-                  onChange={(event) =>
-                    setValues({ ...values, account_id: event.target.value })
-                  }
-                  className="h-8 w-full border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
-                >
-                  <option value="">Select account</option>
-                  {state.accounts.map((account) => (
-                    <option key={account.id} value={account.id}>
-                      {account.name}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  required={key !== "transaction_date"}
-                  type={key === "amount" ? "number" : "date"}
-                  value={(values as any)[key]}
-                  onChange={(event) =>
-                    setValues({ ...values, [key]: event.target.value })
-                  }
-                  className="h-8 w-full border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
-                />
-              )}
-            </OutlinedField>
-          ))}
-          {entryType !== "DEPOSIT" && (
-            <OutlinedField label="Category">
-              <select
-                value={values.category_id}
-                onChange={(event) =>
-                  setValues({ ...values, category_id: event.target.value })
-                }
-                required={entryType === "EXPENSE"}
-                className="h-8 w-full border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
-              >
-                <option value="">Select category</option>
-                {state.categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </OutlinedField>
-          )}
-          <OutlinedField label="Note" className="sm:col-span-2">
-            <textarea
-              value={values.note}
-              onChange={(event) =>
-                setValues({ ...values, note: event.target.value })
-              }
-              className="min-h-20 w-full resize-y border-0 bg-transparent p-0 text-sm text-slate-800 outline-none focus:bg-transparent focus:shadow-none"
-            />
-          </OutlinedField>
-        </form>
-      </Modal>
+        onSubmit={save}
+      />
       <BulkTransactionModal
         open={isBulkOpen}
         onClose={() => setIsBulkOpen(false)}

@@ -156,44 +156,63 @@ export function BulkTransactionModal({
     setSaving(true);
     try {
       await onSave(entries);
+      setEntries([newEntry()]);
+      setText("");
+      setMessage("");
+      setError("");
       onClose();
     } finally {
       setSaving(false);
     }
   };
+  const total = entries.reduce((sum, entry) => sum + (Number(entry.amount) || 0), 0);
+  const typeOptions: Array<{ value: BulkEntry["entry_type"]; label: string; active: string }> = [
+    { value: "EXPENSE", label: "Expense", active: "bg-rose-600 text-white" },
+    { value: "INCOME", label: "Income", active: "bg-emerald-600 text-white" },
+    { value: "DEPOSIT", label: "Deposit", active: "bg-cyan-600 text-white" },
+  ];
   return (
     <Modal
       isOpen={open}
       onClose={onClose}
-      title="Bulk Transaction Entry"
+      title="Bulk entry"
       size="5xl"
       footer={
         <>
+          <p className="mr-auto text-xs text-slate-500 sm:text-sm">
+            <span className="font-semibold text-slate-800">{entries.length}</span>{" "}
+            {entries.length === 1 ? "entry" : "entries"} ·{" "}
+            <span className="font-semibold tabular-nums text-slate-800">
+              BDT {total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </span>
+          </p>
           <button
+            type="button"
             onClick={onClose}
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-600"
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100"
           >
             Cancel
           </button>
           <button
+            type="button"
             onClick={() => void save()}
             disabled={saving}
-            className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
           >
-            {saving ? "Saving..." : `Create ${entries.length} Transactions`}
+            {saving
+              ? "Saving..."
+              : `Save ${entries.length} ${entries.length === 1 ? "transaction" : "transactions"}`}
           </button>
         </>
       }
     >
       <div className="space-y-5">
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <section className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3 sm:p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="font-semibold text-slate-900">
-                Paste transaction text
-              </p>
-              <p className="text-sm text-slate-500">
-                Date on its own line (DD-MM-YYYY), then note followed by amount.
+              <p className="text-sm font-semibold text-slate-900">Quick fill</p>
+              <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
+                Paste a date line (DD-MM-YYYY), then one "note amount" per line — or scan a receipt.
               </p>
             </div>
             <input
@@ -204,26 +223,27 @@ export function BulkTransactionModal({
               className="hidden"
             />
             <button
+              type="button"
               onClick={() => fileInput.current?.click()}
               disabled={scanning}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-60"
             >
               <FileScan className="h-4 w-4" />
-              {scanning ? "Scanning..." : "Scan Receipt"}
+              {scanning ? "Scanning..." : "Scan receipt"}
             </button>
           </div>
           <textarea
             value={text}
             onChange={(event) => setText(event.target.value)}
             placeholder={"10-10-2026\nHome to office 80\nOffice to home 80"}
-            className="mt-3 w-full rounded-lg border border-slate-300 p-3 text-sm"
+            className="mt-3 w-full rounded-lg border border-slate-300 bg-white p-3 font-mono text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-primary-600 focus:shadow-[0_0_0_3px_rgb(41_92_171_/_0.12)]"
             rows={4}
           />
           {parsed.entries.length > 0 && (
             <div className="mt-3 rounded-lg border border-primary-200 bg-white p-3 text-sm">
               <div className="flex items-center justify-between gap-3">
-                <strong className="text-slate-900">Entry preview</strong>
-                <span className="text-primary-700">
+                <strong className="text-slate-900">Preview</strong>
+                <span className="text-xs font-semibold text-primary-700">
                   {parsed.entries.length}{" "}
                   {parsed.entries.length === 1 ? "entry" : "entries"} found
                 </span>
@@ -234,59 +254,81 @@ export function BulkTransactionModal({
                     key={`${entry.transaction_date}-${entry.note}-${index}`}
                     className="grid grid-cols-[auto_1fr_auto] gap-3 py-2 text-slate-600"
                   >
-                    <span>{formatPreviewDate(entry.transaction_date)}</span>
+                    <span className="text-xs tabular-nums text-slate-400">
+                      {formatPreviewDate(entry.transaction_date)}
+                    </span>
                     <span className="truncate">{entry.note}</span>
-                    <strong className="text-slate-900">{entry.amount}</strong>
+                    <strong className="tabular-nums text-slate-900">{entry.amount}</strong>
                   </div>
                 ))}
               </div>
               {parsed.entries.length > 10 && (
-                <p className="mt-2 text-slate-500">
-                  Showing the first 10 entries.
-                </p>
+                <p className="mt-2 text-xs text-slate-500">Showing the first 10 entries.</p>
               )}
               {parsed.invalidLines.length > 0 && (
-                <p className="mt-2 text-amber-700">
+                <p className="mt-2 text-xs text-amber-700">
                   Lines {parsed.invalidLines.join(", ")} will be skipped.
                 </p>
               )}
             </div>
           )}
-          <button
-            onClick={importText}
-            className="mt-2 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-primary-700 ring-1 ring-primary-200"
-          >
-            Fill Transactions from Text
-          </button>
-        </div>
+          <div className="mt-3 flex justify-end">
+            <button
+              type="button"
+              onClick={importText}
+              disabled={!text.trim()}
+              className="w-full rounded-lg bg-white px-3 py-2 text-sm font-semibold text-primary-700 ring-1 ring-primary-200 hover:bg-primary-50 disabled:opacity-50 sm:w-auto"
+            >
+              Fill entries from text
+            </button>
+          </div>
+        </section>
         {error && (
-          <p className="rounded-lg bg-rose-50 p-3 text-sm text-rose-700">
+          <p role="alert" className="rounded-lg bg-rose-50 p-3 text-sm text-rose-700">
             {error}
           </p>
         )}
         {message && (
-          <p className="rounded-lg bg-cyan-50 p-3 text-sm text-cyan-700">
-            {message}
-          </p>
+          <p className="rounded-lg bg-cyan-50 p-3 text-sm text-cyan-700">{message}</p>
         )}
         <div className="space-y-3">
           {entries.map((entry, index) => (
             <div
               key={index}
-              className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+              className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4"
             >
-              <div className="mb-4 flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                <p className="text-sm font-semibold text-slate-700">
-                  Transaction {index + 1}
-                </p>
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+                    {index + 1}
+                  </span>
+                  <div
+                    role="radiogroup"
+                    aria-label={`Type for entry ${index + 1}`}
+                    className="inline-flex rounded-lg bg-slate-100 p-0.5"
+                  >
+                    {typeOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={entry.entry_type === option.value}
+                        onClick={() =>
+                          update(index, { entry_type: option.value, category_id: "" })
+                        }
+                        className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors sm:px-3 ${entry.entry_type === option.value ? `${option.active} shadow-sm` : "text-slate-600 hover:text-slate-900"}`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={() =>
                     setEntries((current) =>
                       current.length > 1
-                        ? current.filter(
-                            (_, entryIndex) => entryIndex !== index,
-                          )
+                        ? current.filter((_, entryIndex) => entryIndex !== index)
                         : current,
                     )
                   }
@@ -297,35 +339,16 @@ export function BulkTransactionModal({
                       ? "At least one transaction is required"
                       : "Remove transaction"
                   }
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:text-slate-300 disabled:hover:bg-transparent"
+                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:text-slate-300 disabled:hover:bg-transparent"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
-              <div className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                <OutlinedField label="Type">
-                  <select
-                    value={entry.entry_type}
-                    onChange={(event) =>
-                      update(index, {
-                        entry_type: event.target
-                          .value as BulkEntry["entry_type"],
-                        category_id: "",
-                      })
-                    }
-                    className={outlinedControlClass}
-                  >
-                    <option value="EXPENSE">Expense</option>
-                    <option value="INCOME">Income</option>
-                    <option value="DEPOSIT">Deposit</option>
-                  </select>
-                </OutlinedField>
+              <div className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <OutlinedField label="Account">
                   <select
                     value={entry.account_id}
-                    onChange={(event) =>
-                      update(index, { account_id: event.target.value })
-                    }
+                    onChange={(event) => update(index, { account_id: event.target.value })}
                     className={outlinedControlClass}
                   >
                     <option value="">Select account</option>
@@ -336,21 +359,18 @@ export function BulkTransactionModal({
                     ))}
                   </select>
                 </OutlinedField>
-                {entry.entry_type !== "DEPOSIT" && (
+                {entry.entry_type !== "DEPOSIT" ? (
                   <OutlinedField label="Category">
                     <select
                       value={entry.category_id}
-                      onChange={(event) =>
-                        update(index, { category_id: event.target.value })
-                      }
+                      onChange={(event) => update(index, { category_id: event.target.value })}
                       className={outlinedControlClass}
                     >
                       <option value="">Select category</option>
                       {categories
                         .filter(
                           (category) =>
-                            String(category.type).toUpperCase() ===
-                            entry.entry_type,
+                            String(category.type).toUpperCase() === entry.entry_type,
                         )
                         .map((category) => (
                           <option key={category.id} value={category.id}>
@@ -359,16 +379,20 @@ export function BulkTransactionModal({
                         ))}
                     </select>
                   </OutlinedField>
+                ) : (
+                  <div className="hidden h-10 items-center rounded-md border border-dashed border-slate-200 px-3 text-xs text-slate-400 sm:flex">
+                    No category needed
+                  </div>
                 )}
                 <OutlinedField label="Amount">
+                  <span className="text-xs font-semibold text-slate-400">BDT</span>
                   <input
                     type="number"
+                    inputMode="decimal"
                     min="0"
                     step="0.01"
                     value={entry.amount}
-                    onChange={(event) =>
-                      update(index, { amount: event.target.value })
-                    }
+                    onChange={(event) => update(index, { amount: event.target.value })}
                     placeholder="0.00"
                     className={outlinedControlClass}
                   />
@@ -377,24 +401,17 @@ export function BulkTransactionModal({
                   <input
                     type="date"
                     value={entry.transaction_date}
-                    onChange={(event) =>
-                      update(index, { transaction_date: event.target.value })
-                    }
+                    onChange={(event) => update(index, { transaction_date: event.target.value })}
                     className={outlinedControlClass}
                   />
                 </OutlinedField>
-                <OutlinedField
-                  label="Note"
-                  className="sm:col-span-2 xl:col-span-3"
-                >
-                  <textarea
+                <OutlinedField label="Note" className="sm:col-span-2 lg:col-span-4">
+                  <input
+                    type="text"
                     value={entry.note}
-                    onChange={(event) =>
-                      update(index, { note: event.target.value })
-                    }
+                    onChange={(event) => update(index, { note: event.target.value })}
                     placeholder="Add a note (optional)"
-                    rows={2}
-                    className="min-h-16 w-full resize-y border-0 bg-transparent p-0 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:bg-transparent focus:shadow-none"
+                    className={outlinedControlClass}
                   />
                 </OutlinedField>
               </div>
@@ -402,15 +419,17 @@ export function BulkTransactionModal({
           ))}
         </div>
         <button
+          type="button"
           onClick={() =>
             setEntries((current) =>
               current.length < 100 ? [...current, newEntry()] : current,
             )
           }
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          disabled={entries.length >= 100}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 py-3 text-sm font-semibold text-slate-600 transition-colors hover:border-primary-300 hover:bg-primary-50/40 hover:text-primary-700 disabled:opacity-50"
         >
           <Plus className="h-4 w-4" />
-          Add Transaction
+          Add another entry
         </button>
       </div>
     </Modal>

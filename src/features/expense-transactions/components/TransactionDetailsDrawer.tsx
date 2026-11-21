@@ -1,6 +1,12 @@
 import { Pencil } from "lucide-react";
 import { Drawer } from "../../../components/Drawer";
-import { getTransactionTypeMeta, isTransactionEditable } from "./transactionTypes";
+import {
+  amountPrefix,
+  amountToneClass,
+  getTransactionDirection,
+  getTransactionTypeMeta,
+  isTransactionEditable,
+} from "./transactionTypes";
 
 type Transaction = Record<string, unknown>;
 
@@ -59,9 +65,12 @@ function InformationRow({
   items: Array<{ label: string; value: React.ReactNode; className?: string }>;
 }) {
   return (
-    <div className="grid grid-cols-1 divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+    <div className="grid grid-cols-2 divide-x divide-slate-100">
       {items.map(({ label, value, className }) => (
-        <div key={label} className={`px-5 py-3 ${className ?? ""}`}>
+        <div
+          key={label}
+          className={`min-w-0 px-4 py-3 sm:px-5 ${items.length === 1 ? "col-span-2" : ""} ${className ?? ""}`}
+        >
           <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             {label}
           </dt>
@@ -76,7 +85,7 @@ function InformationRow({
 
 function InformationCard({ children }: { children: React.ReactNode }) {
   return (
-    <dl className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <dl className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       {children}
     </dl>
   );
@@ -145,9 +154,6 @@ export function TransactionDetailsDrawer({
             <span className="font-semibold text-slate-500">
               ID: TXN #{transactionId}
             </span>
-            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-600">
-              Recorded
-            </span>
           </div>
         ) : undefined
       }
@@ -164,105 +170,91 @@ export function TransactionDetailsDrawer({
           </button>
         ) : undefined
       }
+      noPadding
     >
       {transaction && (
-        <div className="space-y-7">
-          <section className="overflow-hidden rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 via-white to-white shadow-sm">
-            <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary-700">
-                  Transaction amount
-                </p>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
-                  {formatAmount(transaction.amount)}
-                </p>
-                <p className="mt-1 text-sm text-slate-500">
-                  {type} recorded against{" "}
-                  {displayValue(transaction.accountName ?? transaction.account)}
-                </p>
-              </div>
-              <div className="rounded-xl border border-white bg-white/90 px-4 py-3 shadow-sm sm:min-w-44">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Balance after
-                </p>
-                <p className="mt-1 text-lg font-bold text-primary-700">
-                  {formatAmount(transaction.balance_after)}
-                </p>
-              </div>
-            </div>
-          </section>
+        <div className="space-y-6 p-4 sm:p-6">
+          {(() => {
+            const meta = getTransactionTypeMeta(transaction.type);
+            const direction = getTransactionDirection(transaction);
+            const Icon = meta.icon;
+            return (
+              <section className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-white shadow-sm">
+                <div className="flex items-start gap-4 p-5">
+                  <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-full ${meta.iconClassName}`}>
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      {meta.label} amount
+                    </p>
+                    <p className={`mt-1 text-3xl font-bold tracking-tight tabular-nums ${amountToneClass[direction]}`}>
+                      {amountPrefix[direction]}
+                      {formatAmount(transaction.amount)}
+                    </p>
+                    <p className="mt-1 text-sm text-slate-500">
+                      {displayValue(transaction.accountName ?? transaction.account)} ·{" "}
+                      {formatDate(transaction.transaction_date)}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 divide-x divide-slate-100 border-t border-slate-100 bg-white/80">
+                  <div className="px-5 py-3">
+                    <p className="text-xs font-medium text-slate-500">Balance before</p>
+                    <p className="mt-0.5 text-sm font-semibold tabular-nums text-slate-800">
+                      {formatAmount(transaction.balance_before)}
+                    </p>
+                  </div>
+                  <div className="px-5 py-3">
+                    <p className="text-xs font-medium text-slate-500">Balance after</p>
+                    <p className="mt-0.5 text-sm font-semibold tabular-nums text-primary-700">
+                      {formatAmount(transaction.balance_after)}
+                    </p>
+                  </div>
+                </div>
+              </section>
+            );
+          })()}
 
           <section>
-            <h3 className="mb-3 text-base font-semibold text-slate-900">
-              Transaction Information
-            </h3>
+            <h3 className="mb-3 text-base font-semibold text-slate-900">Details</h3>
             <InformationCard>
               <InformationRow
                 items={[
-                  {
-                    label: "Transaction date",
-                    value: formatDate(transaction.transaction_date),
-                  },
-                  { label: "Transaction type", value: type },
+                  { label: "Date", value: formatDate(transaction.transaction_date) },
+                  { label: "Type", value: type },
                 ]}
               />
               <InformationRow
                 items={[
                   {
                     label: "Account",
-                    value: displayValue(
-                      transaction.accountName ?? transaction.account,
-                    ),
+                    value: displayValue(transaction.accountName ?? transaction.account),
                   },
                   {
                     label: "Category",
-                    value: displayValue(
-                      transaction.categoryName ?? transaction.category,
-                    ),
+                    value: displayValue(transaction.categoryName ?? transaction.category),
                   },
                 ]}
               />
               <InformationRow
                 items={[
-                  { label: "Amount", value: formatAmount(transaction.amount) },
                   {
                     label: "Reference",
-                    value: displayValue(
-                      transaction.reference ?? transaction.reference_number,
-                    ),
+                    value: displayValue(transaction.reference ?? transaction.reference_number),
                   },
+                  { label: "Transaction ID", value: `TXN #${transactionId}` },
                 ]}
               />
               <InformationRow
                 items={[
                   {
-                    label: "Transaction details",
+                    label: "Note",
                     value: transaction.note ? (
                       <span className="whitespace-pre-wrap">{note}</span>
                     ) : (
                       "No remarks added"
                     ),
-                    className: "sm:col-span-2",
-                  },
-                ]}
-              />
-            </InformationCard>
-          </section>
-
-          <section>
-            <h3 className="mb-3 text-base font-semibold text-slate-900">
-              Balance Information
-            </h3>
-            <InformationCard>
-              <InformationRow
-                items={[
-                  {
-                    label: "Balance before",
-                    value: formatAmount(transaction.balance_before),
-                  },
-                  {
-                    label: "Balance after",
-                    value: formatAmount(transaction.balance_after),
                   },
                 ]}
               />
@@ -287,6 +279,7 @@ export function TransactionDetailsDrawer({
             </section>
           )}
 
+          {Boolean(transaction.created_at || transaction.updated_at) && (
           <section>
             <h3 className="mb-3 text-base font-semibold text-slate-900">
               Record Information
@@ -306,6 +299,7 @@ export function TransactionDetailsDrawer({
               />
             </InformationCard>
           </section>
+          )}
         </div>
       )}
     </Drawer>
