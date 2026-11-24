@@ -33,7 +33,7 @@ export function AccountBalanceMetrics({
     },
   ];
   return (
-    <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <section className="overview-scroll grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {cards.map((card) => {
         const Icon = card.icon;
         return (

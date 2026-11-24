@@ -48,7 +48,7 @@ export function SummaryMetrics({ report }: { report: SummaryReport }) {
   ];
 
   return (
-    <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    <section className="overview-scroll grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {items.map((item) => {
         const Icon = item.icon;
         return (

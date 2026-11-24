@@ -1,4 +1,5 @@
 import { ArrowDownWideNarrow, CalendarDays, Plus, RefreshCcw, X } from "lucide-react";
+import { MetricCard } from "../../components/MetricCard";
 import { outlinedControlClass, OutlinedField } from "../../components/OutlinedField";
 import { SearchField } from "../../components/SearchField";
 import { useEffect, useMemo, useState } from "react";
@@ -80,6 +81,13 @@ export default function BudgetsPage() {
           })}
         </div>
       </div>
+    </section>
+
+    <section className="overview-scroll grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <MetricCard title="Total Budgets" value={state.budgets.length} isLoading={state.isLoading} />
+      <MetricCard title="Planned Budget" value={formatMoney(state.totals.planned)} isLoading={state.isLoading} />
+      <MetricCard title="Actual Spending" value={formatMoney(state.totals.spent)} isLoading={state.isLoading} />
+      <MetricCard title="Remaining Budget" value={formatMoney(state.totals.remaining)} isLoading={state.isLoading} />
     </section>
 
     <section className="space-y-4">

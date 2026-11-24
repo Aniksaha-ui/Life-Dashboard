@@ -56,7 +56,7 @@ export default function CategoriesPage() {
           New Category
         </button>
       </div>
-      <div className="app-metrics-grid grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="app-metrics-grid overview-scroll grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           title="Total Categories"
           value={metrics.total}

@@ -51,7 +51,7 @@ function BurnRateContent({
           active days, helping you identify months where costs accelerated.
         </p>
       </section>
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="overview-scroll grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {metrics.map((metric) => {
           const Icon = metric.icon;
           return (

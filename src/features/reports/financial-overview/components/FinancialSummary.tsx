@@ -22,7 +22,7 @@ export function FinancialSummaryCards({
   metrics: FinancialOverviewReport["metrics"];
 }) {
   return (
-    <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    <section className="overview-scroll grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {metrics.map((metric, index) => {
         const presentation = metricPresentation[index] ?? metricPresentation[0];
         const Icon = presentation.icon;

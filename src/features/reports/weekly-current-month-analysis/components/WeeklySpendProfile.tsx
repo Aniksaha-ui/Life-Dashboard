@@ -337,7 +337,7 @@ export function WeeklySpendProfile({ rows }: { rows: ReportRow[] }) {
             <p className="text-xs text-slate-600">{money(peak?.total ?? 0)}</p>
           </div>
         </div>
-        <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-4 sm:p-5">
+        <div className="overview-scroll grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-4 sm:p-5">
           {weeks.map((week) => (
             <button
               key={`${week.label}-${week.range}`}

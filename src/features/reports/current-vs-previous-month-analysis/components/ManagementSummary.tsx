@@ -42,7 +42,7 @@ export function ManagementSummary({ report }: { report: ReportData }) {
         </div>
         <p className="text-xs text-slate-500">Measured against the prior reporting month.</p>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="overview-scroll grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {summary.map((item) => {
           const favorable = item.positiveIsGood ? item.difference >= 0 : item.difference <= 0;
           const TrendIcon = item.difference >= 0 ? ArrowUpRight : ArrowDownRight;

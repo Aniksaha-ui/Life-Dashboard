@@ -17,7 +17,7 @@ export function ReportsOverview({
       ];
 
   return (
-    <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <section className="overview-scroll grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {items.map((item) => (
         <MetricCard
           key={item.label}

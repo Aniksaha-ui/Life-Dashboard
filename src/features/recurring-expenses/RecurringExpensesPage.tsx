@@ -54,7 +54,7 @@ export default function RecurringExpensesPage() {
           </button>
         </div>
       </div>
-      <div className="app-metrics-grid grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="app-metrics-grid overview-scroll grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           title="Total Plans"
           value={state.metrics.total}
