@@ -21,6 +21,8 @@ import {
   Quote,
   Award,
   Layers,
+  BellRing,
+  Play,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -49,6 +51,8 @@ const navItems = [
   },
   { group: "Tools", to: "/file-manager", icon: Folder, label: "File Manager" },
   { group: "Tools", to: "/financial-intelligence", icon: BrainCircuit, label: "Financial Intelligence" },
+  { group: "Tools", to: "/report-delivery", icon: BellRing, label: "Report Delivery" },
+  { group: "Tools", to: "/report-delivery/run-jobs", icon: Play, label: "Run Report Jobs" },
   { group: "Tools", to: "/reports", icon: BarChart3, label: "Reports" },
 ];
 

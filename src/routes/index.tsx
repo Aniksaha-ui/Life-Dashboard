@@ -21,6 +21,7 @@ import { PublicationsPage } from "../features/publications";
 import { TestimonialsPage } from "../features/testimonials";
 import { TrainingsPage } from "../features/trainings";
 import { ServicesPage } from "../features/services";
+import { ReportDeliveryPage, ReportRunJobsPage } from "../features/report-delivery";
 import {
   BurnRateAnalysisPage,
   CategoryBreakdownPage,
@@ -76,6 +77,8 @@ const routes: RouteObject[] = [
           { path: "services", element: <ServicesPage /> },
           { path: "file-manager", element: <FileManagerPage /> },
           { path: "financial-intelligence", element: <FinancialIntelligencePage /> },
+          { path: "report-delivery", element: <ReportDeliveryPage /> },
+          { path: "report-delivery/run-jobs", element: <ReportRunJobsPage /> },
           { path: "reports", element: <ReportsPage /> },
           {
             path: "reports/financial-overview",
