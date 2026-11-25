@@ -97,24 +97,29 @@ export function MenuAccessMatrix({
     [users, selectedUserId],
   );
 
+  const validPaths = useMemo(
+    () => new Set(routes.map((route) => route.path)),
+    [routes],
+  );
+
   const savedPaths = useMemo(() => {
     if (mode === "user") {
       return activeUser
-        ? getDirectPathsForUser(allRows, activeUser.id)
+        ? getDirectPathsForUser(allRows, activeUser.id, validPaths)
         : new Set<string>();
     }
 
     return selectedRole
-      ? getPathsForRole(allRows, selectedRole)
+      ? getPathsForRole(allRows, selectedRole, validPaths)
       : new Set<string>();
-  }, [mode, activeUser, selectedRole, allRows]);
+  }, [mode, activeUser, selectedRole, allRows, validPaths]);
 
   // Routes the selected user already inherits through their assigned role.
   const inheritedPaths = useMemo(() => {
     if (mode !== "user" || !activeUser?.role) return new Set<string>();
 
-    return getPathsForRole(allRows, activeUser.role);
-  }, [mode, activeUser, allRows]);
+    return getPathsForRole(allRows, activeUser.role, validPaths);
+  }, [mode, activeUser, allRows, validPaths]);
 
   useEffect(() => {
     setDraftPaths(new Set(savedPaths));
@@ -154,7 +159,9 @@ export function MenuAccessMatrix({
   const handleSave = async () => {
     setSaving(true);
     try {
-      const paths = Array.from(draftPaths);
+      const paths = Array.from(draftPaths).filter((path) =>
+        validPaths.has(path),
+      );
       if (mode === "user" && activeUser) {
         await onSaveUserMenus(activeUser.id, paths);
       } else if (mode === "role" && selectedRole) {

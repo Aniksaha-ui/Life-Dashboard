@@ -103,21 +103,31 @@ export const groupRoutesByLocation = (
 export const getDirectPathsForUser = (
   items: MenuItemRow[],
   userId: number,
+  validPaths?: Set<string>,
 ): Set<string> =>
   new Set(
     items
-      .filter((item) => item.userId === userId && item.path !== NOT_AVAILABLE)
+      .filter(
+        (item) =>
+          item.userId === userId &&
+          item.path !== NOT_AVAILABLE &&
+          (!validPaths || validPaths.has(item.path)),
+      )
       .map((item) => item.path),
   );
 
 export const getPathsForRole = (
   items: MenuItemRow[],
   role: string,
+  validPaths?: Set<string>,
 ): Set<string> =>
   new Set(
     items
       .filter(
-        (item) => item.roles.includes(role) && item.path !== NOT_AVAILABLE,
+        (item) =>
+          item.roles.includes(role) &&
+          item.path !== NOT_AVAILABLE &&
+          (!validPaths || validPaths.has(item.path)),
       )
       .map((item) => item.path),
   );
