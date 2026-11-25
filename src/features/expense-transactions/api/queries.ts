@@ -74,7 +74,19 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
     );
   return (payload?.data ?? payload) as T;
 };
-export const getLedger = () => request<any[]>("/transactions");
+export const getLedger = (filters?: {
+  fromDate?: string;
+  toDate?: string;
+  type?: string;
+}) => {
+  const params = new URLSearchParams();
+  if (filters?.fromDate) params.set("from_date", filters.fromDate);
+  if (filters?.toDate) params.set("to_date", filters.toDate);
+  if (filters?.type) params.set("type", filters.type);
+  const query = params.toString();
+
+  return request<any[]>(query ? `/transactions?${query}` : "/transactions");
+};
 export const getAccounts = () => request<any[]>("/accounts");
 export const getCategories = () => request<any[]>("/categories");
 export const createLedgerEntry = (type: string, payload: object) =>

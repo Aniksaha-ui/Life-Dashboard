@@ -1,385 +1,334 @@
-import { ArrowRight, FolderTree, ReceiptText } from "lucide-react";
-import { SearchField } from "../../../../components/SearchField";
+import {
+  ArrowDownRight,
+  ArrowRight,
+  ArrowUpRight,
+  CalendarDays,
+  Flame,
+  Layers,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Drawer } from "../../../../components/Drawer";
-import { Loader } from "../../../../components/Loader";
+import { EmptyState } from "../../../../components/EmptyState";
 import { getLedger } from "../../../expense-transactions/api/queries";
 import type { ReportRow } from "../../types";
+import {
+  formatDisplayDate,
+  formatMoney,
+  mapWeeklyBlocks,
+  type WeeklyExpenseBlock,
+  type WeeklyTransaction,
+} from "../types";
+import { WeeklyDetailDrawer } from "./WeeklyDetailDrawer";
+import { WeeklySpendChart } from "./WeeklySpendChart";
 
-const number = (value: unknown) => Number(value) || 0;
-const money = (value: number) =>
-  `BDT ${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-type Transaction = Record<string, unknown>;
-type Week = {
-  label: string;
-  range: string;
-  start: string;
-  end: string;
-  total: number;
-  average: number;
-  count: number;
-  share: number;
-};
-const categoryName = (item: Transaction) =>
-  item.category && typeof item.category === "object" && "name" in item.category
-    ? String((item.category as { name?: unknown }).name ?? "Uncategorized")
-    : "Uncategorized";
+interface WeeklySpendProfileProps {
+  rows: ReportRow[];
+  fromDate?: string;
+  toDate?: string;
+}
 
-const mapWeeks = (rows: ReportRow[]) => {
-  const all = rows.reduce((sum, row) => sum + number(row.total_expense), 0);
-  return rows.map((row, index): Week => {
-    const total = number(row.total_expense);
-    return {
-      label: String(row.week_label ?? `Week ${index + 1}`),
-      range: String(row.range_label ?? "N/A"),
-      start: String(row.week_start ?? ""),
-      end: String(row.week_end ?? ""),
-      total,
-      average: number(row.average_expense),
-      count: number(row.transaction_count),
-      share: all ? (total / all) * 100 : 0,
-    };
-  });
-};
+export function WeeklySpendProfile({
+  rows,
+  fromDate,
+  toDate,
+}: WeeklySpendProfileProps) {
+  const [selected, setSelected] = useState<WeeklyExpenseBlock | null>(null);
+  const [ledgerTransactions, setLedgerTransactions] = useState<
+    WeeklyTransaction[] | null
+  >(null);
 
-function WeeklyDetailDrawer({
-  week,
-  onClose,
-}: {
-  week: Week | null;
-  onClose: () => void;
-}) {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [tab, setTab] = useState<"transactions" | "categories">("transactions");
-  const [search, setSearch] = useState("");
+  const needsClientReconcile =
+    rows.length > 0 && rows.some((row) => row.recurring_included !== true);
+  const rangeStart = rows[0]?.week_start
+    ? String(rows[0].week_start)
+    : fromDate;
+  const rangeEnd = rows[rows.length - 1]?.week_end
+    ? String(rows[rows.length - 1].week_end)
+    : toDate;
 
   useEffect(() => {
-    if (!week?.start || !week.end) return;
+    if (!needsClientReconcile || !rangeStart || !rangeEnd) {
+      setLedgerTransactions(null);
+      return;
+    }
+
     let active = true;
-    setLoading(true);
-    setError("");
-    setSearch("");
-    setTab("transactions");
-    setTransactions([]);
-    void getLedger()
+    void getLedger({ fromDate: rangeStart, toDate: rangeEnd })
       .then((data) => {
+        if (!active) return;
         const items = Array.isArray(data)
           ? data
           : ((data as { data?: unknown[] }).data ?? []);
-        const matched = items.filter((raw) => {
-          const item = raw as Transaction;
-          const date = String(item.transaction_date ?? "").slice(0, 10);
-          return (
-            date >= week.start &&
-            date <= week.end &&
-            ["EXPENSE", "RECURRING"].includes(
-              String(item.type ?? "").toUpperCase(),
-            )
-          );
-        }) as Transaction[];
-        if (active) setTransactions(matched);
+        setLedgerTransactions(items as WeeklyTransaction[]);
       })
-      .catch((reason) => {
-        if (active)
-          setError(
-            reason instanceof Error
-              ? reason.message
-              : "Unable to load weekly transactions.",
-          );
-      })
-      .finally(() => {
-        if (active) setLoading(false);
+      .catch(() => {
+        if (active) setLedgerTransactions(null);
       });
+
     return () => {
       active = false;
     };
-  }, [week]);
+  }, [needsClientReconcile, rangeStart, rangeEnd]);
 
-  const filtered = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    return query
-      ? transactions.filter((item) =>
-          `${item.note ?? ""} ${categoryName(item)} ${item.amount ?? ""}`
-            .toLowerCase()
-            .includes(query),
-        )
-      : transactions;
-  }, [search, transactions]);
-  const groups = useMemo(() => {
-    const total = transactions.reduce(
-      (sum, item) => sum + number(item.amount),
-      0,
+  const weeks = useMemo(
+    () => mapWeeklyBlocks(rows, ledgerTransactions),
+    [rows, ledgerTransactions],
+  );
+
+  const summary = useMemo(() => {
+    const totalSpend = weeks.reduce((sum, week) => sum + week.total, 0);
+    const totalTransactions = weeks.reduce((sum, week) => sum + week.count, 0);
+    const activeWeeks = weeks.filter((week) => week.count > 0).length;
+    const averageWeeklySpend = weeks.length > 0 ? totalSpend / weeks.length : 0;
+    const peakWeek = weeks.reduce<WeeklyExpenseBlock | null>(
+      (highest, week) =>
+        !highest || week.total > highest.total ? week : highest,
+      null,
     );
-    const map = new Map<
-      string,
-      { name: string; amount: number; count: number }
-    >();
-    transactions.forEach((item) => {
-      const name = categoryName(item);
-      const group = map.get(name) ?? { name, amount: 0, count: 0 };
-      group.amount += number(item.amount);
-      group.count += 1;
-      map.set(name, group);
-    });
-    const query = search.trim().toLowerCase();
-    return [...map.values()]
-      .map((item) => ({
-        ...item,
-        share: total ? (item.amount / total) * 100 : 0,
-      }))
-      .filter(
-        (item) =>
-          !query ||
-          `${item.name} ${item.amount} ${item.count}`
-            .toLowerCase()
-            .includes(query),
-      )
-      .sort((a, b) => b.amount - a.amount);
-  }, [search, transactions]);
-  const total = transactions.reduce(
-    (sum, item) => sum + number(item.amount),
-    0,
-  );
 
-  return (
-    <Drawer
-      open={Boolean(week)}
-      onClose={onClose}
-      width="4xl"
-      title={week ? `${week.label} transactions` : undefined}
-      subtitle={week ? `${week.range} · ${week.start} to ${week.end}` : undefined}
-      noPadding
-      contentClassName="flex-1 min-h-0 overflow-y-auto"
-    >
-      {week && (
-        <div className="min-h-full bg-slate-50">
-          <div className="space-y-5 p-5 sm:p-6">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary-700">
-                Weekly overview
-              </p>
-              <p className="mt-1 text-sm text-slate-500">
-                Review the week’s spend, then switch between individual transactions and category totals.
-              </p>
-            </div>
-            <section className="grid gap-3 sm:grid-cols-3">
-              <article className="rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white p-4 shadow-sm sm:p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary-700">
-                  Total transactions
-                </p>
-                <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
-                  {loading ? "—" : transactions.length}
-                </p>
-              </article>
-              <article className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-4 shadow-sm sm:p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700">
-                  Total amount
-                </p>
-                <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
-                  {loading ? "—" : money(total)}
-                </p>
-              </article>
-              <article className="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50 to-white p-4 shadow-sm sm:p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-700">
-                  Categories
-                </p>
-                <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
-                  {loading ? "—" : groups.length}
-                </p>
-              </article>
-            </section>
-            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="flex flex-col gap-3 border-b border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto" role="tablist">
-                  <button
-                    type="button"
-                    onClick={() => setTab("transactions")}
-                    className={`inline-flex min-w-0 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${tab === "transactions" ? "bg-primary-600 text-white shadow-sm" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}
-                  >
-                    <ReceiptText className="h-4 w-4" />
-                    All Transactions
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTab("categories")}
-                    className={`inline-flex min-w-0 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${tab === "categories" ? "bg-primary-600 text-white shadow-sm" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}
-                  >
-                    <FolderTree className="h-4 w-4" />
-                    Group by Category
-                  </button>
-                </div>
-                <SearchField
-                  value={search}
-                  onChange={setSearch}
-                  placeholder={
-                    tab === "transactions"
-                      ? "Search transactions"
-                      : "Search categories"
-                  }
-                  className="w-full sm:w-72"
-                />
-              </div>
-              {loading ? (
-                <div className="flex min-h-72 items-center justify-center">
-                  <Loader size="lg" />
-                </div>
-              ) : error ? (
-                <p className="m-4 rounded-xl bg-rose-50 p-4 text-sm text-rose-700">
-                  {error}
-                </p>
-              ) : tab === "transactions" ? (
-                <div className="space-y-3 p-3 sm:space-y-0 sm:divide-y sm:divide-slate-100 sm:p-0">
-                  {filtered.length ? (
-                    filtered.map((item) => (
-                      <article
-                        key={String(item.id)}
-                        className="grid gap-3 rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:rounded-none sm:border-0 sm:bg-white sm:px-5"
-                      >
-                        <div>
-                          <p className="font-semibold text-slate-900">
-                            {String(item.note || "Expense transaction")}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {categoryName(item)} ·{" "}
-                            {String(item.transaction_date ?? "N/A").slice(
-                              0,
-                              10,
-                            )}
-                          </p>
-                        </div>
-                        <div className="sm:text-right">
-                          <p className="font-semibold text-slate-900">
-                            {money(number(item.amount))}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {String(item.type ?? "Expense")}
-                          </p>
-                        </div>
-                      </article>
-                    ))
-                  ) : (
-                    <p className="p-10 text-center text-sm text-slate-500">
-                      No expense transactions were recorded in this week.
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-3 p-3 sm:space-y-0 sm:divide-y sm:divide-slate-100 sm:p-0">
-                  {groups.length ? (
-                    groups.map((group) => (
-                      <article
-                        key={group.name}
-                        className="grid gap-2 rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:rounded-none sm:border-0 sm:bg-white sm:px-5"
-                      >
-                        <div>
-                          <p className="font-semibold text-slate-900">
-                            {group.name}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {group.count} transactions ·{" "}
-                            {group.share.toFixed(1)}% of weekly spend
-                          </p>
-                        </div>
-                        <p className="font-semibold text-slate-900 sm:text-right">
-                          {money(group.amount)}
-                        </p>
-                      </article>
-                    ))
-                  ) : (
-                    <p className="p-10 text-center text-sm text-slate-500">
-                      No categories found for this week.
-                    </p>
-                  )}
-                </div>
-              )}
-            </section>
-          </div>
-        </div>
-      )}
-    </Drawer>
-  );
-}
+    return {
+      totalSpend,
+      totalTransactions,
+      activeWeeks,
+      averageWeeklySpend,
+      peakWeek,
+    };
+  }, [weeks]);
 
-export function WeeklySpendProfile({ rows }: { rows: ReportRow[] }) {
-  const [selected, setSelected] = useState<Week | null>(null);
-  const weeks = useMemo(() => mapWeeks(rows), [rows]);
   const maximum = Math.max(...weeks.map((week) => week.total), 1);
-  const peak = weeks.reduce<Week | null>(
-    (highest, week) =>
-      !highest || week.total > highest.total ? week : highest,
-    null,
-  );
-  if (!weeks.length) return null;
+
+  if (!weeks.length) {
+    return (
+      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <EmptyState
+          title="No weekly data available"
+          subtitle="Adjust the reporting date range or record expenses to view weekly spending blocks."
+        />
+      </section>
+    );
+  }
+
   return (
-    <>
+    <div className="space-y-6">
+      {/* KPI Summary Strip */}
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <article className="rounded-2xl border border-rose-100 bg-gradient-to-br from-rose-50/70 via-white to-white p-4 shadow-sm sm:p-5">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-rose-700">
+              Total period spend
+            </p>
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-rose-100/80 text-rose-600">
+              <Wallet className="h-4 w-4" />
+            </span>
+          </div>
+          <p className="mt-2.5 text-2xl font-bold tracking-tight tabular-nums text-slate-900">
+            {formatMoney(summary.totalSpend)}
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Across {summary.totalTransactions} expense transaction
+            {summary.totalTransactions === 1 ? "" : "s"}
+          </p>
+        </article>
+
+        <article className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/70 via-white to-white p-4 shadow-sm sm:p-5">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">
+              Weekly average
+            </p>
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-blue-100/80 text-blue-600">
+              <TrendingUp className="h-4 w-4" />
+            </span>
+          </div>
+          <p className="mt-2.5 text-2xl font-bold tracking-tight tabular-nums text-slate-900">
+            {formatMoney(summary.averageWeeklySpend)}
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Per week over {weeks.length} week{weeks.length === 1 ? "" : "s"}
+          </p>
+        </article>
+
+        <article className="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50/70 via-white to-white p-4 shadow-sm sm:p-5">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
+              Peak spending week
+            </p>
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-amber-100/80 text-amber-600">
+              <Flame className="h-4 w-4" />
+            </span>
+          </div>
+          <p className="mt-2.5 text-2xl font-bold tracking-tight tabular-nums text-slate-900">
+            {summary.peakWeek && summary.peakWeek.total > 0
+              ? formatMoney(summary.peakWeek.total)
+              : "BDT 0.00"}
+          </p>
+          <p className="mt-1 truncate text-xs text-slate-500">
+            {summary.peakWeek && summary.peakWeek.total > 0
+              ? `${summary.peakWeek.label} (${summary.peakWeek.range})`
+              : "No expenses recorded yet"}
+          </p>
+        </article>
+
+        <article className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50/70 via-white to-white p-4 shadow-sm sm:p-5">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+              Active weeks
+            </p>
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-100/80 text-emerald-600">
+              <Layers className="h-4 w-4" />
+            </span>
+          </div>
+          <p className="mt-2.5 text-2xl font-bold tracking-tight tabular-nums text-slate-900">
+            {summary.activeWeeks}{" "}
+            <span className="text-base font-semibold text-slate-400">
+              / {weeks.length}
+            </span>
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            {fromDate && toDate
+              ? `${formatDisplayDate(fromDate)} – ${formatDisplayDate(toDate)}`
+              : "Weeks with recorded spend"}
+          </p>
+        </article>
+      </section>
+
+      {/* Interactive Weekly Spend Chart */}
+      <WeeklySpendChart
+        weeks={weeks}
+        averageWeeklySpend={summary.averageWeeklySpend}
+        onSelectWeek={setSelected}
+      />
+
+      {/* Weekly Breakdown Cards */}
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary-700">
               Spending cadence
             </p>
             <h2 className="mt-1 text-lg font-semibold text-slate-900">
-              Weekly spend profile
+              Weekly breakdown
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Select a week to inspect transactions and category spending.
+            <p className="mt-0.5 text-sm text-slate-500">
+              Select any week card to inspect transactions and category totals.
             </p>
           </div>
-          <div className="rounded-xl border border-primary-100 bg-primary-50 px-3 py-2 text-right">
-            <p className="text-[10px] font-semibold uppercase text-primary-700">
-              Peak week
-            </p>
-            <p className="mt-1 text-sm font-bold text-slate-900">
-              {peak?.label}
-            </p>
-            <p className="text-xs text-slate-600">{money(peak?.total ?? 0)}</p>
-          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+            <CalendarDays className="h-3.5 w-3.5" />
+            {weeks.length} weekly block{weeks.length === 1 ? "" : "s"}
+          </span>
         </div>
-        <div className="overview-scroll grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-4 sm:p-5">
-          {weeks.map((week) => (
-            <button
-              key={`${week.label}-${week.range}`}
-              type="button"
-              onClick={() => setSelected(week)}
-              className="group rounded-xl border border-slate-200 bg-slate-50/60 p-4 text-left transition hover:-translate-y-0.5 hover:border-primary-300 hover:bg-primary-50/40 hover:shadow-sm"
-            >
-              <div className="flex items-start justify-between gap-3">
+
+        <div className="grid gap-4 p-4 sm:grid-cols-2 sm:p-5 xl:grid-cols-3">
+          {weeks.map((week) => {
+            const barWidth =
+              week.total > 0 ? Math.max((week.total / maximum) * 100, 6) : 0;
+
+            return (
+              <button
+                key={`${week.label}-${week.start}`}
+                type="button"
+                onClick={() => setSelected(week)}
+                className={`group flex flex-col justify-between rounded-2xl border p-4 text-left transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md ${
+                  week.isPeak
+                    ? "border-rose-200 bg-gradient-to-br from-rose-50/50 via-white to-white hover:border-rose-300"
+                    : "border-slate-200 bg-white hover:border-primary-300 hover:bg-primary-50/20"
+                }`}
+              >
                 <div>
-                  <p className="font-semibold text-slate-900">{week.label}</p>
-                  <p className="mt-1 text-xs text-slate-500">{week.range}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-base font-bold text-slate-900">
+                          {week.label}
+                        </span>
+                        {week.isPeak && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold uppercase text-rose-700">
+                            <Flame className="h-3 w-3" />
+                            Peak
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1 text-xs font-medium text-slate-500">
+                        {week.range}
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
+                        week.isPeak
+                          ? "bg-rose-100 text-rose-700"
+                          : "bg-primary-50 text-primary-700"
+                      }`}
+                    >
+                      {week.share.toFixed(1)}%
+                    </span>
+                  </div>
+
+                  <div className="mt-4">
+                    <p className="text-2xl font-bold tracking-tight tabular-nums text-slate-900">
+                      {formatMoney(week.total)}
+                    </p>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                      <span>
+                        {week.count} txn{week.count === 1 ? "" : "s"}
+                      </span>
+                      <span>·</span>
+                      <span>Avg {formatMoney(week.average)}</span>
+                      {week.deltaPercent !== null && (
+                        <span
+                          className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                            week.deltaPercent > 0
+                              ? "bg-rose-50 text-rose-700"
+                              : week.deltaPercent < 0
+                                ? "bg-emerald-50 text-emerald-700"
+                                : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          {week.deltaPercent > 0 ? (
+                            <ArrowUpRight className="h-3 w-3" />
+                          ) : week.deltaPercent < 0 ? (
+                            <ArrowDownRight className="h-3 w-3" />
+                          ) : null}
+                          {week.deltaPercent > 0 ? "+" : ""}
+                          {week.deltaPercent.toFixed(1)}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <span className="rounded-full bg-primary-100 px-2 py-1 text-[11px] font-semibold text-primary-700">
-                  {week.share.toFixed(1)}%
-                </span>
-              </div>
-              <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-200">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-primary-500 to-primary-400"
-                  style={{
-                    width: `${Math.max((week.total / maximum) * 100, week.total ? 6 : 0)}%`,
-                  }}
-                />
-              </div>
-              <div className="mt-4 flex items-end justify-between gap-2">
-                <div>
-                  <p className="font-bold text-slate-900">
-                    {money(week.total)}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {week.count} transactions
-                  </p>
+
+                <div className="mt-4 space-y-3">
+                  <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        week.isPeak
+                          ? "bg-gradient-to-r from-rose-500 to-rose-400"
+                          : "bg-gradient-to-r from-primary-600 to-primary-400"
+                      }`}
+                      style={{ width: `${barWidth}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400">
+                      {week.calendarLabel || `${week.start} → ${week.end}`}
+                    </span>
+                    <span className="inline-flex items-center gap-1 font-semibold text-primary-600 transition-transform group-hover:translate-x-0.5">
+                      Inspect week
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
+                  </div>
                 </div>
-                <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary-600">
-                  Details <ArrowRight className="h-3.5 w-3.5" />
-                </span>
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </section>
-      <WeeklyDetailDrawer week={selected} onClose={() => setSelected(null)} />
-    </>
+
+      <WeeklyDetailDrawer
+        week={selected}
+        prefetchedTransactions={ledgerTransactions}
+        onClose={() => setSelected(null)}
+      />
+    </div>
   );
 }

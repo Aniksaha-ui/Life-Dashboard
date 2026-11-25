@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { DataTable } from "../../components/DataTable";
 import { EmptyState } from "../../components/EmptyState";
+import { MobileRecordDrawer } from "../../components/MobileRecordDrawer";
 import { Modal } from "../../components/Modal";
 import { OutlinedField } from "../../components/OutlinedField";
 import { SearchField } from "../../components/SearchField";
@@ -168,6 +169,7 @@ export default function ProjectsPage() {
   const [selected, setSelected] = useState<Project | null | undefined>(
     undefined,
   );
+  const [viewing, setViewing] = useState<Project | null>(null);
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
@@ -405,8 +407,143 @@ export default function ProjectsPage() {
           mobileCardTitleColumn={0}
           mobileCardHideFirstColumn
           className="compact-mobile-table border-slate-200"
+          onRowClick={setViewing}
         />
       )}
+      <MobileRecordDrawer
+        open={Boolean(viewing)}
+        onClose={() => setViewing(null)}
+        title={viewing?.project_name || "Project Details"}
+        badge={
+          viewing
+            ? viewing.isPublished === true ||
+              viewing.isPublished === 1 ||
+              viewing.isPublished === "1"
+              ? "Published"
+              : "Draft"
+            : undefined
+        }
+        badgeClassName={
+          viewing &&
+          (viewing.isPublished === true ||
+            viewing.isPublished === 1 ||
+            viewing.isPublished === "1")
+            ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+            : "bg-amber-50 text-amber-700 ring-amber-200"
+        }
+        recordId={viewing ? `PRJ #${viewing.id}` : undefined}
+        headerAction={
+          viewing ? (
+            <button
+              type="button"
+              onClick={() => {
+                const target = viewing;
+                setViewing(null);
+                setSelected(target);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <Pencil className="h-4 w-4" />
+              Edit
+            </button>
+          ) : undefined
+        }
+        hero={
+          viewing
+            ? {
+                icon: Code2,
+                iconClassName: "bg-primary-50 text-primary-600",
+                overline: "Portfolio project",
+                value: viewing.project_name,
+                meta: [viewing.frontend_tech, viewing.backend_tech]
+                  .filter(Boolean)
+                  .join(" · "),
+                coverImage: viewing.image ? (
+                  <img
+                    src={viewing.image}
+                    alt=""
+                    className="h-48 w-full border-b border-slate-100 object-cover"
+                    onError={(event) => {
+                      event.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : undefined,
+                stats: [
+                  {
+                    label: "Team size",
+                    value: `${viewing.no_of_developers || 1} developer${Number(viewing.no_of_developers || 1) === 1 ? "" : "s"}`,
+                  },
+                  {
+                    label: "Database",
+                    value: viewing.database,
+                    valueClassName: "text-primary-700",
+                  },
+                ],
+              }
+            : undefined
+        }
+        details={
+          viewing
+            ? [
+                { label: "Frontend Tech", value: viewing.frontend_tech },
+                { label: "Backend Tech", value: viewing.backend_tech },
+                { label: "Database", value: viewing.database },
+                {
+                  label: "Developers",
+                  value: viewing.developers_name || viewing.no_of_developers,
+                },
+                { label: "Start Date", value: viewing.start_date },
+                { label: "End Date", value: viewing.end_date || "Present" },
+                {
+                  label: "Description",
+                  value: viewing.description ? (
+                    <span className="whitespace-pre-line leading-6 text-slate-700">
+                      {viewing.description}
+                    </span>
+                  ) : (
+                    "No description provided."
+                  ),
+                  fullWidth: true,
+                },
+              ]
+            : []
+        }
+        sections={
+          viewing && (viewing.website_link || viewing.github_link)
+            ? [
+                {
+                  title: "Links & Repositories",
+                  content: (
+                    <div className="flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                      {viewing.website_link && (
+                        <a
+                          href={viewing.website_link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-lg border border-primary-200 px-3.5 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Live Website
+                        </a>
+                      )}
+                      {viewing.github_link && (
+                        <a
+                          href={viewing.github_link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                        >
+                          <Github className="h-4 w-4" />
+                          GitHub Repo
+                        </a>
+                      )}
+                    </div>
+                  ),
+                },
+              ]
+            : []
+        }
+      />
       {selected !== undefined && (
         <ProjectForm
           project={selected}

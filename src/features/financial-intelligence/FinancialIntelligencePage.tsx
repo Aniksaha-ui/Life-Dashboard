@@ -10,7 +10,10 @@ import {
   WalletCards,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { outlinedControlClass, OutlinedField } from "../../components/OutlinedField";
+import {
+  outlinedControlClass,
+  OutlinedField,
+} from "../../components/OutlinedField";
 import { PageLoadingState } from "../../components/PageLoadingState";
 import { SearchField } from "../../components/SearchField";
 import {
@@ -19,6 +22,7 @@ import {
   getDashboard,
   reviewAnomaly,
 } from "./api/queries";
+import { MonthlyWeekComparisonSection } from "./components/MonthlyWeekComparisonSection";
 
 const amount = (value: unknown) =>
   `BDT ${Number(value || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -26,7 +30,9 @@ const today = () => new Date().toISOString().slice(0, 10);
 function Card({ label, value, icon: Icon, tone }: any) {
   return (
     <article className="financial-intelligence-metric group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-5">
-      <span className={`grid h-9 w-9 place-items-center rounded-xl sm:h-10 sm:w-10 ${tone}`}>
+      <span
+        className={`grid h-9 w-9 place-items-center rounded-xl sm:h-10 sm:w-10 ${tone}`}
+      >
         <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
       </span>
       <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500 sm:mt-6 sm:text-xs sm:tracking-[0.12em]">
@@ -124,10 +130,18 @@ export default function FinancialIntelligencePage() {
       <header className="financial-intelligence-hero rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
           <div>
-            <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900"><BrainCircuit className="h-6 w-6 text-primary-600" /> Financial Actions</h1>
-            <p className="mt-1 text-sm text-slate-500">Cash flow health, forecast signals, and prioritized actions for your finances.</p>
+            <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+              <BrainCircuit className="h-6 w-6 text-primary-600" /> Financial
+              Actions
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Cash flow health, forecast signals, and prioritized actions for
+              your finances.
+            </p>
           </div>
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary-100 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700"><CalendarRange className="h-4 w-4" /> Live analysis</span>
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary-100 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700">
+            <CalendarRange className="h-4 w-4" /> Live analysis
+          </span>
         </div>
         <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4">
           <OutlinedField label="From date" className="w-full sm:w-44">
@@ -164,39 +178,50 @@ export default function FinancialIntelligencePage() {
           {error}
         </p>
       )}
-      {loading ? <PageLoadingState /> : (
+      {loading ? (
+        <PageLoadingState />
+      ) : (
         <>
           <section>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900">Overview</h2>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900">
+              Overview
+            </h2>
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-            <Card
-              label="Current balance"
-              value={amount(metrics.current_balance)}
-              icon={WalletCards}
-              tone="bg-primary-50 text-primary-600"
-            />
-            <Card
-              label="Period income"
-              value={amount(metrics.total_income)}
-              icon={TrendingUp}
-              tone="bg-emerald-50 text-emerald-600"
-            />
-            <Card
-              label="Period expenses"
-              value={amount(metrics.total_expenses)}
-              icon={TrendingDown}
-              tone="bg-amber-50 text-amber-600"
-            />
-            <Card
-              label="Net cash flow"
-              value={amount(metrics.net_cash_flow)}
-              icon={WalletCards}
-              tone="bg-cyan-50 text-cyan-600"
-            />
+              <Card
+                label="Current balance"
+                value={amount(metrics.current_balance)}
+                icon={WalletCards}
+                tone="bg-primary-50 text-primary-600"
+              />
+              <Card
+                label="Period income"
+                value={amount(metrics.total_income)}
+                icon={TrendingUp}
+                tone="bg-emerald-50 text-emerald-600"
+              />
+              <Card
+                label="Period expenses"
+                value={amount(metrics.total_expenses)}
+                icon={TrendingDown}
+                tone="bg-amber-50 text-amber-600"
+              />
+              <Card
+                label="Net cash flow"
+                value={amount(metrics.net_cash_flow)}
+                icon={WalletCards}
+                tone="bg-cyan-50 text-cyan-600"
+              />
             </div>
           </section>
+          <MonthlyWeekComparisonSection
+            toDate={to}
+            initialReport={data?.monthly_week_comparison}
+          />
           <Panel title="Ask about your finances" icon={BrainCircuit}>
-            <form onSubmit={ask} className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <form
+              onSubmit={ask}
+              className="flex flex-col gap-3 sm:flex-row sm:items-center"
+            >
               <SearchField
                 label="Question"
                 value={question}
@@ -212,7 +237,11 @@ export default function FinancialIntelligencePage() {
                 {asking ? "Thinking…" : "Ask question"}
               </button>
             </form>
-            {answer && <p className="mt-4 rounded-xl border border-primary-100 bg-primary-50 p-4 text-sm leading-6 text-slate-700">{answer}</p>}
+            {answer && (
+              <p className="mt-4 rounded-xl border border-primary-100 bg-primary-50 p-4 text-sm leading-6 text-slate-700">
+                {answer}
+              </p>
+            )}
           </Panel>
           <section className="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(280px,.85fr)]">
             <div className="space-y-5">

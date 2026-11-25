@@ -1,9 +1,12 @@
-import { ArrowLeftRight, RefreshCcw, Wallet } from "lucide-react";
+import { ArrowLeftRight, Pencil, RefreshCcw, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 import { DataTable } from "../../components/DataTable";
 import { MobileRecordDrawer } from "../../components/MobileRecordDrawer";
 import { MetricCard } from "../../components/MetricCard";
-import { outlinedControlClass, OutlinedField } from "../../components/OutlinedField";
+import {
+  outlinedControlClass,
+  OutlinedField,
+} from "../../components/OutlinedField";
 import { SearchField } from "../../components/SearchField";
 import { TransferForm } from "./components/TransferForm";
 import { getTransferColumns } from "./components/columns";
@@ -93,7 +96,10 @@ export default function TransfersPage() {
             ))}
           </div>
           <div className="grid w-full grid-cols-1 items-center gap-3 sm:grid-cols-2 xl:grid-cols-5 lg:min-w-0 lg:flex-1">
-            <OutlinedField label="Account" className="sm:col-span-2 xl:col-span-1">
+            <OutlinedField
+              label="Account"
+              className="sm:col-span-2 xl:col-span-1"
+            >
               <select
                 value={state.accountId}
                 onChange={(e) => state.setAccountId(e.target.value)}
@@ -154,19 +160,87 @@ export default function TransfersPage() {
       <MobileRecordDrawer
         open={Boolean(selectedTransfer)}
         onClose={() => setSelectedTransfer(null)}
-        title="Transfer Details"
-        subtitle={
-          selectedTransfer?.withdrawal ? "Withdraw To Cash" : "Transfer"
+        title={
+          selectedTransfer?.note ||
+          (selectedTransfer
+            ? `${selectedTransfer.fromName} → ${selectedTransfer.toName}`
+            : "Transfer Details")
+        }
+        badge={
+          selectedTransfer?.withdrawal ? "Cash Withdrawal" : "Standard Transfer"
+        }
+        badgeClassName={
+          selectedTransfer?.withdrawal
+            ? "bg-amber-50 text-amber-700 ring-amber-200"
+            : "bg-blue-50 text-blue-700 ring-blue-200"
+        }
+        recordId={selectedTransfer ? `TRF #${selectedTransfer.id}` : undefined}
+        headerAction={
+          selectedTransfer ? (
+            <button
+              type="button"
+              onClick={() => {
+                const target = selectedTransfer;
+                setSelectedTransfer(null);
+                setEditing(target);
+                setMode(target.withdrawal ? "WITHDRAWAL" : "TRANSFER");
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <Pencil className="h-4 w-4" />
+              Edit
+            </button>
+          ) : undefined
+        }
+        hero={
+          selectedTransfer
+            ? {
+                icon: selectedTransfer.withdrawal ? Wallet : ArrowLeftRight,
+                iconClassName: selectedTransfer.withdrawal
+                  ? "bg-amber-50 text-amber-600"
+                  : "bg-blue-50 text-blue-600",
+                overline: selectedTransfer.withdrawal
+                  ? "Withdrawal amount"
+                  : "Transfer amount",
+                value: selectedTransfer.amountLabel,
+                valueClassName: "tabular-nums text-primary-700",
+                meta: `${selectedTransfer.fromName} → ${selectedTransfer.toName} · ${selectedTransfer.dateLabel}`,
+                stats: [
+                  { label: "From account", value: selectedTransfer.fromName },
+                  {
+                    label: "To account",
+                    value: selectedTransfer.toName,
+                    valueClassName: "text-primary-700",
+                  },
+                ],
+              }
+            : undefined
         }
         details={
           selectedTransfer
             ? [
-                { label: "Transfer ID", value: selectedTransfer.id },
+                { label: "Date", value: selectedTransfer.dateLabel },
+                {
+                  label: "Type",
+                  value: selectedTransfer.withdrawal
+                    ? "Withdraw To Cash"
+                    : "Transfer",
+                },
                 { label: "Source", value: selectedTransfer.fromName },
                 { label: "Destination", value: selectedTransfer.toName },
                 { label: "Amount", value: selectedTransfer.amountLabel },
-                { label: "Date", value: selectedTransfer.dateLabel },
-                { label: "Note", value: selectedTransfer.note },
+                { label: "Transfer ID", value: `TRF #${selectedTransfer.id}` },
+                {
+                  label: "Note",
+                  value: selectedTransfer.note ? (
+                    <span className="whitespace-pre-wrap">
+                      {selectedTransfer.note}
+                    </span>
+                  ) : (
+                    "No remarks added"
+                  ),
+                  fullWidth: true,
+                },
               ]
             : []
         }

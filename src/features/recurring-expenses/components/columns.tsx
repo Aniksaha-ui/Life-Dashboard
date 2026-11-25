@@ -53,14 +53,22 @@ export const getRecurringExpenseColumns = (
     cell: ({ row }) => (
       <div className="flex gap-1">
         <button
-          onClick={() => onEdit(row.original)}
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onEdit(row.original);
+          }}
           className="rounded p-2 text-primary-600 hover:bg-primary-50"
         >
           <Pencil className="h-4 w-4" />
         </button>
         <button
+          type="button"
           disabled={!row.original.is_active}
-          onClick={() => onRun(row.original)}
+          onClick={(event) => {
+            event.stopPropagation();
+            onRun(row.original);
+          }}
           className="rounded p-2 text-emerald-600 hover:bg-emerald-50 disabled:opacity-40"
         >
           <Play className="h-4 w-4" />

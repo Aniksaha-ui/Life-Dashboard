@@ -3,6 +3,7 @@ import {
   ExternalLink,
   Eye,
   FileText,
+  GraduationCap,
   Pencil,
   Plus,
   RefreshCcw,
@@ -12,8 +13,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { DataTable } from "../../components/DataTable";
 import { EmptyState } from "../../components/EmptyState";
+import { MobileRecordDrawer } from "../../components/MobileRecordDrawer";
 import { Modal } from "../../components/Modal";
-import { outlinedControlClass, OutlinedField } from "../../components/OutlinedField";
+import {
+  outlinedControlClass,
+  OutlinedField,
+} from "../../components/OutlinedField";
 import { SearchField } from "../../components/SearchField";
 import {
   createPublication,
@@ -171,77 +176,131 @@ function PublicationForm({
 function PublicationDetails({
   publication,
   onClose,
+  onEdit,
 }: {
-  publication: Publication;
+  publication: Publication | null;
   onClose: () => void;
+  onEdit: (publication: Publication) => void;
 }) {
+  const isPublished = Number(publication?.status) === 1;
+
   return (
-    <Modal
-      isOpen
+    <MobileRecordDrawer
+      open={Boolean(publication)}
       onClose={onClose}
-      title="Publication details"
-      footer={
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white"
-        >
-          Close
-        </button>
+      title={publication?.title || "Publication Details"}
+      badge={publication ? (isPublished ? "Published" : "Draft") : undefined}
+      badgeClassName={
+        isPublished
+          ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+          : "bg-amber-50 text-amber-700 ring-amber-200"
       }
-    >
-      <div className="space-y-4 text-sm">
-        <div>
-          <h3 className="text-xl font-bold text-slate-900">
-            {publication.title}
-          </h3>
-          <p className="mt-1 text-slate-500">{publication.authors}</p>
-        </div>
-        <p className="whitespace-pre-line leading-6 text-slate-700">
-          {publication.abstract}
-        </p>
-        <dl className="grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-2">
-          <div>
-            <dt className="text-xs font-bold uppercase text-slate-500">
-              Publisher
-            </dt>
-            <dd className="mt-1 text-slate-800">{publication.publisher}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-bold uppercase text-slate-500">
-              Published
-            </dt>
-            <dd className="mt-1 text-slate-800">
-              {publication.publication_date}
-            </dd>
-          </div>
-          <div className="sm:col-span-2">
-            <dt className="text-xs font-bold uppercase text-slate-500">DOI</dt>
-            <dd className="mt-1 text-slate-800">{publication.doi}</dd>
-          </div>
-        </dl>
-        <div className="flex flex-wrap gap-2">
-          <a
-            href={externalUrl(publication.url)}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-primary-200 px-3 py-2 font-semibold text-primary-700 hover:bg-primary-50"
+      recordId={publication ? `PUB #${publication.id}` : undefined}
+      headerAction={
+        publication ? (
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              onEdit(publication);
+            }}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           >
-            <ExternalLink className="h-4 w-4" />
-            Publication link
-          </a>
-          <a
-            href={externalUrl(publication.pdf_url)}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            <FileText className="h-4 w-4" />
-            Open PDF
-          </a>
-        </div>
-      </div>
-    </Modal>
+            <Pencil className="h-4 w-4" />
+            Edit
+          </button>
+        ) : undefined
+      }
+      hero={
+        publication
+          ? {
+              icon: GraduationCap,
+              iconClassName: "bg-primary-50 text-primary-600",
+              overline: "Academic publication",
+              value: publication.title,
+              meta: publication.authors || undefined,
+              stats: [
+                { label: "Publisher", value: publication.publisher },
+                {
+                  label: "Published date",
+                  value: publication.publication_date,
+                  valueClassName: "text-primary-700",
+                },
+              ],
+            }
+          : undefined
+      }
+      details={
+        publication
+          ? [
+              { label: "Publisher", value: publication.publisher },
+              { label: "Published Date", value: publication.publication_date },
+              {
+                label: "Authors",
+                value: publication.authors,
+                fullWidth: true,
+              },
+              {
+                label: "DOI",
+                value: publication.doi ? (
+                  <code className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
+                    {publication.doi}
+                  </code>
+                ) : (
+                  "—"
+                ),
+                fullWidth: true,
+              },
+              {
+                label: "Abstract",
+                value: publication.abstract ? (
+                  <span className="whitespace-pre-line leading-6 text-slate-700">
+                    {publication.abstract}
+                  </span>
+                ) : (
+                  "No abstract provided."
+                ),
+                fullWidth: true,
+              },
+            ]
+          : []
+      }
+      sections={
+        publication && (publication.url || publication.pdf_url)
+          ? [
+              {
+                title: "Links & Resources",
+                content: (
+                  <div className="flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                    {publication.url && (
+                      <a
+                        href={externalUrl(publication.url)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg border border-primary-200 px-3.5 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Publication link
+                      </a>
+                    )}
+                    {publication.pdf_url && (
+                      <a
+                        href={externalUrl(publication.pdf_url)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                      >
+                        <FileText className="h-4 w-4" />
+                        Open PDF
+                      </a>
+                    )}
+                  </div>
+                ),
+              },
+            ]
+          : []
+      }
+    />
   );
 }
 
@@ -344,7 +403,10 @@ export default function PublicationsPage() {
           <div className="flex justify-end gap-1">
             <button
               type="button"
-              onClick={() => setDetail(row.original)}
+              onClick={(event) => {
+                event.stopPropagation();
+                setDetail(row.original);
+              }}
               className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
               aria-label={`View ${row.original.title}`}
             >
@@ -352,7 +414,10 @@ export default function PublicationsPage() {
             </button>
             <button
               type="button"
-              onClick={() => setEditing(row.original)}
+              onClick={(event) => {
+                event.stopPropagation();
+                setEditing(row.original);
+              }}
               className="rounded-lg p-2 text-primary-600 hover:bg-primary-50"
               aria-label={`Edit ${row.original.title}`}
             >
@@ -360,7 +425,10 @@ export default function PublicationsPage() {
             </button>
             <button
               type="button"
-              onClick={() => void remove(row.original)}
+              onClick={(event) => {
+                event.stopPropagation();
+                void remove(row.original);
+              }}
               className="rounded-lg p-2 text-rose-600 hover:bg-rose-50"
               aria-label={`Delete ${row.original.title}`}
             >
@@ -408,7 +476,9 @@ export default function PublicationsPage() {
             className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 px-3 text-slate-600 disabled:opacity-60"
             aria-label="Refresh publications"
           >
-            <RefreshCcw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCcw
+              className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+            />
           </button>
           <button
             type="button"
@@ -438,6 +508,7 @@ export default function PublicationsPage() {
           mobileCardTitleColumn={0}
           mobileCardHideFirstColumn
           className="compact-mobile-table border-slate-200"
+          onRowClick={setDetail}
         />
       )}
       {editing !== undefined && (
@@ -447,12 +518,11 @@ export default function PublicationsPage() {
           onSave={save}
         />
       )}
-      {detail && (
-        <PublicationDetails
-          publication={detail}
-          onClose={() => setDetail(null)}
-        />
-      )}
+      <PublicationDetails
+        publication={detail}
+        onClose={() => setDetail(null)}
+        onEdit={(item) => setEditing(item)}
+      />
     </div>
   );
 }

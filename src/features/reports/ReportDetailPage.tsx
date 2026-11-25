@@ -6,6 +6,7 @@ import { SearchField } from "../../components/SearchField";
 import { getReportColumns } from "./components/columns";
 import { ReportChart } from "./components/ReportChart";
 import { ReportFilters } from "./components/ReportFilters";
+import { ReportLoadingOverlay } from "./components/ReportLoadingOverlay";
 import { ReportsOverview } from "./components/ReportsOverview";
 import { getReportDefinition } from "./constants/reports";
 import { ManagementSummary } from "./current-vs-previous-month-analysis/components/ManagementSummary";
@@ -18,8 +19,10 @@ function ReportContent({ definition }: { definition: ReportDefinition }) {
   const columns = useMemo(() => getReportColumns(state.rows), [state.rows]);
   const Icon = definition.icon;
   const isCategoryUsage = definition.id === "category-usage-analysis";
-  const isCurrentVsPrevious = definition.id === "current-vs-previous-month-analysis";
-  const isWeeklyCurrentMonth = definition.id === "weekly-current-month-analysis";
+  const isCurrentVsPrevious =
+    definition.id === "current-vs-previous-month-analysis";
+  const isWeeklyCurrentMonth =
+    definition.id === "weekly-current-month-analysis";
 
   return (
     <div className="report-detail-page space-y-6">
@@ -67,9 +70,22 @@ function ReportContent({ definition }: { definition: ReportDefinition }) {
         isLoading={state.loading}
       />
 
-      {!isWeeklyCurrentMonth && <ReportsOverview metrics={state.metrics} loading={state.loading} />}
-      {isCurrentVsPrevious && !state.loading && <ManagementSummary report={state} />}
-      {isWeeklyCurrentMonth && !state.loading && <WeeklySpendProfile rows={state.rows} />}
+      {!isWeeklyCurrentMonth && (
+        <ReportsOverview metrics={state.metrics} loading={state.loading} />
+      )}
+      {isCurrentVsPrevious && !state.loading && (
+        <ManagementSummary report={state} />
+      )}
+      {isWeeklyCurrentMonth &&
+        (state.loading ? (
+          <ReportLoadingOverlay />
+        ) : (
+          <WeeklySpendProfile
+            rows={state.rows}
+            fromDate={state.fromDate}
+            toDate={state.toDate}
+          />
+        ))}
       {!isWeeklyCurrentMonth && <ReportChart chart={state.chart} />}
 
       {!isWeeklyCurrentMonth && (state.loading || state.rows.length > 0) && (
@@ -84,7 +100,11 @@ function ReportContent({ definition }: { definition: ReportDefinition }) {
             <SearchField
               value={state.search}
               onChange={state.setSearch}
-              placeholder={isCategoryUsage ? "Search category, usage count, amount, or share" : "Search report data"}
+              placeholder={
+                isCategoryUsage
+                  ? "Search category, usage count, amount, or share"
+                  : "Search report data"
+              }
               className="w-full md:w-80"
             />
           }

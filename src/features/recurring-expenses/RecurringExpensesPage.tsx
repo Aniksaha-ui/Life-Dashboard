@@ -1,15 +1,27 @@
-import { CalendarCheck, Play, Plus, RefreshCcw } from "lucide-react";
+import {
+  CalendarCheck,
+  Pencil,
+  Play,
+  Plus,
+  RefreshCcw,
+  Repeat,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { DataTable } from "../../components/DataTable";
 import { MetricCard } from "../../components/MetricCard";
+import { MobileRecordDrawer } from "../../components/MobileRecordDrawer";
 import { SearchField } from "../../components/SearchField";
 import { RecurringExpenseForm } from "./components/RecurringExpenseForm";
 import { getRecurringExpenseColumns } from "./components/columns";
 import { useRecurringExpenses } from "./hooks/useRecurringExpenses";
+import type { RecurringExpenseRow } from "./types";
 
 export default function RecurringExpensesPage() {
   const state = useRecurringExpenses();
   const [editing, setEditing] = useState<any>(null);
+  const [selectedPlan, setSelectedPlan] = useState<RecurringExpenseRow | null>(
+    null,
+  );
   const [open, setOpen] = useState(false);
   const columns = useMemo(
     () =>
@@ -117,6 +129,102 @@ export default function RecurringExpensesPage() {
         loadingText="Loading recurring expenses..."
         hideToolbarDateFilter
         hideViewColumn
+        onRowClick={(row) => setSelectedPlan(row as RecurringExpenseRow)}
+      />
+      <MobileRecordDrawer
+        open={Boolean(selectedPlan)}
+        onClose={() => setSelectedPlan(null)}
+        title={selectedPlan?.titleLabel || "Recurring Expense Details"}
+        badge={selectedPlan?.statusLabel}
+        badgeClassName={
+          selectedPlan?.statusLabel === "Active"
+            ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+            : "bg-slate-100 text-slate-600 ring-slate-200"
+        }
+        recordId={selectedPlan ? `REC #${selectedPlan.id}` : undefined}
+        headerAction={
+          selectedPlan ? (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const target = selectedPlan;
+                  setSelectedPlan(null);
+                  void state.run(target.id);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
+              >
+                <Play className="h-4 w-4" />
+                Run
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const target = selectedPlan;
+                  setSelectedPlan(null);
+                  setEditing(target);
+                  setOpen(true);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                <Pencil className="h-4 w-4" />
+                Edit
+              </button>
+            </div>
+          ) : undefined
+        }
+        hero={
+          selectedPlan
+            ? {
+                icon: Repeat,
+                iconClassName: selectedPlan.dueNow
+                  ? "bg-amber-50 text-amber-600"
+                  : "bg-primary-50 text-primary-600",
+                overline: `${selectedPlan.frequencyLabel} recurring expense`,
+                value: selectedPlan.amountLabel,
+                valueClassName: "tabular-nums text-rose-600",
+                meta: `${selectedPlan.accountLabel} · ${selectedPlan.categoryLabel}`,
+                stats: [
+                  {
+                    label: "Frequency",
+                    value: selectedPlan.frequencyLabel,
+                  },
+                  {
+                    label: "Next run date",
+                    value: selectedPlan.nextRunLabel,
+                    valueClassName: selectedPlan.dueNow
+                      ? "text-amber-700"
+                      : "text-primary-700",
+                  },
+                ],
+              }
+            : undefined
+        }
+        details={
+          selectedPlan
+            ? [
+                { label: "Plan ID", value: `REC #${selectedPlan.id}` },
+                { label: "Status", value: selectedPlan.statusLabel },
+                { label: "Account", value: selectedPlan.accountLabel },
+                { label: "Category", value: selectedPlan.categoryLabel },
+                { label: "Frequency", value: selectedPlan.frequencyLabel },
+                { label: "Next Run", value: selectedPlan.nextRunLabel },
+                { label: "Start Date", value: selectedPlan.start_date },
+                { label: "End Date", value: selectedPlan.end_date },
+                {
+                  label: "Note",
+                  value: selectedPlan.note ? (
+                    <span className="whitespace-pre-wrap">
+                      {selectedPlan.note}
+                    </span>
+                  ) : (
+                    "No remarks added"
+                  ),
+                  fullWidth: true,
+                },
+              ]
+            : []
+        }
       />
       <RecurringExpenseForm
         open={open}
