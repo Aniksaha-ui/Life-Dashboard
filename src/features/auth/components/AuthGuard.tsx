@@ -22,8 +22,8 @@ export function GuestGuard({ children }: AuthGuardProps) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   if (isAuthenticated) {
-    const lastRoute = window.localStorage.getItem("life-dashboard:last-route");
-    return <Navigate to={lastRoute?.startsWith("/") ? lastRoute : "/account"} replace />;
+    // Route through "/" so MenuRouteGuard + LastVisitedRouteRedirect pick an authorized page.
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

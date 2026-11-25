@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Drawer } from "./Drawer";
 
 type Detail = {
@@ -17,12 +18,14 @@ export function MobileRecordDrawer({
   title,
   subtitle,
   details,
+  footer,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   subtitle?: string;
   details: Detail[];
+  footer?: ReactNode;
 }) {
   return (
     <Drawer
@@ -47,6 +50,11 @@ export function MobileRecordDrawer({
           </div>
         ))}
       </dl>
+      {footer && (
+        <div className="mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-4">
+          {footer}
+        </div>
+      )}
     </Drawer>
   );
 }

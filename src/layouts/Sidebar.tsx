@@ -23,6 +23,7 @@ import {
   Layers,
   BellRing,
   Play,
+  ListTree,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -32,9 +33,19 @@ import { useMenuPermissions } from "../hooks/useMenuPermissions";
 const navItems = [
   { group: "Money", to: "/account", icon: CreditCard, label: "Accounts" },
   { group: "Money", to: "/categories", icon: Tags, label: "Categories" },
-  { group: "Money", to: "/transactions", icon: CreditCard, label: "Transaction" },
+  {
+    group: "Money",
+    to: "/transactions",
+    icon: CreditCard,
+    label: "Transaction",
+  },
   { group: "Money", to: "/transfers", icon: Shuffle, label: "Transfers" },
-  { group: "Money", to: "/recurring-expenses", icon: Repeat, label: "Recurring Expenses" },
+  {
+    group: "Money",
+    to: "/recurring-expenses",
+    icon: Repeat,
+    label: "Recurring Expenses",
+  },
   { group: "Money", to: "/budgets", icon: WalletCards, label: "Budgets" },
   {
     group: "Portfolio",
@@ -51,10 +62,26 @@ const navItems = [
     ],
   },
   { group: "Tools", to: "/file-manager", icon: Folder, label: "File Manager" },
-  { group: "Tools", to: "/financial-intelligence", icon: BrainCircuit, label: "Financial Intelligence" },
-  { group: "Tools", to: "/report-delivery", icon: BellRing, label: "Report Delivery" },
-  { group: "Tools", to: "/report-delivery/run-jobs", icon: Play, label: "Run Report Jobs" },
+  {
+    group: "Tools",
+    to: "/financial-intelligence",
+    icon: BrainCircuit,
+    label: "Financial Intelligence",
+  },
+  {
+    group: "Tools",
+    to: "/report-delivery",
+    icon: BellRing,
+    label: "Report Delivery",
+  },
+  {
+    group: "Tools",
+    to: "/report-delivery/run-jobs",
+    icon: Play,
+    label: "Run Report Jobs",
+  },
   { group: "Tools", to: "/reports", icon: BarChart3, label: "Reports" },
+  { group: "Tools", to: "/menu-items", icon: ListTree, label: "Menu Items" },
 ];
 
 interface SidebarProps {
@@ -154,7 +181,8 @@ export function Sidebar({
               className={clsx(
                 "flex w-full items-center justify-between rounded-lg px-3 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100",
                 isMobileOpen ? "min-h-11 py-2.5" : "py-2",
-                expandedItem === item.label && "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200",
+                expandedItem === item.label &&
+                  "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200",
               )}
             >
               {content}
@@ -177,7 +205,12 @@ export function Sidebar({
               )}
             >
               <div className="overflow-hidden">
-                <div className={clsx("mt-1", isMobileOpen ? "grid grid-cols-2 gap-1" : "ml-9 space-y-1")}>
+                <div
+                  className={clsx(
+                    "mt-1",
+                    isMobileOpen ? "grid grid-cols-2 gap-1" : "ml-9 space-y-1",
+                  )}
+                >
                   {item.children.map((child: any) => (
                     <NavLink
                       key={child.to}
@@ -226,7 +259,7 @@ export function Sidebar({
             </NavLink>
           </Tooltip>
         ) : (
-            <NavLink
+          <NavLink
             to={item.to}
             className={({ isActive }) =>
               clsx(
@@ -271,14 +304,15 @@ export function Sidebar({
         <div
           className={clsx(
             "h-16 flex items-center border-b border-slate-100 transition-all duration-300",
-            isCompact
-              ? "px-4 justify-center"
-              : "px-5 justify-between md:px-6",
+            isCompact ? "px-4 justify-center" : "px-5 justify-between md:px-6",
           )}
         >
           {!isCompact ? (
             <>
-              <div className="flex min-w-0 items-center gap-2.5" aria-label="Life Dashboard">
+              <div
+                className="flex min-w-0 items-center gap-2.5"
+                aria-label="Life Dashboard"
+              >
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary-600 text-white shadow-sm">
                   <LayoutDashboard className="h-4 w-4" />
                 </span>
@@ -324,16 +358,24 @@ export function Sidebar({
         <nav
           className={clsx(
             "flex-1 py-3 scrollbar-hide transition-all duration-300",
-            isCompact ? "space-y-1 overflow-visible px-2" : "space-y-0.5 overflow-y-auto px-3 pb-6",
+            isCompact
+              ? "space-y-1 overflow-visible px-2"
+              : "space-y-0.5 overflow-y-auto px-3 pb-6",
           )}
         >
           {visibleItems.map((item, index) => {
-            const previousGroup = index > 0 ? visibleItems[index - 1].group : "";
+            const previousGroup =
+              index > 0 ? visibleItems[index - 1].group : "";
             const showGroup = !isCompact && item.group !== previousGroup;
             return (
               <div key={item.label}>
                 {showGroup && (
-                  <p className={clsx("px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400", index === 0 ? "pt-1" : "pt-4")}>
+                  <p
+                    className={clsx(
+                      "px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400",
+                      index === 0 ? "pt-1" : "pt-4",
+                    )}
+                  >
                     {item.group}
                   </p>
                 )}

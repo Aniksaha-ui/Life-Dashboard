@@ -1,14 +1,16 @@
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { useMenuPermissions } from "../hooks/useMenuPermissions";
 import { Header } from "./Header";
 import { MobileBottomNavigation } from "./MobileBottomNavigation";
 import { Sidebar } from "./Sidebar";
 
+const LAST_ROUTE_KEY = "life-dashboard:last-route";
+
 export function AppLayout() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const isInitialLocation = useRef(true);
+  const { isSuccess, isPathAuthorized } = useMenuPermissions();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
@@ -21,33 +23,45 @@ export function AppLayout() {
   }, []);
 
   useEffect(() => {
-    const path = `${location.pathname}${location.search}${location.hash}`;
-    const savedPath = window.localStorage.getItem("life-dashboard:last-route");
-    const shouldRestoreSavedPath =
-      isInitialLocation.current &&
-      savedPath?.startsWith("/") &&
-      savedPath !== path;
-
-    if (shouldRestoreSavedPath) {
-      isInitialLocation.current = false;
-      navigate(savedPath, { replace: true });
-      return;
+    if (
+      isSuccess &&
+      location.pathname !== "/" &&
+      isPathAuthorized(location.pathname)
+    ) {
+      const path = `${location.pathname}${location.search}${location.hash}`;
+      window.localStorage.setItem(LAST_ROUTE_KEY, path);
     }
-
-    if (!isInitialLocation.current && location.pathname !== "/") {
-      window.localStorage.setItem("life-dashboard:last-route", path);
-    }
-
-    isInitialLocation.current = false;
-  }, [location.hash, location.pathname, location.search, navigate]);
+  }, [
+    isSuccess,
+    isPathAuthorized,
+    location.hash,
+    location.pathname,
+    location.search,
+  ]);
 
   useEffect(() => {
     const persistCurrentLocation = () => {
-      window.localStorage.setItem("life-dashboard:last-route", `${location.pathname}${location.search}${location.hash}`);
+      if (
+        isSuccess &&
+        location.pathname !== "/" &&
+        isPathAuthorized(location.pathname)
+      ) {
+        window.localStorage.setItem(
+          LAST_ROUTE_KEY,
+          `${location.pathname}${location.search}${location.hash}`,
+        );
+      }
     };
     window.addEventListener("beforeunload", persistCurrentLocation);
-    return () => window.removeEventListener("beforeunload", persistCurrentLocation);
-  }, [location.hash, location.pathname, location.search]);
+    return () =>
+      window.removeEventListener("beforeunload", persistCurrentLocation);
+  }, [
+    isSuccess,
+    isPathAuthorized,
+    location.hash,
+    location.pathname,
+    location.search,
+  ]);
 
   return (
     <div className="h-dvh overflow-hidden bg-white">
@@ -68,7 +82,10 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
-      <MobileBottomNavigation hidden={isMobileNavOpen} onOpenMenu={() => setIsMobileNavOpen(true)} />
+      <MobileBottomNavigation
+        hidden={isMobileNavOpen}
+        onOpenMenu={() => setIsMobileNavOpen(true)}
+      />
     </div>
   );
 }
