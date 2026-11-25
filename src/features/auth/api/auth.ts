@@ -3,6 +3,7 @@ import { useAuthStore } from "../../../stores/authStore";
 import { setCookie } from "../../../utils/cookie";
 import type { LoginFormValues } from "../validation/loginValidation";
 import { requestLogin, type ExpenseLoginResponse } from "./login";
+import { useQueryClient } from "@tanstack/react-query";
 
 const SESSION_COOKIE_DAYS = 45;
 const EXPENSE_AUTH_STORAGE_KEY = "travel-agency-admin-auth-session";
@@ -23,6 +24,7 @@ export const useLoginMutation = (options?: {
   onError?: (error: Error) => void;
 }) => {
   const setAuth = useAuthStore((state) => state.setAuth);
+  const queryClient = useQueryClient();
 
   return useApiMutation<ExpenseLoginResponse | null, LoginFormValues>(
     (credentials) => requestLogin(credentials.email, credentials.password),
@@ -31,6 +33,7 @@ export const useLoginMutation = (options?: {
       showErrorToast: false,
       onSuccess: (data) => {
         const session = resolveSession(data);
+        queryClient.removeQueries({ queryKey: ["menu-permissions"] });
         setCookie("session_id", session.token, SESSION_COOKIE_DAYS);
         window.localStorage.setItem(
           EXPENSE_AUTH_STORAGE_KEY,

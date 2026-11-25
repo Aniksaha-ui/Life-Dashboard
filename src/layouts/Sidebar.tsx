@@ -27,6 +27,7 @@ import {
 import { useEffect, useState, type MouseEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Tooltip } from "../components/Tooltip";
+import { useMenuPermissions } from "../hooks/useMenuPermissions";
 
 const navItems = [
   { group: "Money", to: "/account", icon: CreditCard, label: "Accounts" },
@@ -70,6 +71,14 @@ export function Sidebar({
   onMobileClose,
 }: SidebarProps) {
   const location = useLocation();
+  const { hasPath } = useMenuPermissions();
+  const visibleItems = navItems.flatMap<(typeof navItems)[number]>((item) => {
+    if (item.children) {
+      const children = item.children.filter((child) => hasPath(child.to));
+      return children.length ? [{ ...item, children }] : [];
+    }
+    return item.to && hasPath(item.to) ? [item] : [];
+  });
   // A phone drawer must always show its labels. Desktop collapse preference
   // should only affect the persistent desktop rail.
   const isCompact = isCollapsed && !isMobileOpen;
@@ -318,8 +327,8 @@ export function Sidebar({
             isCompact ? "space-y-1 overflow-visible px-2" : "space-y-0.5 overflow-y-auto px-3 pb-6",
           )}
         >
-          {navItems.map((item, index) => {
-            const previousGroup = index > 0 ? navItems[index - 1].group : "";
+          {visibleItems.map((item, index) => {
+            const previousGroup = index > 0 ? visibleItems[index - 1].group : "";
             const showGroup = !isCompact && item.group !== previousGroup;
             return (
               <div key={item.label}>

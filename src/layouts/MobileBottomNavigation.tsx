@@ -2,6 +2,7 @@ import { BrainCircuit, CreditCard, Menu, ReceiptText, WalletCards } from "lucide
 import { createPortal } from "react-dom";
 import { NavLink, useLocation } from "react-router-dom";
 import { clsx } from "clsx";
+import { useMenuPermissions } from "../hooks/useMenuPermissions";
 
 const items = [
   { to: "/account", label: "Accounts", icon: CreditCard },
@@ -20,7 +21,9 @@ export function MobileBottomNavigation({
   onOpenMenu: () => void;
 }) {
   const { pathname } = useLocation();
-  const moreActive = !items.some((item) => isItemActive(pathname, item.to));
+  const { hasPath } = useMenuPermissions();
+  const visibleItems = items.filter((item) => hasPath(item.to));
+  const moreActive = !visibleItems.some((item) => isItemActive(pathname, item.to));
 
   if (hidden) return null;
 
@@ -30,14 +33,14 @@ export function MobileBottomNavigation({
       style={{ position: "fixed", left: 0, right: 0, bottom: 0 }}
       aria-label="Mobile navigation"
     >
-      <div className="pointer-events-auto mx-auto grid max-w-md grid-cols-5 gap-1 rounded-[1.35rem] border border-slate-200/90 bg-white/95 p-1.5 shadow-[0_12px_32px_rgba(15,23,42,0.16)] backdrop-blur-md">
-        {items.map(({ to, label, icon: Icon }) => (
+      <div className="pointer-events-auto mx-auto flex max-w-md gap-1 rounded-[1.35rem] border border-slate-200/90 bg-white/95 p-1.5 shadow-[0_12px_32px_rgba(15,23,42,0.16)] backdrop-blur-md">
+        {visibleItems.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
             className={({ isActive }) =>
               clsx(
-                "flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-semibold leading-none transition-colors",
+                "flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-semibold leading-none transition-colors",
                 isActive ? "bg-primary-600 text-white shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700",
               )
             }
@@ -50,7 +53,7 @@ export function MobileBottomNavigation({
           type="button"
           onClick={onOpenMenu}
           className={clsx(
-            "flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-semibold leading-none transition-colors",
+            "flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-semibold leading-none transition-colors",
             moreActive ? "bg-primary-50 text-primary-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700",
           )}
         >
