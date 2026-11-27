@@ -1,5 +1,9 @@
 import { useAuthStore } from "../../../stores/authStore";
 import { getCookie } from "../../../utils/cookie";
+import {
+  endUnauthenticatedSession,
+  isUnauthenticatedResponse,
+} from "../../../utils/session";
 import type { MonthlyWeekComparisonReport } from "../types";
 
 const base = () =>
@@ -16,6 +20,10 @@ const request = async <T>(path: string, init: RequestInit = {}) => {
     },
   });
   const payload = await response.json().catch(() => null);
+  if (isUnauthenticatedResponse(response, payload)) {
+    endUnauthenticatedSession();
+    throw new Error("Your session has expired. Please sign in again.");
+  }
   if (
     !response.ok ||
     payload?.isExecute === false ||

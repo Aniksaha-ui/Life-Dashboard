@@ -1,5 +1,9 @@
 import { getCookie } from "../../../utils/cookie";
 import { useAuthStore } from "../../../stores/authStore";
+import {
+  endUnauthenticatedSession,
+  isUnauthenticatedResponse,
+} from "../../../utils/session";
 
 const baseUrl = () =>
   (import.meta.env.VITE_BASE_URL as string | undefined)?.replace(/\/+$/, "") ??
@@ -16,6 +20,10 @@ const request = async <T>(path: string, init: RequestInit = {}) => {
     },
   });
   const payload = await response.json().catch(() => null);
+  if (isUnauthenticatedResponse(response, payload)) {
+    endUnauthenticatedSession();
+    throw new Error("Your session has expired. Please sign in again.");
+  }
   if (!response.ok || payload?.isExecute === false)
     throw new Error(payload?.message || payload?.msg || "File request failed.");
   return (payload?.data ?? payload) as T;
@@ -56,6 +64,10 @@ export const downloadFile = async (id: string | number) => {
     `${baseUrl()}/file-manager/files/${id}/download`,
     { headers: { Authorization: `Bearer ${token()}` } },
   );
+  if (response.status === 401) {
+    endUnauthenticatedSession();
+    throw new Error("Your session has expired. Please sign in again.");
+  }
   if (!response.ok) throw new Error("Download failed.");
   const url = URL.createObjectURL(await response.blob());
   const link = document.createElement("a");
@@ -65,10 +77,33 @@ export const downloadFile = async (id: string | number) => {
   URL.revokeObjectURL(url);
 };
 export const getFilePreview = async (id: string | number) => {
-  const response = await fetch(`${baseUrl()}/file-manager/files/${id}/preview`, { headers: { Authorization: `Bearer ${token()}` } });
+  const response = await fetch(
+    `${baseUrl()}/file-manager/files/${id}/preview`,
+    { headers: { Authorization: `Bearer ${token()}` } },
+  );
+  if (response.status === 401) {
+    endUnauthenticatedSession();
+    throw new Error("Your session has expired. Please sign in again.");
+  }
   if (!response.ok) throw new Error("Preview is not available for this file.");
-  return { url: URL.createObjectURL(await response.blob()), mime: response.headers.get("content-type") || "" };
+  return {
+    url: URL.createObjectURL(await response.blob()),
+    mime: response.headers.get("content-type") || "",
+  };
 };
-export const getTextContent = (id: string | number) => request<{ content?: string }>(`/file-manager/files/${id}/content`);
-export const saveTextContent = (id: string | number, content: string) => request(`/file-manager/files/${id}/content`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content }) });
-export const uploadFileVersion = (id: string | number, file: File) => { const body = new FormData(); body.append("file", file); return request(`/file-manager/files/${id}/versions`, { method: "POST", body }); };
+export const getTextContent = (id: string | number) =>
+  request<{ content?: string }>(`/file-manager/files/${id}/content`);
+export const saveTextContent = (id: string | number, content: string) =>
+  request(`/file-manager/files/${id}/content`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content }),
+  });
+export const uploadFileVersion = (id: string | number, file: File) => {
+  const body = new FormData();
+  body.append("file", file);
+  return request(`/file-manager/files/${id}/versions`, {
+    method: "POST",
+    body,
+  });
+};

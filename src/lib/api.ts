@@ -6,7 +6,8 @@ import type {
 } from "axios";
 import axios, { AxiosHeaders } from "axios";
 import type { ApiResponse } from "../types/common";
-import { getCookie, removeCookie } from "../utils/cookie";
+import { getCookie } from "../utils/cookie";
+import { endUnauthenticatedSession } from "../utils/session";
 import { showToast } from "./toast";
 
 // Environment variables
@@ -19,19 +20,8 @@ let isLoggingOut = false;
  */
 const handleLogout = (message?: string) => {
   if (isLoggingOut) return;
-
-  // Don't redirect if we are already on the login page
-  if (window.location.pathname === "/login") return;
-
   isLoggingOut = true;
-
-  removeCookie("session_id");
-  showToast(message || "Session expired. Please login again.", "error");
-
-  // Use a small delay for the user to see the toast before redirecting
-  setTimeout(() => {
-    window.location.href = "/login";
-  }, 1000);
+  endUnauthenticatedSession(message || "Session expired. Please login again.");
 };
 
 export const logoutDueToSessionExpiry = (message?: string) => {
