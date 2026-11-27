@@ -24,6 +24,7 @@ import {
   updateProject,
 } from "./api";
 import type { Project, ProjectValues } from "./types";
+import { descriptionText, DescriptionView, ProjectDescriptionEditor } from "./ProjectDescription";
 
 const blank: ProjectValues = {
   project_name: "",
@@ -113,6 +114,10 @@ function ProjectForm({
         id="project-form"
         onSubmit={async (event) => {
           event.preventDefault();
+          if (!descriptionText(values.description).trim()) {
+            toast.error("Please enter a project description.");
+            return;
+          }
           setSaving(true);
           try {
             await onSave(values, project?.id);
@@ -137,16 +142,9 @@ function ProjectForm({
           {field("end_date", "End date", "date", true)}
           {field("published_at", "Published date", "date", true)}
         </div>
-        <OutlinedField label="Description">
-          <textarea
-            required
-            value={values.description}
-            onChange={(event) =>
-              setValues({ ...values, description: event.target.value })
-            }
-            className="min-h-24 w-full resize-y border-0 bg-transparent p-0 text-sm outline-none focus:bg-transparent focus:shadow-none"
-          />
-        </OutlinedField>
+        <div><div className="mb-2 text-sm font-medium text-slate-700">Description</div>
+          <ProjectDescriptionEditor value={values.description} onChange={(description) => setValues((current) => ({ ...current, description }))} />
+        </div>
         <label className="flex h-10 items-center gap-3 rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700">
           <input
             type="checkbox"
@@ -188,7 +186,7 @@ export default function ProjectsPage() {
   const rows = useMemo(
     () =>
       items.filter((item) =>
-        `${item.project_name} ${item.description} ${item.frontend_tech} ${item.backend_tech}`
+        `${item.project_name} ${descriptionText(item.description || "")} ${item.frontend_tech} ${item.backend_tech}`
           .toLowerCase()
           .includes(search.toLowerCase()),
       ),
@@ -246,7 +244,7 @@ export default function ProjectsPage() {
                 {row.original.project_name}
               </p>
               <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">
-                {row.original.description}
+                {descriptionText(row.original.description || "")}
               </p>
             </div>
           </div>
@@ -497,9 +495,7 @@ export default function ProjectsPage() {
                 {
                   label: "Description",
                   value: viewing.description ? (
-                    <span className="whitespace-pre-line leading-6 text-slate-700">
-                      {viewing.description}
-                    </span>
+                    <DescriptionView value={viewing.description} />
                   ) : (
                     "No description provided."
                   ),
